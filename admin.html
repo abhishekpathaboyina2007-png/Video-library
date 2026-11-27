@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Library | Admin</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 30px;
+      background: #090909;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .container { max-width: 850px; margin: auto; }
+    h1 { color: #fff; }
+    .panel {
+      background: #171717;
+      padding: 24px;
+      border: 1px solid #333;
+      border-radius: 14px;
+      margin: 20px 0;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 13px;
+      margin: 8px 0 15px;
+      background: #242424;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 7px;
+    }
+    button {
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 7px;
+      background: #e50914;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #b80710; }
+    .hidden { display: none; }
+    #status { margin-top: 15px; color: #ccc; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>VIDEO LIBRARY</h1>
+  <p>Admin Dashboard</p>
+
+  <section class="panel" id="loginPanel">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <label>Admin Password</label>
+      <input type="password" id="password" required>
+      <button type="submit">Login</button>
+    </form>
+  </section>
+
+  <section class="hidden" id="dashboard">
+    <div class="panel">
+      <h2>Add New Video</h2>
+      <form id="videoForm">
+        <label>Video Title</label>
+        <input id="title" required>
+
+        <label>YouTube URL</label>
+        <input id="youtubeUrl" type="url" required
+               placeholder="https://www.youtube.com/watch?v=...">
+
+        <label>Category</label>
+        <input id="category" placeholder="Entertainment">
+
+        <label>Description</label>
+        <textarea id="description"></textarea>
+
+        <button type="submit">Add Video</button>
+      </form>
+    </div>
+    <p id="status"></p>
+    <button id="logoutButton" type="button">Logout</button>
+  </section>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
