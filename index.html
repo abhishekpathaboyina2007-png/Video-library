@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Video Library</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #101114;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 24px 7%;
+      background: #18191e;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .hero {
+      min-height: 350px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #242b40, #101114);
+    }
+    .hero h1 { font-size: 42px; margin-bottom: 10px; }
+    .hero p { color: #b7bac5; }
+    main { padding: 35px 7%; }
+    .videos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 22px;
+    }
+    .card {
+      background: #202127;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card img { width: 100%; display: block; }
+    .card h3 { padding: 0 15px; }
+    @media(max-width:600px) {
+      .hero h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <header>MY VIDEO LIBRARY</header>
+
+  <section class="hero">
+    <h1>Welcome to My Library</h1>
+    <p>Discover videos and playlists in one place.</p>
+  </section>
+
+  <main>
+    <h2>Latest Videos</h2>
+    <div class="videos">
+      <div class="card">
+        <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="Video thumbnail">
+        <h3>Sample YouTube Video</h3>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
