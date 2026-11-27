@@ -8,8 +8,14 @@ let currentCategory = "All";
 
 function loadLibrary() {
   const script = document.createElement("script");
-  script.src = API_URL + "?action=publicData&callback=window.videoLibraryCallback";
-  script.onerror = () => showError("Unable to connect to the library.");
+
+  script.src = API_URL +
+    "?action=publicData&callback=window.videoLibraryCallback&t=" +
+    Date.now();
+
+  script.onerror = () =>
+    showError("Unable to connect to the library.");
+
   document.body.appendChild(script);
 }
 
@@ -20,6 +26,7 @@ window.videoLibraryCallback = function(data) {
   }
 
   libraryData = data;
+
   applySettings(data.settings || {});
   renderCategories(data.categories || []);
   renderVideos(data.videos || []);
@@ -39,34 +46,113 @@ function escapeHTML(value) {
 function safeYouTubeURL(value) {
   try {
     const url = new URL(value);
-    if (!["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be", "www.youtube-nocookie.com"].includes(url.hostname)) return "";
+
+    if (![
+      "youtube.com",
+      "www.youtube.com",
+      "m.youtube.com",
+      "youtu.be",
+      "www.youtube-nocookie.com"
+    ].includes(url.hostname)) return "";
+
     return url.href;
   } catch {
     return "";
   }
 }
 
-function applySettings(settings) {
-  if (settings.site_title) {
-    document.title = settings.site_title;
-    document.querySelector(".logo").textContent = settings.site_title;
-  }
+function safeImageURL(value) {
+  try {
+    const url = new URL(value);
 
-  if (settings.hero_title) {
-    document.querySelector(".hero h1").textContent = settings.hero_title;
-  }
-
-  if (settings.hero_subtitle) {
-    document.querySelector(".hero p").textContent = settings.hero_subtitle;
-  }
-
-  if (settings.accent_color) {
-    document.documentElement.style.setProperty("--accent", settings.accent_color);
+    return url.protocol === "https:" ? url.href : "";
+  } catch {
+    return "";
   }
 }
 
+/* WEBSITE CUSTOMIZATION */
+
+function applySettings(settings) {
+
+  // WEBSITE NAME
+  const siteName = settings.siteName || settings.site_title;
+
+  if (siteName) {
+    document.title = siteName;
+
+    const logo = document.querySelector(".logo");
+
+    if (logo) {
+      logo.textContent = siteName;
+    }
+  }
+
+  // WEBSITE TAGLINE
+  const tagline = settings.siteTagline || settings.hero_subtitle;
+
+  if (tagline) {
+    const heroSubtitle = document.querySelector(".hero p");
+
+    if (heroSubtitle) {
+      heroSubtitle.textContent = tagline;
+    }
+  }
+
+  // LOGO IMAGE
+  const logoURL = safeImageURL(settings.siteLogo || "");
+
+  const logoElement = document.querySelector(".logo");
+
+  if (logoElement && logoURL) {
+    const image = document.createElement("img");
+
+    image.src = logoURL;
+    image.alt = siteName || "Website Logo";
+    image.style.maxHeight = "45px";
+    image.style.maxWidth = "180px";
+    image.style.objectFit = "contain";
+
+    logoElement.textContent = "";
+    logoElement.appendChild(image);
+  }
+
+  // BACKGROUND COLOUR
+  const background = settings.siteBackground;
+
+  if (background && /^#[0-9a-fA-F]{6}$/.test(background)) {
+    document.body.style.backgroundColor = background;
+    document.documentElement.style.setProperty(
+      "--background",
+      background
+    );
+  }
+
+  // ACCENT COLOUR
+  const accent = settings.siteAccent || settings.accent_color;
+
+  if (accent && /^#[0-9a-fA-F]{6}$/.test(accent)) {
+    document.documentElement.style.setProperty(
+      "--accent",
+      accent
+    );
+  }
+
+  // EXISTING HERO TITLE SETTING
+  if (settings.hero_title) {
+    const heroTitle = document.querySelector(".hero h1");
+
+    if (heroTitle) {
+      heroTitle.textContent = settings.hero_title;
+    }
+  }
+}
+
+/* CATEGORY FILTERS */
+
 function renderCategories(categories) {
   const filters = document.getElementById("filters");
+
   if (!filters) return;
 
   filters.innerHTML = "";
@@ -82,30 +168,49 @@ function renderCategories(categories) {
 
 function addFilter(category) {
   const filters = document.getElementById("filters");
+
   const button = document.createElement("button");
 
-  button.className = "filter" + (category === "All" ? " active" : "");
+  button.className =
+    "filter" + (category === "All" ? " active" : "");
+
   button.textContent = category;
+
   button.onclick = () => {
     currentCategory = category;
-    document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+
+    document.querySelectorAll(".filter").forEach(b =>
+      b.classList.remove("active")
+    );
+
     button.classList.add("active");
+
     renderVideos(libraryData.videos || []);
   };
 
   filters.appendChild(button);
 }
 
+/* VIDEO DISPLAY */
+
 function renderVideos(videos) {
   const grid = document.getElementById("videoGrid");
   const empty = document.getElementById("noVideos");
-  const query = (document.getElementById("search")?.value || "").toLowerCase();
+
+  const query = (
+    document.getElementById("search")?.value || ""
+  ).toLowerCase();
 
   if (!grid) return;
 
   const filtered = videos.filter(video => {
-    const matchesCategory = currentCategory === "All" || video.Category === currentCategory;
-    const matchesSearch = String(video.Title || "").toLowerCase().includes(query);
+    const matchesCategory =
+      currentCategory === "All" ||
+      video.Category === currentCategory;
+
+    const matchesSearch =
+      String(video.Title || "").toLowerCase().includes(query);
+
     return matchesCategory && matchesSearch;
   });
 
@@ -113,28 +218,50 @@ function renderVideos(videos) {
     const id = String(video.YouTube_ID || "");
     const url = safeYouTubeURL(video.YouTube_URL);
 
-    if (!/^[A-Za-z0-9_-]{11}$/.test(id) || !url) return "";
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id) || !url) {
+      return "";
+    }
 
-    const thumbnail = "https://img.youtube.com/vi/" + id + "/hqdefault.jpg";
+    const thumbnail =
+      "https://img.youtube.com/vi/" + id + "/hqdefault.jpg";
 
     return `
       <article class="card">
-        <img class="thumb" src="${thumbnail}" alt="${escapeHTML(video.Title)}" loading="lazy">
+        <img class="thumb"
+          src="${thumbnail}"
+          alt="${escapeHTML(video.Title)}"
+          loading="lazy">
+
         <div class="card-info">
           <h3>${escapeHTML(video.Title)}</h3>
           <p>${escapeHTML(video.Category || "Uncategorized")}</p>
-          ${video.Date_Added ? `<p>${escapeHTML(video.Date_Added)}</p>` : ""}
-          <a class="play" href="${escapeHTML(url)}" target="_blank" rel="noopener">▶ Watch Video</a>
+
+          ${video.Date_Added
+            ? `<p>${escapeHTML(video.Date_Added)}</p>`
+            : ""
+          }
+
+          <a class="play"
+            href="${escapeHTML(url)}"
+            target="_blank"
+            rel="noopener">
+            ▶ Watch Video
+          </a>
         </div>
       </article>
     `;
   }).join("");
 
-  if (empty) empty.hidden = filtered.length !== 0;
+  if (empty) {
+    empty.hidden = filtered.length !== 0;
+  }
 }
+
+/* PLAYLIST DISPLAY */
 
 function renderPlaylists(playlists) {
   const section = document.getElementById("playlists");
+
   if (!section) return;
 
   const visible = playlists.filter(item =>
@@ -143,20 +270,36 @@ function renderPlaylists(playlists) {
 
   const cards = visible.map(item => {
     const url = safeYouTubeURL(item.YouTube_URL);
+
     if (!url) return "";
 
-    const thumbnail = item.Thumbnail_URL || "";
+    const thumbnail = safeImageURL(item.Thumbnail_URL || "");
 
     return `
       <article class="card">
         ${thumbnail
-          ? `<img class="thumb" src="${escapeHTML(thumbnail)}" alt="${escapeHTML(item.Title)}" loading="lazy">`
-          : `<div class="thumb" style="background:linear-gradient(135deg,#252b40,#17181d)"></div>`
+          ? `<img class="thumb"
+              src="${escapeHTML(thumbnail)}"
+              alt="${escapeHTML(item.Title)}"
+              loading="lazy">`
+          : `<div class="thumb"
+              style="background:linear-gradient(135deg,#252b40,#17181d)">
+            </div>`
         }
+
         <div class="card-info">
           <h3>${escapeHTML(item.Title)}</h3>
-          <p>${escapeHTML(item.Description || item.Category || "Playlist")}</p>
-          <a class="play" href="${escapeHTML(url)}" target="_blank" rel="noopener">▶ Open Playlist</a>
+
+          <p>${escapeHTML(
+            item.Description || item.Category || "Playlist"
+          )}</p>
+
+          <a class="play"
+            href="${escapeHTML(url)}"
+            target="_blank"
+            rel="noopener">
+            ▶ Open Playlist
+          </a>
         </div>
       </article>
     `;
@@ -167,6 +310,7 @@ function renderPlaylists(playlists) {
       <h2>Featured Playlists</h2>
       <small>${visible.length} collections</small>
     </div>
+
     ${cards
       ? `<div class="grid">${cards}</div>`
       : `<p class="empty">No playlists available yet.</p>`
@@ -174,15 +318,25 @@ function renderPlaylists(playlists) {
   `;
 }
 
+/* ERROR HANDLING */
+
 function showError(message) {
   const grid = document.getElementById("videoGrid");
-  if (grid) grid.innerHTML = `<p class="empty">${escapeHTML(message)}</p>`;
+
+  if (grid) {
+    grid.innerHTML =
+      `<p class="empty">${escapeHTML(message)}</p>`;
+  }
 }
 
-// Connect search box to live data
+/* SEARCH */
+
 function filterVideos() {
-  if (libraryData) renderVideos(libraryData.videos || []);
+  if (libraryData) {
+    renderVideos(libraryData.videos || []);
+  }
 }
 
-// Start loading the library
+/* START WEBSITE */
+
 document.addEventListener("DOMContentLoaded", loadLibrary);
