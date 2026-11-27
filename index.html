@@ -2,69 +2,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Video Library</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #101114;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    header {
-      padding: 24px 7%;
-      background: #18191e;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .hero {
-      min-height: 350px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 30px;
-      background: linear-gradient(135deg, #242b40, #101114);
-    }
-    .hero h1 { font-size: 42px; margin-bottom: 10px; }
-    .hero p { color: #b7bac5; }
-    main { padding: 35px 7%; }
-    .videos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 22px;
-    }
-    .card {
-      background: #202127;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .card img { width: 100%; display: block; }
-    .card h3 { padding: 0 15px; }
-    @media(max-width:600px) {
-      .hero h1 { font-size: 30px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Library | Discover More</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#090a0d;color:#fff;font-family:Arial,sans-serif}
+header{height:75px;padding:0 6%;display:flex;align-items:center;
+justify-content:space-between;background:#101115;border-bottom:1px solid #25262c}
+.logo{font-size:23px;font-weight:800;letter-spacing:1px}
+.logo span{color:#e50914}
+nav{display:flex;gap:25px}
+nav a{color:#bbb;text-decoration:none;font-size:14px}
+nav a:hover{color:white}
+.hero{min-height:390px;padding:75px 8%;display:flex;flex-direction:column;
+justify-content:center;background:linear-gradient(90deg,#090a0d 10%,#15151c 65%,#24202a)}
+.hero .tag{color:#e50914;font-size:12px;letter-spacing:3px;font-weight:bold}
+.hero h1{font-size:clamp(35px,6vw,65px);margin:18px 0 12px}
+.hero p{color:#aaa;max-width:480px;line-height:1.7}
+.content{padding:35px 6%}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.section-head h2{font-size:22px}
+.section-head small{color:#999}
+.search{width:100%;max-width:400px;padding:13px 16px;background:#191a20;
+border:1px solid #333;border-radius:8px;color:white;outline:none;margin:5px 0 25px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:25px}
+.filter{border:1px solid #333;background:#191a20;color:#ccc;padding:9px 16px;
+border-radius:20px;cursor:pointer}
+.filter.active,.filter:hover{background:#e50914;color:white;border-color:#e50914}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px}
+.card{background:#17181d;border-radius:10px;overflow:hidden;transition:.25s}
+.card:hover{transform:translateY(-5px)}
+.thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#25262b}
+.card-info{padding:15px}
+.card-info h3{font-size:16px;margin-bottom:8px}
+.card-info p{font-size:12px;color:#999}
+.play{display:inline-block;margin-top:13px;background:#e50914;color:white;
+text-decoration:none;padding:9px 15px;border-radius:5px;font-size:12px}
+.empty{color:#888;padding:30px 0}
+footer{text-align:center;padding:30px;color:#777;border-top:1px solid #25262c;font-size:12px}
+@media(max-width:600px){header{padding:0 5%}nav{gap:12px}nav a{font-size:12px}
+.hero{min-height:320px;padding:55px 7%}.content{padding:28px 5%}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card-info{padding:10px}.card-info h3{font-size:13px}}
+</style>
 </head>
 <body>
-  <header>MY VIDEO LIBRARY</header>
 
-  <section class="hero">
-    <h1>Welcome to My Library</h1>
-    <p>Discover videos and playlists in one place.</p>
-  </section>
+<header>
+  <div class="logo">VIDEO<span>LIBRARY</span></div>
+  <nav>
+    <a href="#videos">Videos</a>
+    <a href="#playlists">Playlists</a>
+  </nav>
+</header>
 
-  <main>
+<section class="hero">
+  <div class="tag">YOUR PERSONAL ENTERTAINMENT HUB</div>
+  <h1>Discover. Watch.<br>Experience.</h1>
+  <p>Explore a curated collection of videos and playlists, all in one place. Find something worth watching today.</p>
+</section>
+
+<main>
+<section class="content" id="videos">
+  <div class="section-head">
     <h2>Latest Videos</h2>
-    <div class="videos">
-      <div class="card">
-        <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="Video thumbnail">
-        <h3>Sample YouTube Video</h3>
+    <small>Explore the collection</small>
+  </div>
+  <input class="search" id="search" placeholder="Search videos..." oninput="filterVideos()">
+  <div class="filters" id="filters">
+    <button class="filter active" onclick="setCategory('All',this)">All</button>
+    <button class="filter" onclick="setCategory('Entertainment',this)">Entertainment</button>
+    <button class="filter" onclick="setCategory('Education',this)">Education</button>
+    <button class="filter" onclick="setCategory('Music',this)">Music</button>
+  </div>
+  <div class="grid" id="videoGrid">
+    <article class="card" data-title="Sample video" data-category="Entertainment">
+      <img class="thumb" src="https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="Video thumbnail">
+      <div class="card-info">
+        <h3>Sample Video</h3>
+        <p>Entertainment</p>
+        <a class="play" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener">▶ Watch Video</a>
       </div>
-    </div>
-  </main>
+    </article>
+  </div>
+  <p class="empty" id="noVideos" hidden>No videos found.</p>
+</section>
+
+<section class="content" id="playlists">
+  <div class="section-head">
+    <h2>Featured Playlists</h2>
+    <small>Your collections</small>
+  </div>
+  <p class="empty">Your playlists will appear here once added through the admin dashboard.</p>
+</section>
+</main>
+
+<footer>© 2026 Video Library · All rights reserved</footer>
+
+<script>
+let selectedCategory = "All";
+
+function setCategory(category,button){
+  selectedCategory=category;
+  document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");
+  filterVideos();
+}
+
+function filterVideos(){
+  const query=document.getElementById("search").value.toLowerCase();
+  let visible=0;
+  document.querySelectorAll("#videoGrid .card").forEach(card=>{
+    const title=card.dataset.title.toLowerCase();
+    const category=card.dataset.category;
+    const match=title.includes(query) &&
+      (selectedCategory==="All" || category===selectedCategory);
+    card.style.display=match?"":"none";
+    if(match)visible++;
+  });
+  document.getElementById("noVideos").hidden=visible!==0;
+}
+</script>
 </body>
 </html>
