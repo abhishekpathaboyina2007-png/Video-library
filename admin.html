@@ -4,18 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Library | Admin</title>
+  <title>Shalom Tabernacle | Admin</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      padding: 30px;
+      padding: 25px;
       background: #090909;
       color: white;
       font-family: Arial, sans-serif;
     }
-    .container { max-width: 850px; margin: auto; }
-    h1 { color: #fff; }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    h1 { margin-bottom: 5px; }
+
+    .subtitle {
+      color: #999;
+      margin-bottom: 30px;
+    }
+
     .panel {
       background: #171717;
       padding: 24px;
@@ -23,7 +36,21 @@
       border-radius: 14px;
       margin: 20px 0;
     }
-    input, textarea, select {
+
+    .management-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .management-card {
+      background: #202020;
+      padding: 25px;
+      border: 1px solid #383838;
+      border-radius: 12px;
+    }
+
+    input, textarea {
       width: 100%;
       padding: 13px;
       margin: 8px 0 15px;
@@ -32,27 +59,48 @@
       color: white;
       border-radius: 7px;
     }
+
     button {
-      padding: 12px 20px;
+      padding: 12px 18px;
       border: 0;
       border-radius: 7px;
       background: #e50914;
       color: white;
       cursor: pointer;
       font-weight: bold;
+      margin: 4px;
     }
+
     button:hover { background: #b80710; }
+
+    .secondary {
+      background: #333;
+    }
+
     .hidden { display: none; }
-    #status { margin-top: 15px; color: #ccc; }
+
+    #status {
+      margin: 15px 0;
+      color: #ddd;
+    }
+
+    @media(max-width: 700px) {
+      body { padding: 15px; }
+      .management-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
+
 <body>
 <div class="container">
-  <h1>VIDEO LIBRARY</h1>
-  <p>Admin Dashboard</p>
 
+  <h1>SHALOM TABERNACLE</h1>
+  <p class="subtitle">Admin Dashboard</p>
+
+  <!-- LOGIN -->
   <section class="panel" id="loginPanel">
     <h2>Admin Login</h2>
+
     <form id="loginForm">
       <label>Admin Password</label>
       <input type="password" id="password" required>
@@ -60,31 +108,100 @@
     </form>
   </section>
 
+  <!-- DASHBOARD -->
   <section class="hidden" id="dashboard">
-    <div class="panel">
-      <h2>Add New Video</h2>
+
+    <div class="management-grid">
+
+      <!-- VIDEO MANAGEMENT -->
+      <div class="management-card">
+        <h2>🎬 Video Management</h2>
+        <p>Add and manage your YouTube videos.</p>
+
+        <button type="button" onclick="showSection('videoSection')">
+          Manage Videos
+        </button>
+      </div>
+
+      <!-- PLAYLIST MANAGEMENT -->
+      <div class="management-card">
+        <h2>📂 Playlist Management</h2>
+        <p>Add and manage your YouTube playlists.</p>
+
+        <button type="button" onclick="showSection('playlistSection')">
+          Manage Playlists
+        </button>
+      </div>
+
+    </div>
+
+    <!-- VIDEO SECTION -->
+    <section class="panel hidden" id="videoSection">
+      <h2>Video Management</h2>
+
+      <h3>Add New Video</h3>
+
       <form id="videoForm">
         <label>Video Title</label>
         <input id="title" required>
 
         <label>YouTube URL</label>
         <input id="youtubeUrl" type="url" required
-               placeholder="https://www.youtube.com/watch?v=...">
-
-        <label>Category</label>
-        <input id="category" placeholder="Entertainment">
+          placeholder="https://www.youtube.com/watch?v=...">
 
         <label>Description</label>
         <textarea id="description"></textarea>
 
         <button type="submit">Add Video</button>
       </form>
-    </div>
+
+      <div id="videoList"></div>
+    </section>
+
+    <!-- PLAYLIST SECTION -->
+    <section class="panel hidden" id="playlistSection">
+      <h2>Playlist Management</h2>
+
+      <h3>Add New Playlist</h3>
+
+      <form id="playlistForm">
+        <label>Playlist Title</label>
+        <input id="playlistTitle" required>
+
+        <label>YouTube Playlist URL</label>
+        <input id="playlistUrl" type="url" required
+          placeholder="https://www.youtube.com/playlist?list=...">
+
+        <label>Description</label>
+        <textarea id="playlistDescription"></textarea>
+
+        <label>Thumbnail URL (optional)</label>
+        <input id="playlistThumbnail" type="url">
+
+        <button type="submit">Add Playlist</button>
+      </form>
+
+      <div id="playlistList"></div>
+    </section>
+
     <p id="status"></p>
-    <button id="logoutButton" type="button">Logout</button>
+
+    <button type="button" class="secondary" id="logoutButton">
+      Logout
+    </button>
+
   </section>
 </div>
 
-<script src="admin.js"></script>
+<script>
+  function showSection(sectionId) {
+    document.getElementById("videoSection").classList.add("hidden");
+    document.getElementById("playlistSection").classList.add("hidden");
+    document.getElementById(sectionId).classList.remove("hidden");
+  }
+</script>
+
+<?!= include("admin.js"); ?>
+
 </body>
 </html>
