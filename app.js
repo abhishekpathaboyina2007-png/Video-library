@@ -171,6 +171,7 @@ function renderVideos(videos) {
 
 /* PLAYLIST DISPLAY */
 
+
 function renderPlaylists(playlists) {
   const grid = document.getElementById("playlistGrid");
   const empty = document.getElementById("noPlaylists");
@@ -183,27 +184,22 @@ function renderPlaylists(playlists) {
 
   const cards = visible.map(item => {
     const url = safeYouTubeURL(item.YouTube_URL);
-
     if (!url) return "";
 
+    // Use the custom thumbnail from Google Sheets
     const thumbnail = safeImageURL(item.Thumbnail_URL || "");
 
     return `
       <article class="card">
 
-        ${thumbnail
-          ? `<img class="thumb"
-              src="${escapeHTML(thumbnail)}"
-              alt="${escapeHTML(item.Title)}"
-              loading="lazy">`
-          : `<div class="thumb"
-              style="background:linear-gradient(135deg,#45111d,#171717)">
-            </div>`
-        }
+        <img class="thumb"
+          src="${escapeHTML(thumbnail || './logo.png')}"
+          alt="${escapeHTML(item.Title)}"
+          loading="lazy"
+          onerror="this.onerror=null;this.src='./logo.png';">
 
         <div class="card-info">
           <h3>${escapeHTML(item.Title)}</h3>
-
           <p>Shalom Tabernacle Collection</p>
 
           <a class="play"
@@ -223,6 +219,7 @@ function renderPlaylists(playlists) {
     empty.hidden = cards.length !== 0;
   }
 }
+
 
 /* ERROR HANDLING */
 
