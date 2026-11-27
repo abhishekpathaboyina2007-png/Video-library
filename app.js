@@ -1,10 +1,12 @@
 
-/* VIDEO LIBRARY - PUBLIC WEBSITE CONNECTION */
+/* SHALOM TABERNACLE - PUBLIC WEBSITE */
 
 const API_URL = "https://script.google.com/macros/s/AKfycby_Lxcf0X0bDVZF6hqKcl42YB8AelRc8EoFENbz1D61LaJ9UxZHeqiu7jNtJosgtx05/exec";
 
 let libraryData = null;
 let currentCategory = "All";
+
+/* LOAD GOOGLE SHEETS DATA */
 
 function loadLibrary() {
   const script = document.createElement("script");
@@ -13,25 +15,30 @@ function loadLibrary() {
     "?action=publicData&callback=window.videoLibraryCallback&t=" +
     Date.now();
 
-  script.onerror = () =>
-    showError("Unable to connect to the library.");
+  script.onerror = () => {
+    showError("Unable to connect. Please refresh the page.");
+  };
 
   document.body.appendChild(script);
 }
 
 window.videoLibraryCallback = function(data) {
   if (!data || !data.success) {
-    showError("Unable to load library data.");
+    showError("Unable to load the video library.");
     return;
   }
 
   libraryData = data;
 
-  applySettings(data.settings || {});
-  renderCategories(data.categories || []);
+  // Branding stays permanently in index.html.
+  // Google Sheets only controls videos and playlists.
+
+  renderCategories();
   renderVideos(data.videos || []);
   renderPlaylists(data.playlists || []);
 };
+
+/* SECURITY */
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -64,131 +71,39 @@ function safeYouTubeURL(value) {
 function safeImageURL(value) {
   try {
     const url = new URL(value);
-
     return url.protocol === "https:" ? url.href : "";
   } catch {
     return "";
   }
 }
 
-/* WEBSITE CUSTOMIZATION */
+/* SINGLE CATEGORY */
 
-function applySettings(settings) {
-
-  // WEBSITE NAME
-  const siteName = settings.siteName || settings.site_title;
-
-  if (siteName) {
-    document.title = siteName;
-
-    const logo = document.querySelector(".logo");
-
-    if (logo) {
-      logo.textContent = siteName;
-    }
-  }
-
-  // WEBSITE TAGLINE
-  const tagline = settings.siteTagline || settings.hero_subtitle;
-
-  if (tagline) {
-    const heroSubtitle = document.querySelector(".hero p");
-
-    if (heroSubtitle) {
-      heroSubtitle.textContent = tagline;
-    }
-  }
-
-  // LOGO IMAGE
-  const logoURL = safeImageURL(settings.siteLogo || "");
-
-  const logoElement = document.querySelector(".logo");
-
-  if (logoElement && logoURL) {
-    const image = document.createElement("img");
-
-    image.src = logoURL;
-    image.alt = siteName || "Website Logo";
-    image.style.maxHeight = "45px";
-    image.style.maxWidth = "180px";
-    image.style.objectFit = "contain";
-
-    logoElement.textContent = "";
-    logoElement.appendChild(image);
-  }
-
-  // BACKGROUND COLOUR
-  const background = settings.siteBackground;
-
-  if (background && /^#[0-9a-fA-F]{6}$/.test(background)) {
-    document.body.style.backgroundColor = background;
-    document.documentElement.style.setProperty(
-      "--background",
-      background
-    );
-  }
-
-  // ACCENT COLOUR
-  const accent = settings.siteAccent || settings.accent_color;
-
-  if (accent && /^#[0-9a-fA-F]{6}$/.test(accent)) {
-    document.documentElement.style.setProperty(
-      "--accent",
-      accent
-    );
-  }
-
-  // EXISTING HERO TITLE SETTING
-  if (settings.hero_title) {
-    const heroTitle = document.querySelector(".hero h1");
-
-    if (heroTitle) {
-      heroTitle.textContent = settings.hero_title;
-    }
-  }
-}
-
-/* CATEGORY FILTERS */
-
-function renderCategories(categories) {
+function renderCategories() {
   const filters = document.getElementById("filters");
 
   if (!filters) return;
 
-  filters.innerHTML = "";
+  filters.innerHTML = `
+    <button class="filter active"
+      onclick="setLibraryCategory('All', this)">
+      All
+    </button>
+  `;
 
-  addFilter("All");
-
-  categories.forEach(category => {
-    if (String(category.Visible).toUpperCase() !== "FALSE") {
-      addFilter(category.Category_Name);
-    }
-  });
+  currentCategory = "All";
 }
 
-function addFilter(category) {
-  const filters = document.getElementById("filters");
+function setLibraryCategory(category, button) {
+  currentCategory = category;
 
-  const button = document.createElement("button");
+  document.querySelectorAll(".filter").forEach(b => {
+    b.classList.remove("active");
+  });
 
-  button.className =
-    "filter" + (category === "All" ? " active" : "");
+  button.classList.add("active");
 
-  button.textContent = category;
-
-  button.onclick = () => {
-    currentCategory = category;
-
-    document.querySelectorAll(".filter").forEach(b =>
-      b.classList.remove("active")
-    );
-
-    button.classList.add("active");
-
-    renderVideos(libraryData.videos || []);
-  };
-
-  filters.appendChild(button);
+  renderVideos(libraryData?.videos || []);
 }
 
 /* VIDEO DISPLAY */
@@ -197,21 +112,20 @@ function renderVideos(videos) {
   const grid = document.getElementById("videoGrid");
   const empty = document.getElementById("noVideos");
 
+  if (!grid) return;
+
   const query = (
     document.getElementById("search")?.value || ""
   ).toLowerCase();
 
-  if (!grid) return;
-
   const filtered = videos.filter(video => {
-    const matchesCategory =
-      currentCategory === "All" ||
-      video.Category === currentCategory;
+    const visible =
+      String(video.Visible).toUpperCase() !== "FALSE";
 
     const matchesSearch =
       String(video.Title || "").toLowerCase().includes(query);
 
-    return matchesCategory && matchesSearch;
+    return visible && matchesSearch;
   });
 
   grid.innerHTML = filtered.map(video => {
@@ -226,7 +140,9 @@ function renderVideos(videos) {
       "https://img.youtube.com/vi/" + id + "/hqdefault.jpg";
 
     return `
-      <article class="card">
+      <article class="card"
+        data-title="${escapeHTML(video.Title)}">
+
         <img class="thumb"
           src="${thumbnail}"
           alt="${escapeHTML(video.Title)}"
@@ -234,12 +150,8 @@ function renderVideos(videos) {
 
         <div class="card-info">
           <h3>${escapeHTML(video.Title)}</h3>
-          <p>${escapeHTML(video.Category || "Uncategorized")}</p>
 
-          ${video.Date_Added
-            ? `<p>${escapeHTML(video.Date_Added)}</p>`
-            : ""
-          }
+          <p>Shalom Tabernacle</p>
 
           <a class="play"
             href="${escapeHTML(url)}"
@@ -260,9 +172,10 @@ function renderVideos(videos) {
 /* PLAYLIST DISPLAY */
 
 function renderPlaylists(playlists) {
-  const section = document.getElementById("playlists");
+  const grid = document.getElementById("playlistGrid");
+  const empty = document.getElementById("noPlaylists");
 
-  if (!section) return;
+  if (!grid) return;
 
   const visible = playlists.filter(item =>
     String(item.Visible).toUpperCase() !== "FALSE"
@@ -277,22 +190,21 @@ function renderPlaylists(playlists) {
 
     return `
       <article class="card">
+
         ${thumbnail
           ? `<img class="thumb"
               src="${escapeHTML(thumbnail)}"
               alt="${escapeHTML(item.Title)}"
               loading="lazy">`
           : `<div class="thumb"
-              style="background:linear-gradient(135deg,#252b40,#17181d)">
+              style="background:linear-gradient(135deg,#45111d,#171717)">
             </div>`
         }
 
         <div class="card-info">
           <h3>${escapeHTML(item.Title)}</h3>
 
-          <p>${escapeHTML(
-            item.Description || item.Category || "Playlist"
-          )}</p>
+          <p>Shalom Tabernacle Collection</p>
 
           <a class="play"
             href="${escapeHTML(url)}"
@@ -305,17 +217,11 @@ function renderPlaylists(playlists) {
     `;
   }).join("");
 
-  section.innerHTML = `
-    <div class="section-head">
-      <h2>Featured Playlists</h2>
-      <small>${visible.length} collections</small>
-    </div>
+  grid.innerHTML = cards;
 
-    ${cards
-      ? `<div class="grid">${cards}</div>`
-      : `<p class="empty">No playlists available yet.</p>`
-    }
-  `;
+  if (empty) {
+    empty.hidden = cards.length !== 0;
+  }
 }
 
 /* ERROR HANDLING */
@@ -337,6 +243,6 @@ function filterVideos() {
   }
 }
 
-/* START WEBSITE */
+/* START */
 
 document.addEventListener("DOMContentLoaded", loadLibrary);
