@@ -17,6 +17,7 @@ const CACHE_KEY = "shalomLibraryCache";
 const MIN_REVALIDATE_MS = 60 * 1000;
 const CACHE_TIME = 5 * 60 * 1000;
 const FAVORITES_KEY = "shalomFavorites";
+const WATCHED_KEY = "shalomWatchedItems";
 const THEME_KEY = "shalomTheme";
 const LANG_KEY = "shalomLanguage";
 const INSTALL_DISMISS_KEY = "shalomPwaInstallDismissedAt";
@@ -174,7 +175,14 @@ const I18N = {
     libraryError: "Unable to load the video library.",
     noRecentUploads: "No recent uploads available yet.",
     noVideosAvailable: "No videos available yet.",
-    noPlaylistsAvailable: "No playlists available yet."
+    noPlaylistsAvailable: "No playlists available yet.",
+    watchedBadge: "Watched",
+    playerCloseAria: "Close video player",
+    playerOpenYoutubeBtn: "Open on YouTube ↗",
+    playerMarkWatchedBtn: "Mark as Watched",
+    playerWatchedActiveBtn: "✓ Watched",
+    markedWatchedToast: "Marked as watched",
+    unmarkedWatchedToast: "Removed watched mark"
   },
   te: {
     pageTitle: "షాలోమ్ టబర్నికల్ | విశాఖపట్నం",
@@ -304,7 +312,14 @@ const I18N = {
     libraryError: "వీడియో లైబ్రరీని లోడ్ చేయడం సాధ్యం కాలేదు.",
     noRecentUploads: "ఇంకా ఇటీవలి అప్‌లోడ్‌లు అందుబాటులో లేవు.",
     noVideosAvailable: "ఇంకా వీడియోలు అందుబాటులో లేవు.",
-    noPlaylistsAvailable: "ఇంకా ప్లేలిస్ట్‌లు అందుబాటులో లేవు."
+    noPlaylistsAvailable: "ఇంకా ప్లేలిస్ట్‌లు అందుబాటులో లేవు.",
+    watchedBadge: "చూశారు",
+    playerCloseAria: "వీడియో ప్లేయర్ మూసివేయండి",
+    playerOpenYoutubeBtn: "YouTube లో తెరవండి ↗",
+    playerMarkWatchedBtn: "చూసినట్లు గుర్తించండి",
+    playerWatchedActiveBtn: "✓ చూశారు",
+    markedWatchedToast: "చూసినట్లు గుర్తించబడింది",
+    unmarkedWatchedToast: "చూసిన గుర్తు తీసివేయబడింది"
   }
 };
 
@@ -380,6 +395,8 @@ function applyLanguage(lang, { rerenderDynamic = true } = {}) {
 
   applyTheme(getPreferredTheme());
   syncInstallUI();
+  syncWatchedBadges();
+  syncPlayerWatchedButton();
 
   if (rerenderDynamic) {
     if (typeof renderHistory === "function") renderHistory();
@@ -676,6 +693,7 @@ function renderLibrary(data) {
 
   renderFavorites();
   syncFavoriteButtons();
+  syncWatchedBadges();
   markAlreadyLoadedThumbs();
 }
 
@@ -910,7 +928,7 @@ function initThumbnailDelegation() {
   }, true);
 }
 
-function createThumbnailHTML(id, title, customThumbnail = "", isPriority = false, shouldCheckMaxRes = false) {
+function createThumbnailHTML(id, title, customThumbnail = "", isPriority = false, shouldCheckMaxRes = false, watchedKey = "") {
   const validId = /^[A-Za-z0-9_-]{11}$/.test(id);
   const thumbnail = getPreferredThumbnail(id, customThumbnail);
 
@@ -920,9 +938,13 @@ function createThumbnailHTML(id, title, customThumbnail = "", isPriority = false
 
   const loadingAttr = isPriority ? "eager" : "lazy";
   const priorityAttr = isPriority ? ' fetchpriority="high"' : "";
+  const watchedBadgeHTML = watchedKey
+    ? `<span class="watched-badge" data-watched-badge="${escapeHTML(watchedKey)}"${isWatched(watchedKey) ? "" : " hidden"}><span aria-hidden="true">✓</span> <span data-i18n="watchedBadge">${escapeHTML(t("watchedBadge"))}</span></span>`
+    : "";
 
   return `
     <div class="thumb-wrap">
+      ${watchedBadgeHTML}
       <img
         class="thumb"
         width="480"
@@ -1111,7 +1133,8 @@ function createVideoCard(video, index = 0, { showRecentTag = false, isPriority =
         title,
         "",
         isPriority,
-        isPriority || record.isFeatured
+        isPriority || record.isFeatured,
+        record.key
       )}
 
       <div class="card-info">
@@ -1159,7 +1182,8 @@ function createPlaylistCard(item, index = 0, { showRecentTag = false, isPriority
         title,
         record.customThumbnail,
         isPriority,
-        isPriority
+        isPriority,
+        record.key
       )}
 
       <div class="card-info">
@@ -1304,7 +1328,7 @@ function renderFavorites() {
 
     return `
       <article class="card" data-item-key="${key}" data-item-type="${escapeHTML(item.type || "video")}">
-        ${createThumbnailHTML(firstId, title, customThumb)}
+        ${createThumbnailHTML(firstId, title, customThumb, false, false, item.key)}
 
         <div class="card-info">
           <h3>${title}</h3>
@@ -1949,10 +1973,259 @@ function initPWAInstallPrompt() {
 
 
 /* ==========================================
+   ALREADY WATCHED TRACKING & IN-APP PLAYER
+========================================== */
+
+let activePlayerKey = "";
+
+function extractYouTubeListIdFromUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return (parsed.searchParams.get("list") || "").trim();
+  } catch {
+    return "";
+  }
+}
+
+function extractAnyYouTubeVideoId(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === "youtu.be" || parsed.hostname === "www.youtu.be") {
+      const seg = parsed.pathname.replace(/^\/+/, "").split("/")[0] || "";
+      return /^[A-Za-z0-9_-]{11}$/.test(seg) ? seg : "";
+    }
+    const vParam = (parsed.searchParams.get("v") || "").trim();
+    if (/^[A-Za-z0-9_-]{11}$/.test(vParam)) return vParam;
+
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    if (parts.length >= 2 && ["shorts", "live", "embed"].includes(parts[0])) {
+      return /^[A-Za-z0-9_-]{11}$/.test(parts[1]) ? parts[1] : "";
+    }
+  } catch {}
+  return "";
+}
+
+function deriveWatchedKey({ key = "", url = "", type = "video", videoId = "" } = {}) {
+  if (key) return key;
+  const safeUrl = safeYouTubeURL(url);
+  if (type === "playlist") {
+    const listId = extractYouTubeListIdFromUrl(safeUrl);
+    return listId ? `playlist:${listId}` : (safeUrl ? `playlist:${safeUrl}` : "");
+  }
+  const id = /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : extractAnyYouTubeVideoId(safeUrl);
+  return id ? `video:${id}` : "";
+}
+
+function getWatchedSet() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(WATCHED_KEY) || "[]");
+    if (!Array.isArray(raw)) return new Set();
+    return new Set(raw.filter(item => typeof item === "string" && item));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveWatchedSet(watchedSet) {
+  try {
+    localStorage.setItem(WATCHED_KEY, JSON.stringify([...watchedSet]));
+  } catch (error) {
+    console.warn("Watched storage is unavailable:", error);
+  }
+}
+
+function seedWatchedFromHistory() {
+  if (typeof getHistory !== "function") return;
+  const history = getHistory();
+  if (!history.length) return;
+
+  const watched = getWatchedSet();
+  let changed = false;
+  history.forEach((item) => {
+    const key = deriveWatchedKey({ url: item?.url || "", type: "video" });
+    if (key && !watched.has(key)) {
+      watched.add(key);
+      changed = true;
+    }
+  });
+  if (changed) saveWatchedSet(watched);
+}
+
+function isWatched(key) {
+  if (!key) return false;
+  return getWatchedSet().has(key);
+}
+
+function markWatched(key) {
+  if (!key) return;
+  const watched = getWatchedSet();
+  if (!watched.has(key)) {
+    watched.add(key);
+    saveWatchedSet(watched);
+  }
+  syncWatchedBadges();
+  syncPlayerWatchedButton();
+}
+
+function toggleWatched(key) {
+  if (!key) return false;
+  const watched = getWatchedSet();
+  let nowWatched = false;
+  if (watched.has(key)) {
+    watched.delete(key);
+    nowWatched = false;
+  } else {
+    watched.add(key);
+    nowWatched = true;
+  }
+  saveWatchedSet(watched);
+  syncWatchedBadges();
+  syncPlayerWatchedButton();
+  return nowWatched;
+}
+
+function syncWatchedBadges() {
+  const watched = getWatchedSet();
+  document.querySelectorAll("[data-watched-badge]").forEach((badge) => {
+    const key = badge.dataset.watchedBadge || "";
+    const active = Boolean(key && watched.has(key));
+    badge.hidden = !active;
+    const label = badge.querySelector('[data-i18n="watchedBadge"]');
+    if (label) label.textContent = t("watchedBadge");
+  });
+}
+
+function syncPlayerWatchedButton() {
+  const btn = document.getElementById("videoPlayerWatchedBtn");
+  if (!btn) return;
+  if (!activePlayerKey) {
+    btn.hidden = true;
+    return;
+  }
+  btn.hidden = false;
+  const active = isWatched(activePlayerKey);
+  btn.classList.toggle("active", active);
+  btn.setAttribute("aria-pressed", active ? "true" : "false");
+  btn.textContent = active ? t("playerWatchedActiveBtn") : t("playerMarkWatchedBtn");
+}
+
+function buildYouTubeEmbedURL(rawUrl, itemType = "video", fallbackId = "") {
+  const safeUrl = safeYouTubeURL(rawUrl);
+  if (!safeUrl && !/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "")) return "";
+
+  const listId = extractYouTubeListIdFromUrl(safeUrl);
+  const videoId =
+    extractAnyYouTubeVideoId(safeUrl) ||
+    (/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "") ? fallbackId : "");
+
+  if (itemType === "playlist" && listId) {
+    if (videoId) {
+      return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+    }
+    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+  }
+
+  if (videoId) {
+    const listQuery = listId ? `&list=${encodeURIComponent(listId)}` : "";
+    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0${listQuery}`;
+  }
+
+  if (listId) {
+    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+  }
+
+  return "";
+}
+
+function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type = "video", videoId = "" } = {}) {
+  const modal = document.getElementById("videoPlayerModal");
+  const frame = document.getElementById("videoPlayerFrame");
+  const titleEl = document.getElementById("videoPlayerTitle");
+  const subEl = document.getElementById("videoPlayerSub");
+  const externalLink = document.getElementById("videoPlayerExternalLink");
+  const closeBtn = document.getElementById("closeVideoPlayerBtn");
+
+  const embedUrl = buildYouTubeEmbedURL(url, type, videoId);
+  if (!modal || !frame || !embedUrl) return false;
+
+  const safeExternal = safeYouTubeURL(url) || (videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : "");
+  activePlayerKey = deriveWatchedKey({ key, url: safeExternal, type, videoId });
+
+  if (titleEl) titleEl.textContent = title || t("orgName");
+  if (subEl) {
+    if (subtitle) {
+      subEl.textContent = subtitle;
+      subEl.hidden = false;
+    } else {
+      subEl.textContent = "";
+      subEl.hidden = true;
+    }
+  }
+  if (externalLink && safeExternal) {
+    externalLink.href = safeExternal;
+  }
+
+  frame.src = embedUrl;
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+
+  if (activePlayerKey) {
+    markWatched(activePlayerKey);
+  }
+  syncPlayerWatchedButton();
+  if (closeBtn) closeBtn.focus();
+  return true;
+}
+
+function closeVideoPlayer() {
+  const modal = document.getElementById("videoPlayerModal");
+  const frame = document.getElementById("videoPlayerFrame");
+  if (!modal || modal.hidden) return;
+
+  if (frame) {
+    frame.src = "about:blank";
+  }
+  activePlayerKey = "";
+  modal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+
+/* ==========================================
    SINGLE DELEGATED CARD & HISTORY HANDLER
 ========================================== */
 
 function initCardAndHistoryInteractions() {
+  const modal = document.getElementById("videoPlayerModal");
+  const closeBtn = document.getElementById("closeVideoPlayerBtn");
+  const watchedBtn = document.getElementById("videoPlayerWatchedBtn");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeVideoPlayer);
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target.id === "videoPlayerModal") {
+        closeVideoPlayer();
+      }
+    });
+  }
+
+  if (watchedBtn) {
+    watchedBtn.addEventListener("click", () => {
+      if (!activePlayerKey) return;
+      const nowWatched = toggleWatched(activePlayerKey);
+      showToast(nowWatched ? t("markedWatchedToast") : t("unmarkedWatchedToast"));
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal && !modal.hidden) {
+      closeVideoPlayer();
+    }
+  });
+
   document.addEventListener("click", function(event) {
     const favBtn = event.target.closest(".fav-btn[data-fav-key]");
     if (favBtn) {
@@ -1962,27 +2235,63 @@ function initCardAndHistoryInteractions() {
     }
 
     const playLink = event.target.closest("a.play");
-    if (playLink) {
-      const trackedContainer = playLink.closest(
-        "#homeVideoRow, #homeRecentRow, #homeContinueRow, #videoGrid, #favoritesGrid"
-      );
-      if (!trackedContainer) return;
+    const thumbWrap = !playLink ? event.target.closest(".card .thumb-wrap") : null;
+    if (!playLink && !thumbWrap) return;
 
-      const card = playLink.closest(".card");
-      if (!card || card.dataset.itemType === "playlist") return;
+    const card = (playLink || thumbWrap).closest(".card");
+    if (!card) return;
 
-      const title =
-        card.querySelector("h3")?.textContent?.trim() ||
-        t("orgName");
-      const image = card.querySelector("img.thumb");
+    const cardPlayLink = playLink || card.querySelector("a.play");
+    const key = card.dataset.itemKey || "";
+    const record = key ? libraryItemMap.get(key) : null;
+    const itemType = record?.type || card.dataset.itemType || "video";
+    const url = record?.url || cardPlayLink?.href || "";
+    const title = record?.title || card.querySelector("h3")?.textContent?.trim() || t("orgName");
+    const subtitle = record?.subtitle || card.querySelector(".card-info p")?.textContent?.trim() || "";
+    const image = card.querySelector("img.thumb");
+    const videoId = record?.firstVideoId || image?.dataset.videoId || "";
+    const watchedKey = deriveWatchedKey({ key, url, type: itemType, videoId });
 
-      if (typeof addToHistory === "function") {
+    const trackedContainer = card.closest(
+      "#homeVideoRow, #homeRecentRow, #homeContinueRow, #videoGrid, #favoritesGrid"
+    );
+
+    const recordWatchActivity = () => {
+      if (watchedKey) {
+        markWatched(watchedKey);
+      }
+      if (trackedContainer && itemType !== "playlist" && typeof addToHistory === "function" && url) {
         addToHistory({
           title,
           thumbnail: image?.src || "./logo.png",
-          url: playLink.href
+          url
         });
       }
+    };
+
+    const allowNativeTab =
+      Boolean(playLink) &&
+      (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey);
+
+    if (allowNativeTab) {
+      recordWatchActivity();
+      return;
+    }
+
+    const openedInApp = openVideoPlayer({
+      key: watchedKey,
+      title,
+      subtitle,
+      url,
+      type: itemType,
+      videoId
+    });
+
+    if (openedInApp) {
+      event.preventDefault();
+      recordWatchActivity();
+    } else if (playLink) {
+      recordWatchActivity();
     }
   });
 
@@ -2152,6 +2461,7 @@ async function initIntroReveal() {
 initThumbnailDelegation();
 
 document.addEventListener("DOMContentLoaded", () => {
+  seedWatchedFromHistory();
   initLanguageSwitcher();
   initThemeSwitcher();
   initOfflineIndicator();
@@ -2163,6 +2473,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (typeof renderHistory === "function") renderHistory();
   renderContinueWatching();
   renderFavorites();
+  syncWatchedBadges();
   markAlreadyLoadedThumbs();
   loadLibrary();
 
