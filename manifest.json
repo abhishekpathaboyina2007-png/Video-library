@@ -1,0 +1,20 @@
+
+{
+  "name": "Shalom Tabernacle",
+  "short_name": "Shalom",
+  "description": "Watch sermons, messages and playlists from Shalom Tabernacle, Visakhapatnam.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "icons": [
+    {
+      "src": "./logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
