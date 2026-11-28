@@ -265,12 +265,35 @@ header {
   margin-top:3px;
 }
 
+
 .hero-actions {
   display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-start;
   flex-wrap:wrap;
   gap:12px;
   margin-top:30px;
 }
+
+.hero-actions button {
+  width:auto;
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+@media(max-width:650px) {
+  .hero-actions {
+    gap:10px;
+  }
+
+  .hero-actions button {
+    width:auto;
+    padding:12px 14px;
+    font-size:9px;
+  }
+}
+
 
 /* HOMEPAGE VIDEO AND PLAYLIST SECTIONS */
 
