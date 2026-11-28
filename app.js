@@ -207,21 +207,25 @@ function createVideoCard(video) {
 ========================================== */
 
 
+
 function createPlaylistCard(item) {
 
   const title = escapeHTML(item.Title);
   const url = safeYouTubeURL(item.YouTube_URL);
 
-  const playlistId = String(item.Playlist_ID || "").trim();
+  const customThumbnail = safeImageURL(
+    item.Thumbnail_URL || ""
+  );
 
-  const customThumbnail = safeImageURL(item.Thumbnail_URL || "");
+  const firstVideoId = String(
+    item.First_Video_ID || ""
+  ).trim();
 
-  // YouTube playlist thumbnail fallback
-  const youtubeThumbnail = playlistId
-    ? "https://i.ytimg.com/vi/" + playlistId + "/hqdefault.jpg"
-    : "";
-
-  const thumbnail = customThumbnail || youtubeThumbnail || "./logo.png";
+  const thumbnail = customThumbnail ||
+    ( /^[A-Za-z0-9_-]{11}$/.test(firstVideoId)
+      ? "https://i.ytimg.com/vi/" + firstVideoId + "/hqdefault.jpg"
+      : "./logo.png"
+    );
 
   return `
     <article class="card">
@@ -235,9 +239,7 @@ function createPlaylistCard(item) {
       >
 
       <div class="card-info">
-
         <h3>${title}</h3>
-
         <p>Shalom Tabernacle Collection</p>
 
         <a
@@ -248,14 +250,11 @@ function createPlaylistCard(item) {
         >
           ▶ OPEN PLAYLIST
         </a>
-
       </div>
 
     </article>
   `;
-
 }
-
 
 
 /* ==========================================
