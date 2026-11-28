@@ -24,6 +24,10 @@
           var meta = document.getElementById("metaThemeColor");
           if (meta) meta.setAttribute("content", "#F8F5EE");
         }
+        var savedLang = localStorage.getItem("shalomLanguage");
+        if (savedLang === "te") {
+          document.documentElement.setAttribute("lang", "te");
+        }
       } catch (e) {}
     })();
   </script>
@@ -33,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://img.youtube.com" crossorigin>
 
-  <!-- Fonts with non-blocking text display -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Fonts with non-blocking text display (same Cormorant Garamond + Manrope with matching Telugu fallbacks) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&family=Noto+Serif+Telugu:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -59,8 +63,8 @@
   --banner-bg:linear-gradient(145deg,#181510,#0d0d0d);
   --about-bg:radial-gradient(ellipse at 90% 0%,rgba(214,181,109,.12),transparent 50%),#151515;
   --hero-bg:radial-gradient(ellipse at 85% 30%,rgba(214,181,109,.15),transparent 36%),radial-gradient(ellipse at 5% 100%,rgba(214,181,109,.07),transparent 38%),#090909;
-  --heading:'Cormorant Garamond',Georgia,serif;
-  --body:'Manrope',Arial,sans-serif;
+  --heading:'Cormorant Garamond','Noto Serif Telugu',Georgia,serif;
+  --body:'Manrope','Noto Sans Telugu',Arial,sans-serif;
 }
 
 :root[data-theme="light"] {
@@ -199,7 +203,8 @@ header {
   background:rgba(214,181,109,.1);
 }
 
-.theme-toggle {
+.theme-toggle,
+.lang-toggle {
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -217,15 +222,42 @@ header {
   transition:border-color .2s,background .2s;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.lang-toggle:hover {
   border-color:var(--gold);
   background:rgba(214,181,109,.12);
 }
 
-.theme-toggle svg {
+.theme-toggle svg,
+.lang-toggle svg {
   width:14px;
   height:14px;
   flex-shrink:0;
+}
+
+/* Preserve clean Telugu conjuncts/ligatures without wide Latin tracking */
+:root[lang="te"] .brand-name,
+:root[lang="te"] .brand-name span,
+:root[lang="te"] .eyebrow,
+:root[lang="te"] .hero h1,
+:root[lang="te"] .attribution,
+:root[lang="te"] .verse-ref,
+:root[lang="te"] .gold-button,
+:root[lang="te"] .outline-button,
+:root[lang="te"] .view-all,
+:root[lang="te"] .play,
+:root[lang="te"] .row-hint,
+:root[lang="te"] footer strong {
+  letter-spacing:0;
+}
+
+:root[lang="te"] .hero h1 {
+  font-size:clamp(46px,7vw,88px);
+  line-height:1.15;
+}
+
+:root[lang="te"] .page-heading h1 {
+  line-height:1.2;
 }
 
 /* OFFLINE BANNER */
@@ -1100,13 +1132,15 @@ footer strong {
     -webkit-backdrop-filter:none;
   }
 
-  .brand { gap:9px; }
+  .brand { gap:9px; min-width:0; }
   .brand img { width:38px; height:38px; }
   .brand-name { font-size:13px; letter-spacing:1.5px; }
   .brand-name span { font-size:9px; letter-spacing:3px; }
+  .header-right { gap:6px; flex-shrink:0; }
   .desktop-nav { display:none; }
   .theme-toggle span { display:none; }
   .theme-toggle { padding:8px 10px; }
+  .lang-toggle { padding:8px 10px; font-size:10px; }
 
   .hero {
     min-height:440px;
@@ -1256,6 +1290,7 @@ footer strong {
 
   .bottom-nav button {
     display:flex;
+    flex:1 1 0;
     flex-direction:column;
     align-items:center;
     justify-content:center;
@@ -1267,12 +1302,15 @@ footer strong {
     font-weight:700;
     line-height:1.2;
     text-align:center;
-    min-width:44px;
-    padding:5px 2px;
+    min-width:0;
+    padding:5px 1px;
     transition:color .2s;
   }
 
   .bottom-nav button span:last-child {
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
     white-space:nowrap;
   }
 
@@ -1287,7 +1325,8 @@ footer strong {
 @media(max-width:360px) {
   .grid { grid-template-columns:1fr; }
   .hero h1 { font-size:50px; }
-  .bottom-nav button { min-width:40px; font-size:8px; }
+  :root[lang="te"] .hero h1 { font-size:40px; }
+  .bottom-nav button { font-size:7.5px; }
 }
 
 /* ACCESSIBILITY AND REDUCED MOTION */
@@ -1311,7 +1350,7 @@ footer strong {
     <img src="./logo.png" alt="Shalom Tabernacle Logo"
          width="46" height="46"
          onerror="this.style.display='none'">
-    <div class="brand-name">
+    <div class="brand-name" data-i18n-html="brandNameHtml">
       SHALOM
       <span>TABERNACLE</span>
     </div>
@@ -1319,13 +1358,21 @@ footer strong {
 
   <div class="header-right">
     <nav class="desktop-nav" aria-label="Main navigation">
-      <button class="nav-link active" data-view="home">Home</button>
-      <button class="nav-link" data-view="videos">Videos</button>
-      <button class="nav-link" data-view="playlists">Playlists</button>
-      <button class="nav-link" data-view="favorites">Favorites</button>
-      <button class="nav-link" data-view="history">History</button>
-      <button class="nav-link" data-view="about">About</button>
+      <button class="nav-link active" data-view="home" data-i18n="navHome">Home</button>
+      <button class="nav-link" data-view="videos" data-i18n="navVideos">Videos</button>
+      <button class="nav-link" data-view="playlists" data-i18n="navPlaylists">Playlists</button>
+      <button class="nav-link" data-view="favorites" data-i18n="navFavorites">Favorites</button>
+      <button class="nav-link" data-view="history" data-i18n="navHistory">History</button>
+      <button class="nav-link" data-view="about" data-i18n="navAbout">About</button>
     </nav>
+
+    <button type="button" class="lang-toggle" id="langToggleBtn" aria-label="Switch language">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+      </svg>
+      <span id="langToggleLabel">తెలుగు</span>
+    </button>
 
     <button type="button" class="theme-toggle" id="themeToggleBtn" aria-label="Switch theme">
       <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1337,7 +1384,7 @@ footer strong {
   </div>
 </header>
 
-<div class="offline-banner" id="offlineBanner" role="status" hidden>
+<div class="offline-banner" id="offlineBanner" role="status" hidden data-i18n="offlineBanner">
   You are currently offline. Showing previously loaded messages, saved favorites, and local history.
 </div>
 
@@ -1350,16 +1397,16 @@ footer strong {
   <div class="hero">
     <div class="hero-content">
 
-      <div class="eyebrow">
+      <div class="eyebrow" data-i18n="heroEyebrow">
         WELCOME TO SHALOM TABERNACLE
       </div>
 
-      <h1>
+      <h1 data-i18n-html="heroTitleHtml">
         Faith. Truth.
         <span>The Word of God.</span>
       </h1>
 
-      <p class="quote">
+      <p class="quote" data-i18n="heroQuote">
         🕊️ And in here, we don’t have no creed but Christ, that’s the creed;
         and no law but love; no book but the Bible. And Christ is the Head;
         and the Bible is our textbook; the world is my parish. So I like to
@@ -1367,7 +1414,7 @@ footer strong {
         I see it. 🦅
       </p>
 
-      <div class="attribution">
+      <div class="attribution" data-i18n-html="heroAttributionHtml">
         PAS. JOEL. P
         <span>Visakhapatnam</span>
       </div>
@@ -1379,15 +1426,15 @@ footer strong {
   <div class="home-content" id="homeContinueSection" hidden>
     <div class="home-section-heading">
       <div>
-        <div class="eyebrow">PICK UP WHERE YOU LEFT OFF</div>
-        <h2>Continue Watching</h2>
+        <div class="eyebrow" data-i18n="continueEyebrow">PICK UP WHERE YOU LEFT OFF</div>
+        <h2 data-i18n="continueTitle">Continue Watching</h2>
       </div>
 
       <div class="heading-actions">
-        <button class="view-all" type="button" id="homeClearHistoryBtn">
+        <button class="view-all" type="button" id="homeClearHistoryBtn" data-i18n="clearBtn">
           CLEAR
         </button>
-        <button class="view-all" type="button" onclick="showView('history')">
+        <button class="view-all" type="button" onclick="showView('history')" data-i18n="viewAllBtn">
           VIEW ALL →
         </button>
       </div>
@@ -1400,8 +1447,8 @@ footer strong {
   <div class="home-content" id="dailyVerseSection">
     <div class="home-section-heading">
       <div>
-        <div class="eyebrow">DAILY WORD</div>
-        <h2>Daily Bible Verse</h2>
+        <div class="eyebrow" data-i18n="verseEyebrow">DAILY WORD</div>
+        <h2 data-i18n="verseTitle">Daily Bible Verse</h2>
       </div>
     </div>
 
@@ -1410,8 +1457,8 @@ footer strong {
       <div class="verse-ref" id="dailyVerseRef"></div>
       <p class="verse-note" id="dailyVerseNote"></p>
       <div class="verse-actions">
-        <button type="button" class="gold-button" id="copyVerseBtn">Copy Verse</button>
-        <button type="button" class="outline-button" id="shareVerseBtn">Share Verse</button>
+        <button type="button" class="gold-button" id="copyVerseBtn" data-i18n="copyVerseBtn">Copy Verse</button>
+        <button type="button" class="outline-button" id="shareVerseBtn" data-i18n="shareVerseBtn">Share Verse</button>
       </div>
     </article>
   </div>
@@ -1420,60 +1467,60 @@ footer strong {
   <div class="home-content">
     <div class="home-section-heading">
       <div>
-        <div class="eyebrow">FRESH UPLOADS</div>
-        <h2>Recently Added</h2>
+        <div class="eyebrow" data-i18n="recentEyebrow">FRESH UPLOADS</div>
+        <h2 data-i18n="recentTitle">Recently Added</h2>
       </div>
 
-      <button class="view-all" type="button" onclick="showView('videos')">
+      <button class="view-all" type="button" onclick="showView('videos')" data-i18n="browseLibraryBtn">
         BROWSE LIBRARY →
       </button>
     </div>
 
     <div class="horizontal-row" id="homeRecentRow">
-      <p class="empty">Loading recent additions...</p>
+      <p class="empty" data-i18n="loadingRecent">Loading recent additions...</p>
     </div>
 
-    <p class="row-hint">← Swipe to explore recent videos &amp; playlists →</p>
+    <p class="row-hint" data-i18n="swipeRecentHint">← Swipe to explore recent videos &amp; playlists →</p>
   </div>
 
   <!-- LATEST MESSAGES -->
   <div class="home-content">
     <div class="home-section-heading">
       <div>
-        <div class="eyebrow">WATCH AND GROW</div>
-        <h2>Latest Messages</h2>
+        <div class="eyebrow" data-i18n="latestEyebrow">WATCH AND GROW</div>
+        <h2 data-i18n="latestTitle">Latest Messages</h2>
       </div>
 
-      <button class="view-all" type="button" onclick="showView('videos')">
+      <button class="view-all" type="button" onclick="showView('videos')" data-i18n="viewAllBtn">
         VIEW ALL →
       </button>
     </div>
 
     <div class="horizontal-row" id="homeVideoRow">
-      <p class="empty">Loading videos...</p>
+      <p class="empty" data-i18n="loadingVideos">Loading videos...</p>
     </div>
 
-    <p class="row-hint">← Swipe to explore more videos →</p>
+    <p class="row-hint" data-i18n="swipeVideosHint">← Swipe to explore more videos →</p>
   </div>
 
   <!-- FEATURED PLAYLISTS -->
   <div class="home-content">
     <div class="home-section-heading">
       <div>
-        <div class="eyebrow">EXPLORE OUR COLLECTIONS</div>
-        <h2>Featured Playlists</h2>
+        <div class="eyebrow" data-i18n="playlistsEyebrow">EXPLORE OUR COLLECTIONS</div>
+        <h2 data-i18n="playlistsTitle">Featured Playlists</h2>
       </div>
 
-      <button class="view-all" type="button" onclick="showView('playlists')">
+      <button class="view-all" type="button" onclick="showView('playlists')" data-i18n="viewAllBtn">
         VIEW ALL →
       </button>
     </div>
 
     <div class="horizontal-row" id="homePlaylistRow">
-      <p class="empty">Loading playlists...</p>
+      <p class="empty" data-i18n="loadingPlaylists">Loading playlists...</p>
     </div>
 
-    <p class="row-hint">← Swipe to explore more playlists →</p>
+    <p class="row-hint" data-i18n="swipePlaylistsHint">← Swipe to explore more playlists →</p>
   </div>
 
 </section>
@@ -1485,9 +1532,9 @@ footer strong {
   <div class="page-content">
 
     <div class="page-heading">
-      <div class="eyebrow">SHALOM TABERNACLE</div>
-      <h1>Latest <span>Messages.</span></h1>
-      <p>Search by title, preacher, description or category, and sort messages below.</p>
+      <div class="eyebrow" data-i18n="brandTitle">SHALOM TABERNACLE</div>
+      <h1 data-i18n-html="videosHeadingHtml">Latest <span>Messages.</span></h1>
+      <p data-i18n="videosSubtitle">Search by title, preacher, description or category, and sort messages below.</p>
     </div>
 
     <div class="search-toolbar">
@@ -1496,31 +1543,33 @@ footer strong {
         id="search"
         type="search"
         placeholder="Search by title, preacher, description or category..."
+        data-i18n-placeholder="searchVideosPlaceholder"
         aria-label="Search videos"
+        data-i18n-aria="searchVideosAria"
         oninput="filterVideos()"
       >
 
-      <select class="sort-select" id="videoSort" aria-label="Sort videos" onchange="filterVideos()">
-        <option value="default">Sort: Default Order</option>
-        <option value="newest">Sort: Newest First</option>
-        <option value="oldest">Sort: Oldest First</option>
-        <option value="title">Sort: Title (A–Z)</option>
+      <select class="sort-select" id="videoSort" aria-label="Sort videos" data-i18n-aria="sortVideosAria" onchange="filterVideos()">
+        <option value="default" data-i18n="sortDefault">Sort: Default Order</option>
+        <option value="newest" data-i18n="sortNewest">Sort: Newest First</option>
+        <option value="oldest" data-i18n="sortOldest">Sort: Oldest First</option>
+        <option value="title" data-i18n="sortTitle">Sort: Title (A–Z)</option>
       </select>
     </div>
 
     <div class="filters" id="filters">
-      <button class="filter active" type="button">All</button>
+      <button class="filter active" type="button" data-i18n="filterAll">All</button>
     </div>
 
     <div class="grid" id="videoGrid"></div>
 
     <div class="load-more-wrap" id="loadMoreVideosWrap" hidden>
-      <button type="button" class="outline-button" id="loadMoreVideosBtn">
+      <button type="button" class="outline-button" id="loadMoreVideosBtn" data-i18n="loadMoreVideosDefault">
         Load More Messages
       </button>
     </div>
 
-    <p class="empty" id="noVideos" hidden>
+    <p class="empty" id="noVideos" hidden data-i18n="noVideosFound">
       No videos found. Try another search or category.
     </p>
 
@@ -1535,9 +1584,9 @@ footer strong {
   <div class="page-content">
 
     <div class="page-heading">
-      <div class="eyebrow">EXPLORE OUR COLLECTIONS</div>
-      <h1>Featured <span>Playlists.</span></h1>
-      <p>Find collections of messages and worship videos.</p>
+      <div class="eyebrow" data-i18n="playlistsEyebrow">EXPLORE OUR COLLECTIONS</div>
+      <h1 data-i18n-html="playlistsHeadingHtml">Featured <span>Playlists.</span></h1>
+      <p data-i18n="playlistsSubtitle">Find collections of messages and worship videos.</p>
     </div>
 
     <div class="search-toolbar">
@@ -1546,15 +1595,17 @@ footer strong {
         id="playlistSearch"
         type="search"
         placeholder="Search playlists by title, preacher, description or category..."
+        data-i18n-placeholder="searchPlaylistsPlaceholder"
         aria-label="Search playlists"
+        data-i18n-aria="searchPlaylistsAria"
         oninput="filterPlaylists()"
       >
 
-      <select class="sort-select" id="playlistSort" aria-label="Sort playlists" onchange="filterPlaylists()">
-        <option value="default">Sort: Default Order</option>
-        <option value="newest">Sort: Newest First</option>
-        <option value="oldest">Sort: Oldest First</option>
-        <option value="title">Sort: Title (A–Z)</option>
+      <select class="sort-select" id="playlistSort" aria-label="Sort playlists" data-i18n-aria="sortPlaylistsAria" onchange="filterPlaylists()">
+        <option value="default" data-i18n="sortDefault">Sort: Default Order</option>
+        <option value="newest" data-i18n="sortNewest">Sort: Newest First</option>
+        <option value="oldest" data-i18n="sortOldest">Sort: Oldest First</option>
+        <option value="title" data-i18n="sortTitle">Sort: Title (A–Z)</option>
       </select>
     </div>
 
@@ -1563,12 +1614,12 @@ footer strong {
     <div class="grid" id="playlistGrid"></div>
 
     <div class="load-more-wrap" id="loadMorePlaylistsWrap" hidden>
-      <button type="button" class="outline-button" id="loadMorePlaylistsBtn">
+      <button type="button" class="outline-button" id="loadMorePlaylistsBtn" data-i18n="loadMorePlaylistsDefault">
         Load More Playlists
       </button>
     </div>
 
-    <p class="empty" id="noPlaylists">
+    <p class="empty" id="noPlaylists" data-i18n="noPlaylistsYet">
       Playlists will appear here once added.
     </p>
 
@@ -1583,18 +1634,18 @@ footer strong {
   <div class="page-content">
 
     <div class="page-heading">
-      <div class="eyebrow">SAVED MESSAGES &amp; PLAYLISTS</div>
-      <h1>Your <span>Favorites.</span></h1>
-      <p>Messages and playlists saved on this device.</p>
+      <div class="eyebrow" data-i18n="favoritesEyebrow">SAVED MESSAGES &amp; PLAYLISTS</div>
+      <h1 data-i18n-html="favoritesHeadingHtml">Your <span>Favorites.</span></h1>
+      <p data-i18n="favoritesSubtitle">Messages and playlists saved on this device.</p>
     </div>
 
     <div class="history-tools">
 
-      <span class="history-count" id="favoritesCount">
+      <span class="history-count" id="favoritesCount" data-i18n="noFavoritesCount">
         No saved favorites yet
       </span>
 
-      <button class="clear-button" id="clearFavorites" type="button" hidden>
+      <button class="clear-button" id="clearFavorites" type="button" hidden data-i18n="clearFavoritesBtn">
         CLEAR FAVORITES
       </button>
 
@@ -1602,7 +1653,7 @@ footer strong {
 
     <div class="grid" id="favoritesGrid"></div>
 
-    <p class="empty" id="emptyFavorites">
+    <p class="empty" id="emptyFavorites" data-i18n="emptyFavoritesText">
       You haven't saved any favorites yet. Tap the heart icon on any video or playlist.
     </p>
 
@@ -1617,18 +1668,18 @@ footer strong {
   <div class="page-content">
 
     <div class="page-heading">
-      <div class="eyebrow">YOUR WATCHING ACTIVITY</div>
-      <h1>Watch <span>Again.</span></h1>
-      <p>Find videos you opened recently.</p>
+      <div class="eyebrow" data-i18n="historyEyebrow">YOUR WATCHING ACTIVITY</div>
+      <h1 data-i18n-html="historyHeadingHtml">Watch <span>Again.</span></h1>
+      <p data-i18n="historySubtitle">Find videos you opened recently.</p>
     </div>
 
     <div class="history-tools">
 
-      <span class="history-count" id="historyCount">
+      <span class="history-count" id="historyCount" data-i18n="noHistoryCount">
         No videos in your history
       </span>
 
-      <button class="clear-button" id="clearHistory" type="button">
+      <button class="clear-button" id="clearHistory" type="button" data-i18n="clearHistoryBtn">
         CLEAR HISTORY
       </button>
 
@@ -1636,7 +1687,7 @@ footer strong {
 
     <div class="grid" id="historyGrid"></div>
 
-    <p class="empty" id="emptyHistory">
+    <p class="empty" id="emptyHistory" data-i18n="emptyHistoryText">
       You haven't opened any videos yet.
     </p>
 
@@ -1651,35 +1702,35 @@ footer strong {
   <div class="page-content">
 
     <div class="page-heading">
-      <div class="eyebrow">GET TO KNOW US</div>
-      <h1>About <span>Us.</span></h1>
-      <p>Welcome to Shalom Tabernacle.</p>
+      <div class="eyebrow" data-i18n="aboutEyebrow">GET TO KNOW US</div>
+      <h1 data-i18n-html="aboutHeadingHtml">About <span>Us.</span></h1>
+      <p data-i18n="aboutSubtitle">Welcome to Shalom Tabernacle.</p>
     </div>
 
     <div class="about-panel">
 
-      <h2>Shalom Tabernacle</h2>
+      <h2 data-i18n="aboutPanelTitle">Shalom Tabernacle</h2>
 
-      <p>
+      <p data-i18n="aboutPara1">
         Welcome to Shalom Tabernacle, Visakhapatnam.
         This website is a place to explore our messages,
         teachings and worship collections.
       </p>
 
-      <p style="margin-top:15px">
+      <p style="margin-top:15px" data-i18n="aboutPara2">
         Watch, revisit and share the messages that inspire
         your faith and help you grow in the Word of God.
       </p>
 
-      <div class="about-details">
+      <div class="about-details" data-i18n="locationUpper">
         VISAKHAPATNAM
       </div>
 
     </div>
 
     <div class="settings-panel">
-      <h3>Display &amp; App Preferences</h3>
-      <p>
+      <h3 data-i18n="prefsTitle">Display &amp; App Preferences</h3>
+      <p data-i18n="prefsDesc">
         Customize your reading theme, install the Shalom Tabernacle app for offline browsing, or share this library with others.
       </p>
 
@@ -1687,10 +1738,13 @@ footer strong {
         <button type="button" class="gold-button" id="aboutThemeBtn">
           Switch to Light Mode
         </button>
-        <button type="button" class="outline-button" id="aboutInstallBtn" hidden>
+        <button type="button" class="outline-button" id="aboutLangBtn">
+          తెలుగులో చూడండి (Telugu)
+        </button>
+        <button type="button" class="outline-button" id="aboutInstallBtn" hidden data-i18n="installAppBtn">
           Install App
         </button>
-        <button type="button" class="outline-button" id="aboutShareWebsiteBtn">
+        <button type="button" class="outline-button" id="aboutShareWebsiteBtn" data-i18n="shareWebsiteBtn">
           Share Website
         </button>
       </div>
@@ -1705,11 +1759,11 @@ footer strong {
 <!-- FOOTER -->
 
 <footer>
-  <strong>SHALOM TABERNACLE</strong>
+  <strong data-i18n="brandTitle">SHALOM TABERNACLE</strong>
   <br>
-  Visakhapatnam
+  <span data-i18n="locationText">Visakhapatnam</span>
   <br>
-  © 2026 Shalom Tabernacle. All rights reserved.
+  <span data-i18n="footerCopy">© 2026 Shalom Tabernacle. All rights reserved.</span>
 </footer>
 
 <!-- MOBILE NAV -->
@@ -1718,32 +1772,32 @@ footer strong {
 
   <button class="active" data-view="home">
     <span class="nav-icon">⌂</span>
-    <span>Home</span>
+    <span data-i18n="navHome">Home</span>
   </button>
 
   <button data-view="videos">
     <span class="nav-icon">▶</span>
-    <span>Videos</span>
+    <span data-i18n="navVideos">Videos</span>
   </button>
 
   <button data-view="playlists">
     <span class="nav-icon">▤</span>
-    <span>Playlists</span>
+    <span data-i18n="navPlaylists">Playlists</span>
   </button>
 
   <button data-view="favorites">
     <span class="nav-icon">♥</span>
-    <span>Favorites</span>
+    <span data-i18n="navFavorites">Favorites</span>
   </button>
 
   <button data-view="history">
     <span class="nav-icon">◷</span>
-    <span>History</span>
+    <span data-i18n="navHistory">History</span>
   </button>
 
   <button data-view="about">
     <span class="nav-icon">ⓘ</span>
-    <span>About</span>
+    <span data-i18n="navAbout">About</span>
   </button>
 
 </nav>
@@ -1754,15 +1808,15 @@ footer strong {
   <div class="pwa-banner-brand">
     <img src="./app-icon-192.png" alt="Shalom Tabernacle App Icon" width="42" height="42">
     <div>
-      <div class="pwa-banner-title">Install Shalom Tabernacle</div>
-      <div class="pwa-banner-sub" id="pwaBannerSubtitle">
+      <div class="pwa-banner-title" data-i18n="installTitle">Install Shalom Tabernacle</div>
+      <div class="pwa-banner-sub" id="pwaBannerSubtitle" data-i18n="installBannerSub">
         Add to your home screen for quick access to messages &amp; playlists.
       </div>
     </div>
   </div>
   <div class="pwa-banner-actions">
-    <button type="button" class="pwa-banner-dismiss" id="pwaBannerDismissBtn">Not now</button>
-    <button type="button" class="gold-button pwa-banner-install" id="pwaBannerInstallBtn">Install App</button>
+    <button type="button" class="pwa-banner-dismiss" id="pwaBannerDismissBtn" data-i18n="notNowBtn">Not now</button>
+    <button type="button" class="gold-button pwa-banner-install" id="pwaBannerInstallBtn" data-i18n="installAppBtn">Install App</button>
   </div>
 </aside>
 
@@ -1770,9 +1824,9 @@ footer strong {
 
 <div class="modal-backdrop" id="installGuideModal" hidden role="dialog" aria-modal="true" aria-labelledby="installGuideTitle">
   <div class="modal-card">
-    <h3 id="installGuideTitle">Install Shalom Tabernacle</h3>
+    <h3 id="installGuideTitle" data-i18n="installTitle">Install Shalom Tabernacle</h3>
     <div id="installGuideBody"></div>
-    <button type="button" class="gold-button" id="closeInstallGuideBtn" style="width:100%;">
+    <button type="button" class="gold-button" id="closeInstallGuideBtn" style="width:100%;" data-i18n="gotItBtn">
       Got It
     </button>
   </div>
@@ -1783,7 +1837,7 @@ footer strong {
 <div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
 
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=7"></script>
+<script src="./app.js?v=8"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 
@@ -1948,6 +2002,10 @@ function renderHistory() {
 
   const history = getHistory();
 
+  const orgLabel = typeof t === "function" ? t("orgName") : "Shalom Tabernacle";
+  const watchAgainLabel = typeof t === "function" ? t("watchAgainBtn") : "▶ WATCH AGAIN";
+  const removeHistoryLabel = typeof t === "function" ? t("removeHistoryBtn") : "Remove from history ×";
+
   grid.innerHTML = history.map((item,index) => {
 
     const safeURL = safeHistoryURL(item.url);
@@ -1988,7 +2046,7 @@ function renderHistory() {
 
           <h3>${title}</h3>
 
-          <p>Shalom Tabernacle</p>
+          <p>${historyEscape(orgLabel)}</p>
 
           <a
             class="play"
@@ -1996,7 +2054,7 @@ function renderHistory() {
             target="_blank"
             rel="noopener"
           >
-            ▶ WATCH AGAIN
+            ${historyEscape(watchAgainLabel)}
           </a>
 
           <button
@@ -2004,7 +2062,7 @@ function renderHistory() {
             type="button"
             data-remove-history="${index}"
           >
-            Remove from history ×
+            ${historyEscape(removeHistoryLabel)}
           </button>
 
         </div>
@@ -2017,10 +2075,14 @@ function renderHistory() {
   if (empty) empty.hidden = history.length !== 0;
 
   if (count) {
-    count.textContent = history.length
-      ? history.length + " recently opened video" +
-        (history.length === 1 ? "" : "s")
-      : "No videos in your history";
+    if (typeof formatHistoryCount === "function") {
+      count.textContent = formatHistoryCount(history.length);
+    } else {
+      count.textContent = history.length
+        ? history.length + " recently opened video" +
+          (history.length === 1 ? "" : "s")
+        : "No videos in your history";
+    }
   }
 
   if (clearButton) {
@@ -2067,7 +2129,11 @@ document.getElementById("clearHistory").addEventListener(
 
     if (!history.length) return;
 
-    if (!window.confirm("Clear all your recently watched videos?")) {
+    const confirmText =
+      typeof t === "function"
+        ? t("confirmClearHistory")
+        : "Clear all your recently watched videos?";
+    if (!window.confirm(confirmText)) {
       return;
     }
 
@@ -2089,8 +2155,24 @@ if ("serviceWorker" in navigator) {
 
   window.addEventListener("load", () => {
 
-    navigator.serviceWorker.register("./service-worker.js")
-      .then(() => console.log("Shalom App Ready"))
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshing = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadController || refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
+    navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" })
+      .then((registration) => {
+        console.log("Shalom App Ready");
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            registration.update().catch(() => {});
+          }
+        });
+      })
       .catch(error => console.error("App setup error:", error));
 
   });

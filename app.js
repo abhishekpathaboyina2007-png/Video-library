@@ -18,8 +18,11 @@ const MIN_REVALIDATE_MS = 60 * 1000;
 const CACHE_TIME = 5 * 60 * 1000;
 const FAVORITES_KEY = "shalomFavorites";
 const THEME_KEY = "shalomTheme";
+const LANG_KEY = "shalomLanguage";
 const INSTALL_DISMISS_KEY = "shalomPwaInstallDismissedAt";
 const INSTALL_DISMISS_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
+
+let currentLanguage = "en";
 
 const HOME_ROW_LIMIT = 10;
 const VIDEOS_PAGE_SIZE = 12;
@@ -201,6 +204,551 @@ const DAILY_VERSES = [
 ];
 
 
+const DAILY_VERSES_TE = [
+  {
+    reference: "కీర్తనలు 119:105",
+    text: "నీ వాక్యము నా పాదములకు దీపమును నా త్రోవకు వెలుగునై యున్నది.",
+    note: "ఈ రోజు మీరు తీసుకునే ప్రతి నిర్ణయంలో దేవుని వాక్యం మీకు మార్గదర్శిగా ఉండనివ్వండి."
+  },
+  {
+    reference: "యోహాను 14:6",
+    text: "యేసు నేనే మార్గమును, సత్యమును, జీవమును; నా ద్వారానే తప్ప యెవడును తండ్రి యొద్దకు రాడు అని చెప్పెను.",
+    note: "క్రీస్తే మన విశ్వాస సూత్రం, మన దిశానిర్దేశం, మన సమాధానం."
+  },
+  {
+    reference: "యెషయా 40:31",
+    text: "యెహోవా కొరకు ఎదురు చూచువారు నూతన బలము పొందుదురు; వారు పక్షిరాజులవలె రెక్కలు చాపి పైకి ఎగురుదురు.",
+    note: "ప్రభువు కొరకు సహనంతో ఎదురుచూడండి; ఆయన బలం ప్రతి శ్రమను అధిగమిస్తుంది."
+  },
+  {
+    reference: "హెబ్రీయులకు 13:8",
+    text: "యేసుక్రీస్తు నిన్న, నేడు, ఎల్లప్పుడు ఏకరీతిగా ఉన్నాడు.",
+    note: "మారిపోయే ఈ లోకంలో ఆయన నమ్మకత్వం మరియు శక్తి ఎన్నడూ మారదు."
+  },
+  {
+    reference: "రోమీయులకు 8:28",
+    text: "దేవుని ప్రేమించువారికి, అనగా ఆయన సంకల్పము చొప్పున పిలువబడినవారికి, మేలు కలుగుటకై సమస్తమును సమకూడి జరుగుచున్నవని యెరుగుదుము.",
+    note: "మార్గం ఇంకా స్పష్టంగా కనిపించకపోయినా ఆయన సర్వాధికార హస్తాన్ని నమ్మండి."
+  },
+  {
+    reference: "కీర్తనలు 23:1",
+    text: "యెహోవా నా కాపరి; నాకు లేమి కలుగదు.",
+    note: "మంచి కాపరియైన ప్రభువు మిమ్మల్ని కాపాడుతూ, పోషిస్తూ నడిపిస్తున్నారు."
+  },
+  {
+    reference: "సామెతలు 3:5–6",
+    text: "నీ స్వబుద్ధిని ఆధారము చేసికొనక నీ పూర్ణహృదయముతో యెహోవాయందు నమ్మకముంచుము. నీ ప్రవర్తన అంతటియందు ఆయన అధికారమునకు ఒప్పుకొనుము; అప్పుడు ఆయన నీ త్రోవలను సరాళము చేయును.",
+    note: "ప్రార్థనలో ఆయనను గుర్తించండి; ఆయన మీ మార్గాన్ని స్పష్టంగా నడిపిస్తారు."
+  },
+  {
+    reference: "ఫిలిప్పీయులకు 4:6–7",
+    text: "దేనిని గూర్చియు చింతపడకుడి గాని ప్రతి విషయములోను ప్రార్థన విజ్ఞాపనములచేత కృతజ్ఞతాపూర్వకముగా మీ విన్నపములు దేవునికి తెలియజేయుడి.",
+    note: "ప్రతి చింతను కృతజ్ఞతతో కూడిన ప్రార్థనగా మార్చి ఆయన సమాధానాన్ని పొందండి."
+  },
+  {
+    reference: "మత్తయి 11:28",
+    text: "ప్రయాసపడి భారము మోసికొనుచున్న సమస్త జనులారా, నా యొద్దకు రండి; నేను మీకు విశ్రాంతి కలుగజేతును.",
+    note: "యేసు పాదాల వద్ద మీ భారాలను దించి ఆత్మకు నిజమైన విశ్రాంతిని పొందండి."
+  },
+  {
+    reference: "యెహోషువ 1:9",
+    text: "నిబ్బరము కలిగి ధైర్యముగా నుండుము; దిగులుపడకుము జడియకుము; నీవు నడుచు మార్గమంతటిలో నీ దేవుడైన యెహోవా నీకు తోడైయుండును.",
+    note: "ప్రభువు మీతోనే నడుస్తున్నారనే ధైర్యంతో ముందుకు సాగండి."
+  },
+  {
+    reference: "కీర్తనలు 46:1",
+    text: "దేవుడు మనకు ఆశ్రయమును దుర్గమునై యున్నాడు; ఆపత్కాలములో ఆయన నమ్ముకొనదగిన సహాయకుడు.",
+    note: "ఆయన దూరంగా లేరు—ప్రతి అవసరంలోనూ సమీప సహాయకుడిగా ఉన్నారు."
+  },
+  {
+    reference: "2 కొరింథీయులకు 5:7",
+    text: "వెలుపటి చూపువలన కాక విశ్వాసమువలననే నడుచుకొనుచున్నాము.",
+    note: "ఫలితాన్ని చూడకముందే దేవుని వాగ్దానాన్ని గట్టిగా పట్టుకోండి."
+  },
+  {
+    reference: "యోహాను 8:32",
+    text: "అప్పుడు మీరు సత్యమును గ్రహించెదరు; మరియు ఆ సత్యము మిమ్మును స్వతంత్రులనుగా చేయును.",
+    note: "లేఖన సత్యంలో నిలబడటం శాశ్వతమైన స్వాతంత్ర్యాన్ని మరియు స్పష్టతను ఇస్తుంది."
+  },
+  {
+    reference: "విలాపవాక్యములు 3:22–23",
+    text: "యెహోవా కృప ఎడతెగకయుండును; ఆయన వాత్సల్యమునకు అంతము లేదు. అనుదినము నూతనముగా అది పుట్టుచుండును.",
+    note: "ఈ రోజు పరలోకం నుండి నూతన కృప మరియు దయ మీకు అనుగ్రహించబడింది."
+  },
+  {
+    reference: "1 కొరింథీయులకు 16:14",
+    text: "మీ కార్యములన్నియు ప్రేమతో జరిగించుడి.",
+    note: "ఈ రోజు మీ మాటలలో, సహనంలో, సేవలో క్రీస్తు ప్రేమ ప్రతిఫలించనివ్వండి."
+  },
+  {
+    reference: "కీర్తనలు 27:1",
+    text: "యెహోవా నాకు వెలుగును రక్షణయునై యున్నాడు; నేను ఎవరికి భయపడుదును?",
+    note: "ప్రభువు మీ జీవితంపై ప్రకాశించినప్పుడు భయానికి చోటు ఉండదు."
+  },
+  {
+    reference: "రోమీయులకు 10:17",
+    text: "కాగా వినుట వలన విశ్వాసము కలుగును; వినుట క్రీస్తును గూర్చిన మాట వలన కలుగును.",
+    note: "జీవముగల దేవుని వాక్యాన్ని వినడానికి మరియు ధ్యానించడానికి సమయం కేటాయించండి."
+  },
+  {
+    reference: "ఎఫెసీయులకు 2:8",
+    text: "మీరు విశ్వాసము ద్వారా కృపచేతనే రక్షింపబడియున్నారు; ఇది మీవలన కలిగినది కాదు, దేవుని వరమే.",
+    note: "యేసుక్రీస్తు ఉచితంగా ఇచ్చిన పరిపూర్ణ కృపలో విశ్రమించండి."
+  },
+  {
+    reference: "కీర్తనలు 34:8",
+    text: "యెహోవా ఉత్తముడని రుచి చూచి తెలిసికొనుడి; ఆయనను ఆశ్రయించు నరుడు ధన్యుడు.",
+    note: "ఆయనపై నమ్మకం ఉంచి ఆయన మంచితనాన్ని అనుభవపూర్వకంగా చూడండి."
+  },
+  {
+    reference: "యెషయా 26:3",
+    text: "ఎవని మనస్సు నీమీద ఆనుకొనునో వానిని నీవు పూర్ణశాంతిగలవానిగా కాపాడుదువు; ఏలయనగా వాడు నీయందు విశ్వాసముంచియున్నాడు.",
+    note: "మీ ఆలోచనలను ప్రభువుపై నిలిపి మీ హృదయాన్ని సమాధానంలో కాపాడుకోండి."
+  },
+  {
+    reference: "కొలొస్సయులకు 3:23",
+    text: "మీరేమి చేసినను అది మనుష్యుల నిమిత్తము కాక ప్రభువు నిమిత్తమని మనస్ఫూర్తిగా చేయుడి.",
+    note: "క్రీస్తు కొరకు విశ్వాసంతో చేసే ప్రతి పనికి నిత్యమైన విలువ ఉంది."
+  },
+  {
+    reference: "యోహాను 16:33",
+    text: "లోకములో మీకు శ్రమ కలుగును; అయినను ధైర్యము తెచ్చుకొనుడి, నేను లోకమును జయించియున్నాను.",
+    note: "ఈ రోజు ధైర్యంగా ఉండండి—మన రక్షకుడు ఇప్పటికే విజయం సాధించారు."
+  },
+  {
+    reference: "కీర్తనలు 91:1–2",
+    text: "మహోన్నతుని చాటున నివసించువాడే సర్వశక్తుని నీడను విశ్రమించువాడు.",
+    note: "ప్రార్థనలో దేవునికి సమీపంగా ఉండండి; ఆయన నీడలో భద్రత ఉంది."
+  },
+  {
+    reference: "మత్తయి 6:33",
+    text: "కాబట్టి మీరు ఆయన రాజ్యమును నీతిని మొదట వెదకుడి; అప్పుడవన్నియు మీకు అనుగ్రహింపబడును.",
+    note: "దేవుని రాజ్యానికి మొదటి స్థానం ఇచ్చి ప్రతి అవసరాన్ని ఆయన చేతికి అప్పగించండి."
+  },
+  {
+    reference: "1 పేతురు 5:7",
+    text: "ఆయన మిమ్మును గూర్చి చింతించుచున్నాడు గనుక మీ చింత యావత్తు ఆయనమీద వేయుడి.",
+    note: "రేపటి చింతలను మీరు ఒంటరిగా మోయాల్సిన అవసరం లేదు."
+  },
+  {
+    reference: "కీర్తనలు 100:5",
+    text: "యెహోవా దయాళుడు; ఆయన కృప నిత్యముండును; ఆయన సత్యము తరతరములకు ఉండును.",
+    note: "ఎన్నటికీ తరగని ఆయన కృపకై ఈ రోజు ఆయనను స్తుతించండి."
+  },
+  {
+    reference: "యోహాను 1:5",
+    text: "ఆ వెలుగు చీకటిలో ప్రకాశించుచున్నది గాని చీకటి దానిని గ్రహింపకుండెను.",
+    note: "క్రీస్తు వెలుగు ప్రతి చీకటిని జయిస్తుంది—ఆయన నిరీక్షణలో నడవండి."
+  },
+  {
+    reference: "2 తిమోతి 1:7",
+    text: "దేవుడు మనకు శక్తియు ప్రేమయు ఇంద్రియనిగ్రహమును గల ఆత్మనే ఇచ్చెను గాని పిరికితనము గల ఆత్మను ఇయ్యలేదు.",
+    note: "ఈ రోజు ధైర్యం, ప్రేమ మరియు స్థిరమైన మనస్సును దేవుని నుండి పొందండి."
+  },
+  {
+    reference: "కీర్తనలు 121:1–2",
+    text: "కొండలతట్టు నా కన్నులెత్తుచున్నాను; నాకు సహాయము ఎక్కడనుండి వచ్చును? భూమ్యాకాశములను సృజించిన యెహోవా వలననే నాకు సహాయము కలుగును.",
+    note: "విశ్వాసంతో పైకి చూడండి—భూమ్యాకాశాలను సృష్టించిన దేవుని నుండే మీకు సహాయం వస్తుంది."
+  },
+  {
+    reference: "గలతీయులకు 6:9",
+    text: "మనము మేలుచేయుటయందు విసుకక యుందము; మనము అలయక యుంటిమేని తగిన కాలమందు పంట కోతుము.",
+    note: "చిన్న విషయాలలో నమ్మకంగా ఉండండి; సహనంతో కూడిన విశ్వాసాన్ని దేవుడు ఘనపరుస్తారు."
+  },
+  {
+    reference: "ప్రకటన 22:20",
+    text: "ఈ సంగతులను గూర్చి సాక్ష్యమిచ్చుచున్నవాడు—అవును, త్వరగా వచ్చుచున్నాను అనుచున్నాడు. ఆమేన్; ప్రభువైన యేసూ రమ్ము.",
+    note: "క్రీస్తు రాకడపై ఆశతో సిద్ధంగా మరియు స్థిరంగా జీవించండి."
+  }
+];
+
+
+/* ==========================================
+   BILINGUAL DICTIONARY (ENGLISH / TELUGU)
+========================================== */
+
+const I18N = {
+  en: {
+    pageTitle: "Shalom Tabernacle | Visakhapatnam",
+    orgName: "Shalom Tabernacle",
+    brandTitle: "SHALOM TABERNACLE",
+    brandNameHtml: "SHALOM\n<span>TABERNACLE</span>",
+    locationText: "Visakhapatnam",
+    locationUpper: "VISAKHAPATNAM",
+    footerCopy: "© 2026 Shalom Tabernacle. All rights reserved.",
+    langSwitchLabel: "తెలుగు",
+    langAboutBtn: "తెలుగులో చూడండి (Telugu)",
+    langSwitchedToast: "Language switched to English",
+    navHome: "Home",
+    navVideos: "Videos",
+    navPlaylists: "Playlists",
+    navFavorites: "Favorites",
+    navHistory: "History",
+    navAbout: "About",
+    lightModeShort: "Light Mode",
+    darkModeShort: "Dark Mode",
+    switchToLightBtn: "Switch to Light Mode",
+    switchToDarkBtn: "Switch to Dark Mode",
+    lightThemeToast: "Light theme enabled",
+    darkThemeToast: "Dark theme enabled",
+    offlineBanner: "You are currently offline. Showing previously loaded messages, saved favorites, and local history.",
+    heroEyebrow: "WELCOME TO SHALOM TABERNACLE",
+    heroTitleHtml: "Faith. Truth.\n<span>The Word of God.</span>",
+    heroQuote: "🕊️ And in here, we don’t have no creed but Christ, that’s the creed; and no law but love; no book but the Bible. And Christ is the Head; and the Bible is our textbook; the world is my parish. So I like to just preach the way that I feel led to preach, and just the way that I see it. 🦅",
+    heroAttributionHtml: "PAS. JOEL. P\n<span>Visakhapatnam</span>",
+    continueEyebrow: "PICK UP WHERE YOU LEFT OFF",
+    continueTitle: "Continue Watching",
+    clearBtn: "CLEAR",
+    viewAllBtn: "VIEW ALL →",
+    verseEyebrow: "DAILY WORD",
+    verseTitle: "Daily Bible Verse",
+    copyVerseBtn: "Copy Verse",
+    shareVerseBtn: "Share Verse",
+    verseCopiedToast: "Bible verse copied!",
+    verseCopiedShareToast: "Bible verse copied for sharing!",
+    verseCopyErrorToast: "Could not copy verse.",
+    dailyVerseShareTitle: "Daily Bible Verse",
+    recentEyebrow: "FRESH UPLOADS",
+    recentTitle: "Recently Added",
+    browseLibraryBtn: "BROWSE LIBRARY →",
+    loadingRecent: "Loading recent additions...",
+    swipeRecentHint: "← Swipe to explore recent videos & playlists →",
+    latestEyebrow: "WATCH AND GROW",
+    latestTitle: "Latest Messages",
+    loadingVideos: "Loading videos...",
+    swipeVideosHint: "← Swipe to explore more videos →",
+    playlistsEyebrow: "EXPLORE OUR COLLECTIONS",
+    playlistsTitle: "Featured Playlists",
+    loadingPlaylists: "Loading playlists...",
+    swipePlaylistsHint: "← Swipe to explore more playlists →",
+    videosHeadingHtml: "Latest <span>Messages.</span>",
+    videosSubtitle: "Search by title, preacher, description or category, and sort messages below.",
+    searchVideosPlaceholder: "Search by title, preacher, description or category...",
+    searchVideosAria: "Search videos",
+    sortVideosAria: "Sort videos",
+    playlistsHeadingHtml: "Featured <span>Playlists.</span>",
+    playlistsSubtitle: "Find collections of messages and worship videos.",
+    searchPlaylistsPlaceholder: "Search playlists by title, preacher, description or category...",
+    searchPlaylistsAria: "Search playlists",
+    sortPlaylistsAria: "Sort playlists",
+    sortDefault: "Sort: Default Order",
+    sortNewest: "Sort: Newest First",
+    sortOldest: "Sort: Oldest First",
+    sortTitle: "Sort: Title (A–Z)",
+    filterAll: "All",
+    loadMoreVideosDefault: "Load More Messages",
+    loadMoreVideosRemaining: "Load More Messages ({n} remaining)",
+    loadMorePlaylistsDefault: "Load More Playlists",
+    loadMorePlaylistsRemaining: "Load More Playlists ({n} remaining)",
+    noVideosFound: "No videos found. Try another search or category.",
+    noPlaylistsYet: "Playlists will appear here once added.",
+    favoritesEyebrow: "SAVED MESSAGES & PLAYLISTS",
+    favoritesHeadingHtml: "Your <span>Favorites.</span>",
+    favoritesSubtitle: "Messages and playlists saved on this device.",
+    noFavoritesCount: "No saved favorites yet",
+    clearFavoritesBtn: "CLEAR FAVORITES",
+    emptyFavoritesText: "You haven't saved any favorites yet. Tap the heart icon on any video or playlist.",
+    historyEyebrow: "YOUR WATCHING ACTIVITY",
+    historyHeadingHtml: "Watch <span>Again.</span>",
+    historySubtitle: "Find videos you opened recently.",
+    noHistoryCount: "No videos in your history",
+    clearHistoryBtn: "CLEAR HISTORY",
+    emptyHistoryText: "You haven't opened any videos yet.",
+    aboutEyebrow: "GET TO KNOW US",
+    aboutHeadingHtml: "About <span>Us.</span>",
+    aboutSubtitle: "Welcome to Shalom Tabernacle.",
+    aboutPanelTitle: "Shalom Tabernacle",
+    aboutPara1: "Welcome to Shalom Tabernacle, Visakhapatnam. This website is a place to explore our messages, teachings and worship collections.",
+    aboutPara2: "Watch, revisit and share the messages that inspire your faith and help you grow in the Word of God.",
+    prefsTitle: "Display & App Preferences",
+    prefsDesc: "Customize your reading theme, switch language, install the Shalom Tabernacle app for offline browsing, or share this library with others.",
+    installAppBtn: "Install App",
+    howToInstallBtn: "How to Install",
+    shareWebsiteBtn: "Share Website",
+    installTitle: "Install Shalom Tabernacle",
+    installBannerSub: "Add to your home screen for quick access to messages & playlists.",
+    installBannerSubIos: "Tap below for Safari Add to Home Screen steps.",
+    notNowBtn: "Not now",
+    gotItBtn: "Got It",
+    installGuideIosHtml: "<p>Install <strong>Shalom Tabernacle</strong> directly to your iPhone or iPad home screen:</p><ol><li>Tap the <strong>Share</strong> icon in Safari's toolbar.</li><li>Scroll down and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong> in the top-right corner.</li></ol>",
+    installGuideOtherHtml: "<p>Your browser does not show an automatic install prompt right now. You can still install or pin <strong>Shalom Tabernacle</strong>:</p><ol><li>Open your browser's menu (<strong>⋮</strong> or <strong>⋯</strong>) or address bar install icon.</li><li>Choose <strong>Install App</strong>, <strong>Add to Home Screen</strong>, or <strong>Create Shortcut</strong>.</li></ol>",
+    installingToast: "Installing Shalom Tabernacle...",
+    installedToast: "Shalom Tabernacle app installed!",
+    watchVideoBtn: "▶ WATCH VIDEO",
+    openPlaylistBtn: "▶ OPEN PLAYLIST",
+    watchAgainBtn: "▶ WATCH AGAIN",
+    removeHistoryBtn: "Remove from history ×",
+    continueLabel: "Continue Watching",
+    videoTag: "Video",
+    playlistTag: "Playlist",
+    playlistCollectionSub: "Shalom Tabernacle Collection",
+    addFavAria: "Add to favorites",
+    removeFavAria: "Remove from favorites",
+    saveFavTitle: "Save to favorites",
+    shareTitle: "Share",
+    addedFavToast: "Added to Favorites",
+    removedFavToast: "Removed from Favorites",
+    clearedFavToast: "Favorites cleared",
+    clearedHistoryToast: "Viewing history cleared",
+    confirmClearFavorites: "Remove all saved favorites?",
+    confirmClearHistory: "Clear all your recently watched videos?",
+    shareUnavailableToast: "Unable to share this link.",
+    websiteCopiedToast: "Website link copied to clipboard!",
+    linkCopiedToast: "Link copied to clipboard!",
+    copyManualToast: "Copy unavailable. Long-press the link to copy.",
+    shareTextTemplate: "Watch \"{title}\" from Shalom Tabernacle ({type})",
+    typeMessage: "message",
+    typePlaylist: "playlist",
+    websiteShareText: "Watch messages and explore playlists from Shalom Tabernacle, Visakhapatnam.",
+    offlineNoCacheError: "You are offline and no previously loaded library is cached yet.",
+    connectError: "Unable to connect. Please check your internet and refresh.",
+    timeoutError: "Connection is taking too long. Please refresh the page.",
+    libraryError: "Unable to load the video library.",
+    noRecentUploads: "No recent uploads available yet.",
+    noVideosAvailable: "No videos available yet.",
+    noPlaylistsAvailable: "No playlists available yet."
+  },
+  te: {
+    pageTitle: "షలోమ్ టాబర్నాకిల్ | విశాఖపట్నం",
+    orgName: "షలోమ్ టాబర్నాకిల్",
+    brandTitle: "షలోమ్ టాబర్నాకిల్",
+    brandNameHtml: "షలోమ్\n<span>టాబర్నాకిల్</span>",
+    locationText: "విశాఖపట్నం",
+    locationUpper: "విశాఖపట్నం",
+    footerCopy: "© 2026 షలోమ్ టాబర్నాకిల్. సర్వ హక్కులు ప్రత్యేకించబడినవి.",
+    langSwitchLabel: "English",
+    langAboutBtn: "Switch to English",
+    langSwitchedToast: "భాష తెలుగులోకి మార్చబడింది",
+    navHome: "హోమ్",
+    navVideos: "వీడియోలు",
+    navPlaylists: "ప్లేలిస్ట్‌లు",
+    navFavorites: "ఇష్టమైనవి",
+    navHistory: "చరిత్ర",
+    navAbout: "గురించి",
+    lightModeShort: "లైట్ మోడ్",
+    darkModeShort: "డార్క్ మోడ్",
+    switchToLightBtn: "లైట్ మోడ్‌కు మార్చండి",
+    switchToDarkBtn: "డార్క్ మోడ్‌కు మార్చండి",
+    lightThemeToast: "లైట్ థీమ్ ఆన్ చేయబడింది",
+    darkThemeToast: "డార్క్ థీమ్ ఆన్ చేయబడింది",
+    offlineBanner: "మీరు ప్రస్తుతం ఆఫ్‌లైన్‌లో ఉన్నారు. గతంలో లోడ్ చేసిన సందేశాలు, సేవ్ చేసిన ఇష్టమైనవి మరియు స్థానిక చరిత్ర చూపబడుతున్నాయి.",
+    heroEyebrow: "షలోమ్ టాబర్నాకిల్‌కు స్వాగతం",
+    heroTitleHtml: "విశ్వాసం. సత్యం.\n<span>దేవుని వాక్యం.</span>",
+    heroQuote: "🕊️ ఇక్కడ మాకు క్రీస్తు తప్ప మరే విశ్వాస సూత్రం లేదు, అదే మా విశ్వాసం; ప్రేమ తప్ప మరే చట్టం లేదు; బైబిల్ తప్ప మరే గ్రంథం లేదు. క్రీస్తే శిరస్సు; బైబిలే మా పాఠ్యపుస్తకం; లోకమే నా పరిచర్య క్షేత్రం. కాబట్టి నాకు ప్రేరేపించబడిన రీతిలో, నేను చూసిన విధంగానే వాక్యాన్ని ప్రకటించడం నాకు ఇష్టం. 🦅",
+    heroAttributionHtml: "పాస్టర్ జోయెల్. పి\n<span>విశాఖపట్నం</span>",
+    continueEyebrow: "మీరు ఆపిన చోటు నుండి కొనసాగించండి",
+    continueTitle: "చూడటం కొనసాగించండి",
+    clearBtn: "క్లియర్",
+    viewAllBtn: "అన్నీ చూడండి →",
+    verseEyebrow: "దినసరి వాక్యం",
+    verseTitle: "నేటి బైబిల్ వాక్యం",
+    copyVerseBtn: "వాక్యం కాపీ చేయండి",
+    shareVerseBtn: "వాక్యం షేర్ చేయండి",
+    verseCopiedToast: "బైబిల్ వాక్యం కాపీ చేయబడింది!",
+    verseCopiedShareToast: "షేర్ చేయడానికి బైబిల్ వాక్యం కాపీ చేయబడింది!",
+    verseCopyErrorToast: "వాక్యాన్ని కాపీ చేయలేకపోయాము.",
+    dailyVerseShareTitle: "నేటి బైబిల్ వాక్యం",
+    recentEyebrow: "కొత్తగా చేర్చబడినవి",
+    recentTitle: "ఇటీవల చేర్చబడినవి",
+    browseLibraryBtn: "లైబ్రరీ చూడండి →",
+    loadingRecent: "ఇటీవలి అప్‌లోడ్‌లు లోడ్ అవుతున్నాయి...",
+    swipeRecentHint: "← ఇటీవలి వీడియోలు & ప్లేలిస్ట్‌ల కోసం స్వైప్ చేయండి →",
+    latestEyebrow: "చూడండి మరియు ఎదగండి",
+    latestTitle: "తాజా సందేశాలు",
+    loadingVideos: "వీడియోలు లోడ్ అవుతున్నాయి...",
+    swipeVideosHint: "← మరిన్ని వీడియోల కోసం స్వైప్ చేయండి →",
+    playlistsEyebrow: "మా సేకరణలను చూడండి",
+    playlistsTitle: "ప్రత్యేక ప్లేలిస్ట్‌లు",
+    loadingPlaylists: "ప్లేలిస్ట్‌లు లోడ్ అవుతున్నాయి...",
+    swipePlaylistsHint: "← మరిన్ని ప్లేలిస్ట్‌ల కోసం స్వైప్ చేయండి →",
+    videosHeadingHtml: "తాజా <span>సందేశాలు.</span>",
+    videosSubtitle: "శీర్షిక, బోధకుడు, వివరణ లేదా వర్గం ద్వారా వెతకండి మరియు సందేశాలను క్రమబద్ధీకరించండి.",
+    searchVideosPlaceholder: "శీర్షిక, బోధకుడు, వివరణ లేదా వర్గం ద్వారా వెతకండి...",
+    searchVideosAria: "వీడియోలు వెతకండి",
+    sortVideosAria: "వీడియోలను క్రమబద్ధీకరించండి",
+    playlistsHeadingHtml: "ప్రత్యేక <span>ప్లేలిస్ట్‌లు.</span>",
+    playlistsSubtitle: "సందేశాలు మరియు ఆరాధన వీడియోల సేకరణలను కనుగొనండి.",
+    searchPlaylistsPlaceholder: "శీర్షిక, బోధకుడు, వివరణ లేదా వర్గం ద్వారా ప్లేలిస్ట్‌లను వెతకండి...",
+    searchPlaylistsAria: "ప్లేలిస్ట్‌లు వెతకండి",
+    sortPlaylistsAria: "ప్లేలిస్ట్‌లను క్రమబద్ధీకరించండి",
+    sortDefault: "క్రమం: సాధారణ క్రమం",
+    sortNewest: "క్రమం: కొత్తవి ముందుగా",
+    sortOldest: "క్రమం: పాతవి ముందుగా",
+    sortTitle: "క్రమం: శీర్షిక (A–Z)",
+    filterAll: "అన్నీ",
+    loadMoreVideosDefault: "మరిన్ని సందేశాలు లోడ్ చేయండి",
+    loadMoreVideosRemaining: "మరిన్ని సందేశాలు లోడ్ చేయండి ({n} మిగిలాయి)",
+    loadMorePlaylistsDefault: "మరిన్ని ప్లేలిస్ట్‌లు లోడ్ చేయండి",
+    loadMorePlaylistsRemaining: "మరిన్ని ప్లేలిస్ట్‌లు లోడ్ చేయండి ({n} మిగిలాయి)",
+    noVideosFound: "వీడియోలు కనుగొనబడలేదు. మరొక శోధన లేదా వర్గాన్ని ప్రయత్నించండి.",
+    noPlaylistsYet: "ప్లేలిస్ట్‌లు జోడించబడిన తర్వాత ఇక్కడ కనిపిస్తాయి.",
+    favoritesEyebrow: "సేవ్ చేసిన సందేశాలు & ప్లేలిస్ట్‌లు",
+    favoritesHeadingHtml: "మీ <span>ఇష్టమైనవి.</span>",
+    favoritesSubtitle: "ఈ పరికరంలో సేవ్ చేయబడిన సందేశాలు మరియు ప్లేలిస్ట్‌లు.",
+    noFavoritesCount: "ఇంకా ఇష్టమైనవి సేవ్ చేయబడలేదు",
+    clearFavoritesBtn: "ఇష్టమైనవి క్లియర్ చేయండి",
+    emptyFavoritesText: "మీరు ఇంకా ఏవీ ఇష్టమైన వాటిలో సేవ్ చేయలేదు. ఏదైనా వీడియో లేదా ప్లేలిస్ట్‌పై హార్ట్ చిహ్నాన్ని నొక్కండి.",
+    historyEyebrow: "మీరు చూసిన వీడియోల వివరాలు",
+    historyHeadingHtml: "మళ్లీ <span>చూడండి.</span>",
+    historySubtitle: "మీరు ఇటీవల తెరిచిన వీడియోలను చూడండి.",
+    noHistoryCount: "మీ చరిత్రలో వీడియోలు లేవు",
+    clearHistoryBtn: "చరిత్రను క్లియర్ చేయండి",
+    emptyHistoryText: "మీరు ఇంకా ఏ వీడియోలను తెరవలేదు.",
+    aboutEyebrow: "మా గురించి తెలుసుకోండి",
+    aboutHeadingHtml: "మా <span>గురించి.</span>",
+    aboutSubtitle: "షలోమ్ టాబర్నాకిల్‌కు స్వాగతం.",
+    aboutPanelTitle: "షలోమ్ టాబర్నాకిల్",
+    aboutPara1: "విశాఖపట్నంలోని షలోమ్ టాబర్నాకిల్‌కు స్వాగతం. ఈ వెబ్‌సైట్ మా సందేశాలు, బోధనలు మరియు ఆరాధన సేకరణలను అన్వేషించడానికి ఒక వేదిక.",
+    aboutPara2: "మీ విశ్వాసాన్ని ప్రేరేపించే మరియు దేవుని వాక్యంలో ఎదగడానికి సహాయపడే సందేశాలను చూడండి, మళ్లీ వీక్షించండి మరియు షేర్ చేయండి.",
+    prefsTitle: "డిస్‌ప్లే & యాప్ ప్రాధాన్యతలు",
+    prefsDesc: "మీ థీమ్ మరియు భాషను మార్చుకోండి, ఆఫ్‌లైన్ బ్రౌజింగ్ కోసం షలోమ్ టాబర్నాకిల్ యాప్‌ను ఇన్‌స్టాల్ చేయండి లేదా ఈ లైబ్రరీని ఇతరులతో షేర్ చేయండి.",
+    installAppBtn: "యాప్ ఇన్‌స్టాల్ చేయండి",
+    howToInstallBtn: "ఇన్‌స్టాల్ చేయడం ఎలా",
+    shareWebsiteBtn: "వెబ్‌సైట్ షేర్ చేయండి",
+    installTitle: "షలోమ్ టాబర్నాకిల్ ఇన్‌స్టాల్ చేయండి",
+    installBannerSub: "సందేశాలు & ప్లేలిస్ట్‌లను త్వరగా చూడటానికి మీ హోమ్ స్క్రీన్‌కు జోడించండి.",
+    installBannerSubIos: "సఫారిలో హోమ్ స్క్రీన్‌కు జోడించే దశల కోసం క్రింద నొక్కండి.",
+    notNowBtn: "ఇప్పుడు కాదు",
+    gotItBtn: "అర్థమైంది",
+    installGuideIosHtml: "<p>మీ iPhone లేదా iPad హోమ్ స్క్రీన్‌పై నేరుగా <strong>షలోమ్ టాబర్నాకిల్</strong> ఇన్‌స్టాల్ చేయండి:</p><ol><li>సఫారి టూల్‌బార్‌లోని <strong>Share</strong> చిహ్నాన్ని నొక్కండి.</li><li>క్రిందికి స్క్రోల్ చేసి <strong>Add to Home Screen</strong> నొక్కండి.</li><li>పై కుడి మూలలో ఉన్న <strong>Add</strong> నొక్కండి.</li></ol>",
+    installGuideOtherHtml: "<p>మీ బ్రౌజర్ ప్రస్తుతం ఆటోమేటిక్ ఇన్‌స్టాల్ ప్రాంప్ట్ చూపడం లేదు. అయినా మీరు <strong>షలోమ్ టాబర్నాకిల్</strong> ఇన్‌స్టాల్ చేయవచ్చు:</p><ol><li>మీ బ్రౌజర్ మెను (<strong>⋮</strong> లేదా <strong>⋯</strong>) లేదా అడ్రస్ బార్ ఇన్‌స్టాల్ చిహ్నాన్ని తెరవండి.</li><li><strong>Install App</strong>, <strong>Add to Home Screen</strong>, లేదా <strong>Create Shortcut</strong> ఎంచుకోండి.</li></ol>",
+    installingToast: "షలోమ్ టాబర్నాకిల్ ఇన్‌స్టాల్ అవుతోంది...",
+    installedToast: "షలోమ్ టాబర్నాకిల్ యాప్ ఇన్‌స్టాల్ చేయబడింది!",
+    watchVideoBtn: "▶ వీడియో చూడండి",
+    openPlaylistBtn: "▶ ప్లేలిస్ట్ తెరవండి",
+    watchAgainBtn: "▶ మళ్లీ చూడండి",
+    removeHistoryBtn: "చరిత్ర నుండి తీసివేయండి ×",
+    continueLabel: "చూడటం కొనసాగించండి",
+    videoTag: "వీడియో",
+    playlistTag: "ప్లేలిస్ట్",
+    playlistCollectionSub: "షలోమ్ టాబర్నాకిల్ సేకరణ",
+    addFavAria: "ఇష్టమైన వాటిలో చేర్చండి",
+    removeFavAria: "ఇష్టమైన వాటి నుండి తీసివేయండి",
+    saveFavTitle: "ఇష్టమైన వాటిలో సేవ్ చేయండి",
+    shareTitle: "షేర్ చేయండి",
+    addedFavToast: "ఇష్టమైన వాటిలో చేర్చబడింది",
+    removedFavToast: "ఇష్టమైన వాటి నుండి తీసివేయబడింది",
+    clearedFavToast: "ఇష్టమైనవి క్లియర్ చేయబడ్డాయి",
+    clearedHistoryToast: "వీక్షణ చరిత్ర క్లియర్ చేయబడింది",
+    confirmClearFavorites: "సేవ్ చేసిన అన్ని ఇష్టమైన వాటిని తీసివేయాలా?",
+    confirmClearHistory: "మీరు ఇటీవల చూసిన అన్ని వీడియోలను క్లియర్ చేయాలా?",
+    shareUnavailableToast: "ఈ లింక్‌ను షేర్ చేయడం సాధ్యం కాలేదు.",
+    websiteCopiedToast: "వెబ్‌సైట్ లింక్ క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది!",
+    linkCopiedToast: "లింక్ క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది!",
+    copyManualToast: "కాపీ అందుబాటులో లేదు. కాపీ చేయడానికి లింక్‌ను నొక్కి ఉంచండి.",
+    shareTextTemplate: "షలోమ్ టాబర్నాకిల్ నుండి \"{title}\" ({type}) చూడండి",
+    typeMessage: "సందేశం",
+    typePlaylist: "ప్లేలిస్ట్",
+    websiteShareText: "విశాఖపట్నం షలోమ్ టాబర్నాకిల్ నుండి సందేశాలు మరియు ప్లేలిస్ట్‌లను చూడండి.",
+    offlineNoCacheError: "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు మరియు గతంలో లోడ్ చేసిన లైబ్రరీ ఇంకా సేవ్ చేయబడలేదు.",
+    connectError: "కనెక్ట్ చేయడం సాధ్యం కాలేదు. దయచేసి మీ ఇంటర్నెట్ తనిఖీ చేసి రిఫ్రెష్ చేయండి.",
+    timeoutError: "కనెక్షన్ చాలా సమయం తీసుకుంటోంది. దయచేసి పేజీని రిఫ్రెష్ చేయండి.",
+    libraryError: "వీడియో లైబ్రరీని లోడ్ చేయడం సాధ్యం కాలేదు.",
+    noRecentUploads: "ఇంకా ఇటీవలి అప్‌లోడ్‌లు అందుబాటులో లేవు.",
+    noVideosAvailable: "ఇంకా వీడియోలు అందుబాటులో లేవు.",
+    noPlaylistsAvailable: "ఇంకా ప్లేలిస్ట్‌లు అందుబాటులో లేవు."
+  }
+};
+
+function getPreferredLanguage() {
+  try {
+    const saved = localStorage.getItem(LANG_KEY);
+    if (saved === "te" || saved === "en") return saved;
+  } catch {}
+  return "en";
+}
+
+function t(key, vars) {
+  const dict = I18N[currentLanguage] || I18N.en;
+  let text = dict[key] ?? I18N.en[key] ?? key;
+  if (vars && typeof vars === "object") {
+    Object.keys(vars).forEach((k) => {
+      text = text.replaceAll(`{${k}}`, String(vars[k]));
+    });
+  }
+  return text;
+}
+
+function formatFavoritesCount(count) {
+  if (!count) return t("noFavoritesCount");
+  if (currentLanguage === "te") {
+    return `${count} సేవ్ చేసిన${count === 1 ? "ది" : "వి"}`;
+  }
+  return `${count} saved favorite${count === 1 ? "" : "s"}`;
+}
+
+function formatHistoryCount(count) {
+  if (!count) return t("noHistoryCount");
+  if (currentLanguage === "te") {
+    return `ఇటీవల తెరిచిన ${count} వీడియో${count === 1 ? "" : "లు"}`;
+  }
+  return `${count} recently opened video${count === 1 ? "" : "s"}`;
+}
+
+function applyLanguage(lang, { rerenderDynamic = true } = {}) {
+  currentLanguage = lang === "te" ? "te" : "en";
+  document.documentElement.setAttribute("lang", currentLanguage);
+  document.title = t("pageTitle");
+
+  try {
+    localStorage.setItem(LANG_KEY, currentLanguage);
+  } catch {}
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    if (key) el.textContent = t(key);
+  });
+
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    const key = el.dataset.i18nHtml;
+    if (key) el.innerHTML = t(key);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.dataset.i18nPlaceholder;
+    if (key) el.setAttribute("placeholder", t(key));
+  });
+
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+    const key = el.dataset.i18nAria;
+    if (key) el.setAttribute("aria-label", t(key));
+  });
+
+  const langToggleLabel = document.getElementById("langToggleLabel");
+  if (langToggleLabel) langToggleLabel.textContent = t("langSwitchLabel");
+
+  const aboutLangBtn = document.getElementById("aboutLangBtn");
+  if (aboutLangBtn) aboutLangBtn.textContent = t("langAboutBtn");
+
+  applyTheme(getPreferredTheme());
+  syncInstallUI();
+
+  if (rerenderDynamic) {
+    renderDailyBibleVerse();
+    if (typeof renderHistory === "function") renderHistory();
+    renderContinueWatching();
+    if (libraryData) {
+      renderLibrary(libraryData);
+    } else {
+      renderFavorites();
+    }
+  }
+}
+
+function initLanguageSwitcher() {
+  applyLanguage(getPreferredLanguage(), { rerenderDynamic: false });
+
+  const toggleLanguage = () => {
+    const next = currentLanguage === "te" ? "en" : "te";
+    applyLanguage(next, { rerenderDynamic: true });
+    showToast(t("langSwitchedToast"));
+  };
+
+  document.getElementById("langToggleBtn")?.addEventListener("click", toggleLanguage);
+  document.getElementById("aboutLangBtn")?.addEventListener("click", toggleLanguage);
+}
+
+
 /* ==========================================
    TOAST CONFIRMATION
 ========================================== */
@@ -242,16 +790,16 @@ function applyTheme(theme) {
   if (mode === "light") {
     root.setAttribute("data-theme", "light");
     if (metaTheme) metaTheme.setAttribute("content", "#F8F5EE");
-    if (toggleLabel) toggleLabel.textContent = "Dark Mode";
-    if (aboutThemeBtn) aboutThemeBtn.textContent = "Switch to Dark Mode";
+    if (toggleLabel) toggleLabel.textContent = t("darkModeShort");
+    if (aboutThemeBtn) aboutThemeBtn.textContent = t("switchToDarkBtn");
     if (toggleIcon) {
       toggleIcon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
     }
   } else {
     root.removeAttribute("data-theme");
     if (metaTheme) metaTheme.setAttribute("content", "#090909");
-    if (toggleLabel) toggleLabel.textContent = "Light Mode";
-    if (aboutThemeBtn) aboutThemeBtn.textContent = "Switch to Light Mode";
+    if (toggleLabel) toggleLabel.textContent = t("lightModeShort");
+    if (aboutThemeBtn) aboutThemeBtn.textContent = t("switchToLightBtn");
     if (toggleIcon) {
       toggleIcon.innerHTML =
         '<circle cx="12" cy="12" r="5"/>' +
@@ -270,7 +818,7 @@ function initThemeSwitcher() {
   const toggleHandler = () => {
     const next = getPreferredTheme() === "light" ? "dark" : "light";
     applyTheme(next);
-    showToast(next === "light" ? "Light theme enabled" : "Dark theme enabled");
+    showToast(next === "light" ? t("lightThemeToast") : t("darkThemeToast"));
   };
 
   document.getElementById("themeToggleBtn")?.addEventListener("click", toggleHandler);
@@ -371,7 +919,7 @@ function loadLibrary(forceRefresh = false) {
 
   if (navigator.onLine === false) {
     if (!libraryData) {
-      showError("You are offline and no previously loaded library is cached yet.");
+      showError(t("offlineNoCacheError"));
     }
     return;
   }
@@ -400,7 +948,7 @@ function loadLibrary(forceRefresh = false) {
     clearTimeout(requestTimeout);
 
     if (!libraryData) {
-      showError("Unable to connect. Please check your internet and refresh.");
+      showError(t("connectError"));
     }
 
     console.warn("Google Sheets connection failed.");
@@ -412,7 +960,7 @@ function loadLibrary(forceRefresh = false) {
   requestTimeout = setTimeout(() => {
     isFetchingLibrary = false;
     if (!libraryData && !cacheStatus.loaded) {
-      showError("Connection is taking too long. Please refresh the page.");
+      showError(t("timeoutError"));
     }
   }, 15000);
 }
@@ -423,7 +971,7 @@ window.videoLibraryCallback = function(data) {
 
   if (!data || !data.success) {
     if (!libraryData) {
-      showError("Unable to load the video library.");
+      showError(t("libraryError"));
     }
     return;
   }
@@ -778,8 +1326,8 @@ function buildVideoRecord(video, index = 0) {
     preacher,
     description: getDescription(video),
     subtitle: preacher
-      ? `Shalom Tabernacle · ${preacher} · ${category}`
-      : `Shalom Tabernacle · ${category}`,
+      ? `${t("orgName")} · ${preacher} · ${category}`
+      : `${t("orgName")} · ${category}`,
     url,
     thumbnail: getPreferredThumbnail(id),
     firstVideoId: id,
@@ -811,8 +1359,8 @@ function buildPlaylistRecord(item, index = 0) {
     preacher,
     description: getDescription(item),
     subtitle: preacher
-      ? `Shalom Tabernacle · ${preacher}`
-      : "Shalom Tabernacle Collection",
+      ? `${t("orgName")} · ${preacher}`
+      : t("playlistCollectionSub"),
     url,
     thumbnail:
       customThumbnail ||
@@ -875,6 +1423,9 @@ function createCardIconActionsHTML(record) {
   const safeKey = escapeHTML(record.key);
   const safeTitle = escapeHTML(record.title);
   const safeUrl = escapeHTML(record.url);
+  const favAria = escapeHTML(favActive ? t("removeFavAria") : t("addFavAria"));
+  const favTitle = escapeHTML(favActive ? t("removeFavAria") : t("saveFavTitle"));
+  const shareLabel = escapeHTML(t("shareTitle"));
 
   return `
     <div class="card-icon-actions">
@@ -882,9 +1433,9 @@ function createCardIconActionsHTML(record) {
         type="button"
         class="card-icon-btn fav-btn${favActive ? " active" : ""}"
         data-fav-key="${safeKey}"
-        aria-label="${favActive ? "Remove from favorites" : "Add to favorites"}: ${safeTitle}"
+        aria-label="${favAria}: ${safeTitle}"
         aria-pressed="${favActive ? "true" : "false"}"
-        title="${favActive ? "Remove from favorites" : "Save to favorites"}"
+        title="${favTitle}"
       >
         ${heartIconSVG(favActive)}
       </button>
@@ -895,8 +1446,8 @@ function createCardIconActionsHTML(record) {
         data-share-url="${safeUrl}"
         data-share-title="${safeTitle}"
         data-share-type="${escapeHTML(record.type)}"
-        aria-label="Share ${safeTitle}"
-        title="Share"
+        aria-label="${shareLabel} ${safeTitle}"
+        title="${shareLabel}"
       >
         ${shareIconSVG()}
       </button>
@@ -918,7 +1469,7 @@ function createVideoCard(video, index = 0, { showRecentTag = false, isPriority =
   const title = escapeHTML(record.title);
   const url = escapeHTML(record.url);
   const subtitle = showRecentTag
-    ? escapeHTML(`Video${record.dateLabel ? " · " + record.dateLabel : " · " + record.category}`)
+    ? escapeHTML(`${t("videoTag")}${record.dateLabel ? " · " + record.dateLabel : " · " + record.category}`)
     : escapeHTML(record.subtitle);
 
   return `
@@ -945,7 +1496,7 @@ function createVideoCard(video, index = 0, { showRecentTag = false, isPriority =
             target="_blank"
             rel="noopener"
           >
-            ▶ WATCH VIDEO
+            ${escapeHTML(t("watchVideoBtn"))}
           </a>
 
           ${createCardIconActionsHTML(record)}
@@ -966,7 +1517,7 @@ function createPlaylistCard(item, index = 0, { showRecentTag = false, isPriority
   const title = escapeHTML(record.title);
   const url = escapeHTML(record.url);
   const subtitle = showRecentTag
-    ? escapeHTML(`Playlist${record.dateLabel ? " · " + record.dateLabel : ""}`)
+    ? escapeHTML(`${t("playlistTag")}${record.dateLabel ? " · " + record.dateLabel : ""}`)
     : escapeHTML(record.subtitle);
 
   return `
@@ -993,7 +1544,7 @@ function createPlaylistCard(item, index = 0, { showRecentTag = false, isPriority
             target="_blank"
             rel="noopener"
           >
-            ▶ OPEN PLAYLIST
+            ${escapeHTML(t("openPlaylistBtn"))}
           </a>
 
           ${createCardIconActionsHTML(record)}
@@ -1050,7 +1601,7 @@ function toggleFavoriteByKey(key) {
   if (existingIndex >= 0) {
     favorites.splice(existingIndex, 1);
     saveFavorites(favorites);
-    showToast("Removed from Favorites");
+    showToast(t("removedFavToast"));
   } else {
     const record = libraryItemMap.get(key);
     if (!record) return;
@@ -1072,7 +1623,7 @@ function toggleFavoriteByKey(key) {
       });
       saveFavorites(favorites);
     }
-    showToast("Added to Favorites");
+    showToast(t("addedFavToast"));
   }
 
   renderFavorites();
@@ -1086,7 +1637,7 @@ function syncFavoriteButtons() {
     const active = favKeys.has(btn.dataset.favKey);
     btn.classList.toggle("active", active);
     btn.setAttribute("aria-pressed", active ? "true" : "false");
-    btn.title = active ? "Remove from favorites" : "Save to favorites";
+    btn.title = active ? t("removeFavAria") : t("saveFavTitle");
     btn.innerHTML = heartIconSVG(active);
   });
 }
@@ -1105,19 +1656,21 @@ function renderFavorites() {
     const safeUrl = safeYouTubeURL(item.url);
     if (!safeUrl) return "";
 
-    const title = escapeHTML(item.title || "Shalom Tabernacle");
+    const title = escapeHTML(item.title || t("orgName"));
+    const liveRecord = libraryItemMap.get(item.key);
     const subtitle = escapeHTML(
-      item.subtitle ||
-      (item.type === "playlist" ? "Shalom Tabernacle Collection" : "Shalom Tabernacle")
+      liveRecord?.subtitle ||
+      (item.type === "playlist" ? t("playlistCollectionSub") : t("orgName"))
     );
     const key = escapeHTML(item.key);
-    const cta = item.type === "playlist" ? "▶ OPEN PLAYLIST" : "▶ WATCH VIDEO";
+    const cta = escapeHTML(item.type === "playlist" ? t("openPlaylistBtn") : t("watchVideoBtn"));
     const firstId = String(item.firstVideoId || "").trim();
     const validFirstId = /^[A-Za-z0-9_-]{11}$/.test(firstId);
     const savedThumb = safeImageURL(item.thumbnail || "");
     const isStandardYouTubeThumb =
       validFirstId && (!savedThumb || savedThumb.includes("ytimg.com") || savedThumb.includes("youtube.com"));
     const customThumb = isStandardYouTubeThumb ? "" : (savedThumb || "./logo.png");
+    const shareLabel = escapeHTML(t("shareTitle"));
 
     return `
       <article class="card" data-item-key="${key}" data-item-type="${escapeHTML(item.type || "video")}">
@@ -1142,9 +1695,9 @@ function renderFavorites() {
                 type="button"
                 class="card-icon-btn fav-btn active"
                 data-fav-key="${key}"
-                aria-label="Remove from favorites: ${title}"
+                aria-label="${escapeHTML(t("removeFavAria"))}: ${title}"
                 aria-pressed="true"
-                title="Remove from favorites"
+                title="${escapeHTML(t("removeFavAria"))}"
               >
                 ${heartIconSVG(true)}
               </button>
@@ -1155,8 +1708,8 @@ function renderFavorites() {
                 data-share-url="${escapeHTML(safeUrl)}"
                 data-share-title="${title}"
                 data-share-type="${escapeHTML(item.type || "video")}"
-                aria-label="Share ${title}"
-                title="Share"
+                aria-label="${shareLabel} ${title}"
+                title="${shareLabel}"
               >
                 ${shareIconSVG()}
               </button>
@@ -1170,9 +1723,7 @@ function renderFavorites() {
   if (empty) empty.hidden = favorites.length !== 0;
 
   if (count) {
-    count.textContent = favorites.length
-      ? `${favorites.length} saved favorite${favorites.length === 1 ? "" : "s"}`
-      : "No saved favorites yet";
+    count.textContent = formatFavoritesCount(favorites.length);
   }
 
   if (clearBtn) {
@@ -1215,15 +1766,15 @@ async function handleShare({ title, text, url, isWebsite = false }) {
   const websiteUrl = new URL("./", window.location.href).href;
   const safeTarget = isWebsite ? websiteUrl : safeYouTubeURL(url);
   if (!safeTarget) {
-    showToast("Unable to share this link.");
+    showToast(t("shareUnavailableToast"));
     return;
   }
 
   if (typeof navigator.share === "function") {
     try {
       await navigator.share({
-        title: title || "Shalom Tabernacle",
-        text: text || title || "Shalom Tabernacle, Visakhapatnam",
+        title: title || t("orgName"),
+        text: text || title || `${t("orgName")}, ${t("locationText")}`,
         url: safeTarget
       });
       return;
@@ -1236,9 +1787,9 @@ async function handleShare({ title, text, url, isWebsite = false }) {
 
   const copied = await copyTextToClipboard(safeTarget);
   if (copied) {
-    showToast(isWebsite ? "Website link copied to clipboard!" : "Link copied to clipboard!");
+    showToast(isWebsite ? t("websiteCopiedToast") : t("linkCopiedToast"));
   } else {
-    showToast("Copy unavailable. Long-press the link to copy.");
+    showToast(t("copyManualToast"));
   }
 }
 
@@ -1272,6 +1823,8 @@ function renderContinueWatching() {
   }
 
   section.hidden = false;
+  const shareLabel = escapeHTML(t("shareTitle"));
+
   row.innerHTML = history.slice(0, HOME_ROW_LIMIT).map(item => {
     const safeUrl =
       typeof safeHistoryURL === "function"
@@ -1279,7 +1832,7 @@ function renderContinueWatching() {
         : safeYouTubeURL(item.url);
     if (!safeUrl) return "";
 
-    const title = escapeHTML(item.title || "Shalom Tabernacle Video");
+    const title = escapeHTML(item.title || t("orgName"));
     const videoId = extractYouTubeIdFromUrl(safeUrl);
     const validId = /^[A-Za-z0-9_-]{11}$/.test(videoId);
     const savedThumb = safeImageURL(item.thumbnail || "");
@@ -1294,10 +1847,10 @@ function renderContinueWatching() {
         ${createThumbnailHTML(videoId, title, customThumb)}
         <div class="card-info">
           <h3>${title}</h3>
-          <p>Continue Watching</p>
+          <p>${escapeHTML(t("continueLabel"))}</p>
           <div class="card-actions">
             <a class="play" href="${url}" target="_blank" rel="noopener">
-              ▶ WATCH AGAIN
+              ${escapeHTML(t("watchAgainBtn"))}
             </a>
             <div class="card-icon-actions">
               <button
@@ -1306,8 +1859,8 @@ function renderContinueWatching() {
                 data-share-url="${url}"
                 data-share-title="${title}"
                 data-share-type="video"
-                aria-label="Share ${title}"
-                title="Share"
+                aria-label="${shareLabel} ${title}"
+                title="${shareLabel}"
               >
                 ${shareIconSVG()}
               </button>
@@ -1332,10 +1885,20 @@ function getTodaysBibleVerse() {
     now.getFullYear() * 372 +
     (now.getMonth() + 1) * 31 +
     now.getDate();
-  return DAILY_VERSES[daySeed % DAILY_VERSES.length];
+  const idx = daySeed % DAILY_VERSES.length;
+  if (currentLanguage === "te" && DAILY_VERSES_TE[idx]) {
+    return DAILY_VERSES_TE[idx];
+  }
+  return DAILY_VERSES[idx];
 }
 
-function initDailyBibleVerse() {
+function getFormattedDailyVerseShareText() {
+  const verse = getTodaysBibleVerse();
+  if (!verse) return "";
+  return `"${verse.text}" — ${verse.reference}\n${verse.note}\n${t("orgName")}, ${t("locationText")}`;
+}
+
+function renderDailyBibleVerse() {
   const verse = getTodaysBibleVerse();
   const textEl = document.getElementById("dailyVerseText");
   const refEl = document.getElementById("dailyVerseRef");
@@ -1346,19 +1909,23 @@ function initDailyBibleVerse() {
   textEl.textContent = `“${verse.text}”`;
   refEl.textContent = verse.reference;
   noteEl.textContent = verse.note;
+}
 
-  const formattedShareText = `"${verse.text}" — ${verse.reference}\n${verse.note}\nShalom Tabernacle, Visakhapatnam`;
+function initDailyBibleVerse() {
+  renderDailyBibleVerse();
 
   document.getElementById("copyVerseBtn")?.addEventListener("click", async () => {
-    const copied = await copyTextToClipboard(formattedShareText);
-    showToast(copied ? "Bible verse copied!" : "Could not copy verse.");
+    const copied = await copyTextToClipboard(getFormattedDailyVerseShareText());
+    showToast(copied ? t("verseCopiedToast") : t("verseCopyErrorToast"));
   });
 
   document.getElementById("shareVerseBtn")?.addEventListener("click", async () => {
+    const verse = getTodaysBibleVerse();
+    const formattedShareText = getFormattedDailyVerseShareText();
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({
-          title: `Daily Bible Verse — ${verse.reference}`,
+          title: `${t("dailyVerseShareTitle")} — ${verse.reference}`,
           text: formattedShareText,
           url: new URL("./", window.location.href).href
         });
@@ -1368,7 +1935,7 @@ function initDailyBibleVerse() {
       }
     }
     const copied = await copyTextToClipboard(formattedShareText);
-    showToast(copied ? "Bible verse copied for sharing!" : "Could not copy verse.");
+    showToast(copied ? t("verseCopiedShareToast") : t("verseCopyErrorToast"));
   });
 }
 
@@ -1397,7 +1964,7 @@ function renderHomeRecent(videos, playlists) {
 
   const latest = combined.slice(0, HOME_ROW_LIMIT);
   if (!latest.length) {
-    row.innerHTML = '<p class="empty">No recent uploads available yet.</p>';
+    row.innerHTML = `<p class="empty">${escapeHTML(t("noRecentUploads"))}</p>`;
     return;
   }
 
@@ -1421,7 +1988,7 @@ function renderHomeVideos(videos) {
     .slice(0, HOME_ROW_LIMIT);
 
   if (visibleVideos.length === 0) {
-    row.innerHTML = '<p class="empty">No videos available yet.</p>';
+    row.innerHTML = `<p class="empty">${escapeHTML(t("noVideosAvailable"))}</p>`;
     return;
   }
 
@@ -1441,7 +2008,7 @@ function renderHomePlaylists(playlists) {
     .slice(0, HOME_ROW_LIMIT);
 
   if (visiblePlaylists.length === 0) {
-    row.innerHTML = '<p class="empty">No playlists available yet.</p>';
+    row.innerHTML = `<p class="empty">${escapeHTML(t("noPlaylistsAvailable"))}</p>`;
     return;
   }
 
@@ -1479,7 +2046,7 @@ function renderCategories() {
   const allButton = document.createElement("button");
   allButton.className = "filter active";
   allButton.type = "button";
-  allButton.textContent = "All";
+  allButton.textContent = t("filterAll");
   allButton.dataset.category = "All";
   filters.appendChild(allButton);
 
@@ -1522,7 +2089,7 @@ function renderPlaylistCategories() {
   const allButton = document.createElement("button");
   allButton.className = "filter active";
   allButton.type = "button";
-  allButton.textContent = "All";
+  allButton.textContent = t("filterAll");
   allButton.dataset.category = "All";
   filters.appendChild(allButton);
 
@@ -1655,7 +2222,7 @@ function renderVideos(videos) {
   if (loadMoreWrap && loadMoreBtn) {
     loadMoreWrap.hidden = remaining <= 0;
     if (remaining > 0) {
-      loadMoreBtn.textContent = `Load More Messages (${remaining} remaining)`;
+      loadMoreBtn.textContent = t("loadMoreVideosRemaining", { n: remaining });
     }
   }
 
@@ -1707,7 +2274,7 @@ function renderPlaylists(playlists) {
   if (loadMoreWrap && loadMoreBtn) {
     loadMoreWrap.hidden = remaining <= 0;
     if (remaining > 0) {
-      loadMoreBtn.textContent = `Load More Playlists (${remaining} remaining)`;
+      loadMoreBtn.textContent = t("loadMorePlaylistsRemaining", { n: remaining });
     }
   }
 
@@ -1795,24 +2362,9 @@ function openInstallGuideModal() {
   const body = document.getElementById("installGuideBody");
   if (!modal || !body) return;
 
-  if (isIOSDevice()) {
-    body.innerHTML = `
-      <p>Install <strong>Shalom Tabernacle</strong> directly to your iPhone or iPad home screen:</p>
-      <ol>
-        <li>Tap the <strong>Share</strong> icon in Safari's toolbar.</li>
-        <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
-        <li>Tap <strong>Add</strong> in the top-right corner.</li>
-      </ol>
-    `;
-  } else {
-    body.innerHTML = `
-      <p>Your browser does not show an automatic install prompt right now. You can still install or pin <strong>Shalom Tabernacle</strong>:</p>
-      <ol>
-        <li>Open your browser's menu (<strong>⋮</strong> or <strong>⋯</strong>) or address bar install icon.</li>
-        <li>Choose <strong>Install App</strong>, <strong>Add to Home Screen</strong>, or <strong>Create Shortcut</strong>.</li>
-      </ol>
-    `;
-  }
+  body.innerHTML = isIOSDevice()
+    ? t("installGuideIosHtml")
+    : t("installGuideOtherHtml");
 
   modal.hidden = false;
 }
@@ -1837,7 +2389,7 @@ async function triggerInstallFlow() {
       if (choice && choice.outcome === "accepted") {
         const banner = document.getElementById("pwaInstallBanner");
         if (banner) banner.hidden = true;
-        showToast("Installing Shalom Tabernacle...");
+        showToast(t("installingToast"));
       } else {
         dismissInstallBanner();
       }
@@ -1870,16 +2422,12 @@ function syncInstallUI() {
     if (wasInstallDismissedRecently()) {
       banner.hidden = true;
     } else if (deferredInstallPrompt) {
-      if (bannerSub) {
-        bannerSub.textContent = "Add to your home screen for quick access to messages & playlists.";
-      }
-      if (bannerBtn) bannerBtn.textContent = "Install App";
+      if (bannerSub) bannerSub.textContent = t("installBannerSub");
+      if (bannerBtn) bannerBtn.textContent = t("installAppBtn");
       banner.hidden = false;
     } else if (isIOSDevice()) {
-      if (bannerSub) {
-        bannerSub.textContent = "Tap below for Safari Add to Home Screen steps.";
-      }
-      if (bannerBtn) bannerBtn.textContent = "How to Install";
+      if (bannerSub) bannerSub.textContent = t("installBannerSubIos");
+      if (bannerBtn) bannerBtn.textContent = t("howToInstallBtn");
       banner.hidden = false;
     } else {
       banner.hidden = true;
@@ -1897,7 +2445,7 @@ function initPWAInstallPrompt() {
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
     syncInstallUI();
-    showToast("Shalom Tabernacle app installed!");
+    showToast(t("installedToast"));
   });
 
   const displayModeQuery = window.matchMedia("(display-mode: standalone)");
@@ -1939,15 +2487,15 @@ function initCardAndShareInteractions() {
       const key = shareBtn.dataset.shareKey || "";
       const record = libraryItemMap.get(key);
       const url = record?.url || shareBtn.dataset.shareUrl || "";
-      const title = record?.title || shareBtn.dataset.shareTitle || "Shalom Tabernacle";
+      const title = record?.title || shareBtn.dataset.shareTitle || t("orgName");
       const typeLabel =
         (record?.type || shareBtn.dataset.shareType) === "playlist"
-          ? "playlist"
-          : "message";
+          ? t("typePlaylist")
+          : t("typeMessage");
 
       handleShare({
         title,
-        text: `Watch "${title}" from Shalom Tabernacle (${typeLabel})`,
+        text: t("shareTextTemplate", { title, type: typeLabel }),
         url
       });
       return;
@@ -1965,7 +2513,7 @@ function initCardAndShareInteractions() {
 
       const title =
         card.querySelector("h3")?.textContent?.trim() ||
-        "Shalom Tabernacle Video";
+        t("orgName");
       const image = card.querySelector("img.thumb");
 
       if (typeof addToHistory === "function") {
@@ -1981,25 +2529,25 @@ function initCardAndShareInteractions() {
   document.getElementById("clearFavorites")?.addEventListener("click", function() {
     const favorites = getFavorites();
     if (!favorites.length) return;
-    if (!window.confirm("Remove all saved favorites?")) return;
+    if (!window.confirm(t("confirmClearFavorites"))) return;
     saveFavorites([]);
     renderFavorites();
     syncFavoriteButtons();
-    showToast("Favorites cleared");
+    showToast(t("clearedFavToast"));
   });
 
   document.getElementById("homeClearHistoryBtn")?.addEventListener("click", function() {
     if (typeof getHistory !== "function" || typeof saveHistory !== "function") return;
     if (!getHistory().length) return;
-    if (!window.confirm("Clear all your recently watched videos?")) return;
+    if (!window.confirm(t("confirmClearHistory"))) return;
     saveHistory([]);
-    showToast("Viewing history cleared");
+    showToast(t("clearedHistoryToast"));
   });
 
   const shareWebsiteHandler = () => {
     handleShare({
-      title: "Shalom Tabernacle | Visakhapatnam",
-      text: "Watch messages and explore playlists from Shalom Tabernacle, Visakhapatnam.",
+      title: t("pageTitle"),
+      text: t("websiteShareText"),
       isWebsite: true
     });
   };
@@ -2034,6 +2582,7 @@ function showError(message) {
 initThumbnailDelegation();
 
 document.addEventListener("DOMContentLoaded", () => {
+  initLanguageSwitcher();
   initThemeSwitcher();
   initOfflineIndicator();
   initThumbnailDelegation();
@@ -2041,6 +2590,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLoadMoreControls();
   initCardAndShareInteractions();
   initPWAInstallPrompt();
+  if (typeof renderHistory === "function") renderHistory();
   renderContinueWatching();
   renderFavorites();
   markAlreadyLoadedThumbs();

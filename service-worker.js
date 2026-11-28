@@ -1,4 +1,4 @@
-const CACHE_NAME = "shalom-tabernacle-v5";
+const CACHE_NAME = "shalom-tabernacle-v6";
 
 const FILES_TO_CACHE = [
   "./",
