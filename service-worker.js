@@ -1,4 +1,4 @@
-const CACHE_NAME = "shalom-tabernacle-v13";
+const CACHE_NAME = "shalom-tabernacle-v14";
 
 const FILES_TO_CACHE = [
   "./",
@@ -26,6 +26,7 @@ function isExcludedPath(pathname) {
 }
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(FILES_TO_CACHE);
