@@ -974,76 +974,65 @@ footer strong {
 
 <!-- HOME VIEW -->
 
+
 <section class="view active" id="home">
 
+  <!-- HERO -->
   <div class="hero">
-    <div class="hero-content">
+    <p class="eyebrow">SHALOM TABERNACLE · VISAKHAPATNAM</p>
 
-      <div class="eyebrow">
-        WELCOME TO SHALOM TABERNACLE
+    <h1>Welcome to<br><span>Shalom Tabernacle</span></h1>
+
+    <p class="hero-description">
+      Watch messages, worship and inspiring moments.
+    </p>
+
+    <button class="gold-button" onclick="showView('videos')">
+      EXPLORE VIDEOS
+    </button>
+  </div>
+
+
+  <!-- LATEST VIDEOS -->
+  <section class="home-content">
+
+    <div class="home-section-heading">
+      <div>
+        <p class="eyebrow">WATCH & BE INSPIRED</p>
+        <h2>Latest Videos</h2>
       </div>
 
-      <h1>
-        Faith. Truth.
-        <span>The Word of God.</span>
-      </h1>
-
-      <p class="quote">
-        🕊️ And in here, we don’t have no creed but Christ, that’s the creed;
-        and no law but love; no book but the Bible. And Christ is the Head;
-        and the Bible is our textbook; the world is my parish. So I like to
-        just preach the way that I feel led to preach, and just the way that
-        I see it. 🦅
-      </p>
-
-      <div class="attribution">
-        PAS. JOEL. P
-        <span>Visakhapatnam</span>
-      </div>
-
-      <div class="hero-actions">
-        <button class="gold-button" data-view="videos">
-          ▶ WATCH VIDEOS
-        </button>
-
-        <button class="outline-button" data-view="playlists">
-          EXPLORE PLAYLISTS ↗
-        </button>
-      </div>
-
+      <button class="view-all" onclick="showView('videos')">
+        View All →
+      </button>
     </div>
-  </div>
 
-  <div class="home-links">
+    <div class="horizontal-row" id="homeVideoRow">
+      <p class="empty">Loading videos...</p>
+    </div>
 
-    <button class="quick-card" data-view="videos">
-      <span class="quick-icon">▶</span>
-      <span>
-        <h3>Watch Videos</h3>
-        <p>Explore messages and teachings</p>
-      </span>
-      <span class="quick-arrow">EXPLORE →</span>
-    </button>
+  </section>
 
-    <button class="quick-card" data-view="playlists">
-      <span class="quick-icon">▤</span>
-      <span>
-        <h3>Playlists</h3>
-        <p>Find videos in our collections</p>
-      </span>
-      <span class="quick-arrow">EXPLORE →</span>
-    </button>
 
-    <button class="quick-card" data-view="history">
-      <span class="quick-icon">◷</span>
-      <span>
-        <h3>Watch Again</h3>
-        <p>Find videos you opened before</p>
-      </span>
-      <span class="quick-arrow">VIEW →</span>
-    </button>
+  <!-- FEATURED PLAYLISTS -->
+  <section class="home-content">
 
-  </div>
+    <div class="home-section-heading">
+      <div>
+        <p class="eyebrow">EXPLORE COLLECTIONS</p>
+        <h2>Featured Playlists</h2>
+      </div>
+
+      <button class="view-all" onclick="showView('playlists')">
+        View All →
+      </button>
+    </div>
+
+    <div class="horizontal-row" id="homePlaylistRow">
+      <p class="empty">Loading playlists...</p>
+    </div>
+
+  </section>
 
 </section>
 
