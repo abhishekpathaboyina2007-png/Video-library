@@ -388,60 +388,6 @@ header {
   margin-top:3px;
 }
 
-.hero-actions {
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:flex-start;
-  flex-wrap:wrap;
-  gap:12px;
-  margin-top:30px;
-}
-
-.hero-actions button {
-  width:auto;
-  flex:0 0 auto;
-  white-space:nowrap;
-}
-
-.hero-utility-row {
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:10px;
-  margin-top:16px;
-}
-
-.utility-button {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  padding:9px 15px;
-  border-radius:30px;
-  border:1px solid var(--border);
-  background:var(--surface);
-  color:var(--gold-light);
-  font-size:11px;
-  font-weight:700;
-  line-height:1.2;
-  letter-spacing:.4px;
-  text-align:center;
-  transition:border-color .2s,background .2s,transform .2s;
-}
-
-.utility-button:hover {
-  border-color:var(--gold);
-  background:rgba(214,181,109,.12);
-  transform:translateY(-1px);
-}
-
-.utility-button svg {
-  width:14px;
-  height:14px;
-  flex-shrink:0;
-}
-
 /* HOMEPAGE ROWS */
 
 .home-content {
@@ -572,70 +518,6 @@ header {
   flex-wrap:wrap;
   gap:10px;
   margin-top:4px;
-}
-
-/* EVENTS */
-
-.events-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
-  gap:18px;
-}
-
-.event-card {
-  background:var(--surface);
-  border:1px solid var(--card-border);
-  border-radius:14px;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  transition:transform .2s,border-color .2s;
-}
-
-.event-card:hover {
-  transform:translateY(-3px);
-  border-color:rgba(214,181,109,.55);
-}
-
-.event-badge {
-  display:inline-flex;
-  align-self:flex-start;
-  padding:4px 10px;
-  border-radius:20px;
-  background:rgba(214,181,109,.14);
-  border:1px solid rgba(214,181,109,.35);
-  color:var(--gold-light);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.7px;
-  text-transform:uppercase;
-}
-
-.event-card h3 {
-  font-family:var(--heading);
-  font-size:25px;
-  line-height:1.2;
-}
-
-.event-meta {
-  color:var(--gold);
-  font-size:11px;
-  font-weight:700;
-}
-
-.event-desc {
-  color:var(--text-soft);
-  font-size:12px;
-  line-height:1.65;
-}
-
-.event-location {
-  color:var(--muted);
-  font-size:11px;
-  margin-top:auto;
-  padding-top:8px;
-  border-top:1px solid var(--border);
 }
 
 /* OTHER PAGES */
@@ -1246,14 +1128,6 @@ footer strong {
     letter-spacing:2.5px;
   }
 
-  .hero-actions { gap:10px; }
-
-  .hero-actions button {
-    width:auto;
-    padding:12px 14px;
-    font-size:9px;
-  }
-
   .home-content {
     padding-top:26px;
     padding-bottom:12px;
@@ -1413,7 +1287,6 @@ footer strong {
 @media(max-width:360px) {
   .grid { grid-template-columns:1fr; }
   .hero h1 { font-size:50px; }
-  .hero-actions button { white-space:normal; }
   .bottom-nav button { min-width:40px; font-size:8px; }
 }
 
@@ -1449,7 +1322,6 @@ footer strong {
       <button class="nav-link active" data-view="home">Home</button>
       <button class="nav-link" data-view="videos">Videos</button>
       <button class="nav-link" data-view="playlists">Playlists</button>
-      <button class="nav-link" data-view="events">Events</button>
       <button class="nav-link" data-view="favorites">Favorites</button>
       <button class="nav-link" data-view="history">History</button>
       <button class="nav-link" data-view="about">About</button>
@@ -1498,43 +1370,6 @@ footer strong {
       <div class="attribution">
         PAS. JOEL. P
         <span>Visakhapatnam</span>
-      </div>
-
-      <div class="hero-actions">
-        <button class="gold-button" data-view="videos">
-          ▶ WATCH VIDEOS
-        </button>
-
-        <button class="outline-button" data-view="playlists">
-          EXPLORE PLAYLISTS ↗
-        </button>
-      </div>
-
-      <div class="hero-utility-row">
-        <button type="button" class="utility-button" id="installAppBtn" hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
-          </svg>
-          <span>Install App</span>
-        </button>
-
-        <button type="button" class="utility-button" data-view="events">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <path d="M16 2v4M8 2v4M3 10h18"/>
-          </svg>
-          <span>Church Events</span>
-        </button>
-
-        <button type="button" class="utility-button" id="shareWebsiteBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="18" cy="5" r="3"/>
-            <circle cx="6" cy="12" r="3"/>
-            <circle cx="18" cy="19" r="3"/>
-            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-          </svg>
-          <span>Share Website</span>
-        </button>
       </div>
 
     </div>
@@ -1641,23 +1476,6 @@ footer strong {
     <p class="row-hint">← Swipe to explore more playlists →</p>
   </div>
 
-  <!-- UPCOMING CHURCH EVENTS PREVIEW -->
-  <div class="home-content">
-    <div class="home-section-heading">
-      <div>
-        <div class="eyebrow">FELLOWSHIP &amp; SERVICES</div>
-        <h2>Upcoming Gatherings</h2>
-      </div>
-
-      <button class="view-all" type="button" onclick="showView('events')">
-        FULL CALENDAR →
-      </button>
-    </div>
-
-    <div class="events-grid" id="homeEventsGrid"></div>
-    <p class="empty" id="homeNoEvents" hidden>No upcoming events scheduled right now.</p>
-  </div>
-
 </section>
 
 <!-- VIDEOS -->
@@ -1752,35 +1570,6 @@ footer strong {
 
     <p class="empty" id="noPlaylists">
       Playlists will appear here once added.
-    </p>
-
-  </div>
-
-</section>
-
-<!-- CHURCH EVENTS -->
-
-<section class="view" id="events">
-
-  <div class="page-content">
-
-    <div class="page-heading">
-      <div class="eyebrow">CHURCH CALENDAR</div>
-      <h1>Upcoming <span>Events.</span></h1>
-      <p>Join our Sunday services, Wednesday fellowship, and special gatherings in Visakhapatnam.</p>
-    </div>
-
-    <div class="filters" id="eventFilters">
-      <button class="filter active" type="button" data-event-filter="All">All Events</button>
-      <button class="filter" type="button" data-event-filter="Sunday Service">Sunday Services</button>
-      <button class="filter" type="button" data-event-filter="Wednesday Service">Wednesday Services</button>
-      <button class="filter" type="button" data-event-filter="Special Event">Special Events</button>
-    </div>
-
-    <div class="events-grid" id="eventsGrid"></div>
-
-    <p class="empty" id="noEvents" hidden>
-      There are no upcoming events in this category right now. Please check back soon.
     </p>
 
   </div>
@@ -1891,7 +1680,7 @@ footer strong {
     <div class="settings-panel">
       <h3>Display &amp; App Preferences</h3>
       <p>
-        Customize your reading theme, install the Shalom Tabernacle app for offline browsing, view upcoming services, or share this library with others.
+        Customize your reading theme, install the Shalom Tabernacle app for offline browsing, or share this library with others.
       </p>
 
       <div class="settings-actions">
@@ -1900,9 +1689,6 @@ footer strong {
         </button>
         <button type="button" class="outline-button" id="aboutInstallBtn" hidden>
           Install App
-        </button>
-        <button type="button" class="outline-button" data-view="events">
-          Church Events
         </button>
         <button type="button" class="outline-button" id="aboutShareWebsiteBtn">
           Share Website
@@ -2010,7 +1796,6 @@ function showView(viewName) {
     "home",
     "videos",
     "playlists",
-    "events",
     "favorites",
     "history",
     "about"

@@ -17,7 +17,12 @@ const EXCLUDED_PATHS = [
 ];
 
 function isExcludedPath(pathname) {
-  return EXCLUDED_PATHS.some((excluded) => pathname === excluded || pathname.startsWith(`${excluded}/`));
+  return EXCLUDED_PATHS.some(
+    (excluded) =>
+      pathname === excluded ||
+      pathname.startsWith(`${excluded}/`) ||
+      pathname.endsWith(excluded)
+  );
 }
 
 self.addEventListener("install", (event) => {

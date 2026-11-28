@@ -12,7 +12,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycby_Lxcf0X0bDVZF6hqKcl42
 let libraryData = null;
 let currentCategory = "All";
 let currentPlaylistCategory = "All";
-let currentEventFilter = "All";
 
 const CACHE_KEY = "shalomLibraryCache";
 const MIN_REVALIDATE_MS = 60 * 1000;
@@ -203,46 +202,6 @@ const DAILY_VERSES = [
 
 
 /* ==========================================
-   MANUALLY EDITABLE CHURCH EVENTS CALENDAR
-========================================== */
-
-const CHURCH_EVENTS = [
-  {
-    title: "Sunday Worship Service",
-    category: "Sunday Service",
-    recurringWeekday: 0,
-    time: "10:00 AM IST",
-    description: "Weekly gathering for worship, fellowship, and preaching of the Word of God.",
-    location: "Shalom Tabernacle, Visakhapatnam"
-  },
-  {
-    title: "Wednesday Prayer & Bible Study",
-    category: "Wednesday Service",
-    recurringWeekday: 3,
-    time: "7:00 PM IST",
-    description: "Midweek Scripture teaching, prayer meeting, and spiritual encouragement.",
-    location: "Shalom Tabernacle, Visakhapatnam"
-  },
-  {
-    title: "Special Youth & Family Fellowship",
-    category: "Special Event",
-    date: "2026-12-20",
-    time: "5:30 PM IST",
-    description: "An evening of worship songs, testimonies, and encouraging messages for families and youth.",
-    location: "Shalom Tabernacle Main Hall, Visakhapatnam"
-  },
-  {
-    title: "Year-End Thanksgiving & Watchnight Service",
-    category: "Special Event",
-    date: "2026-12-31",
-    time: "9:30 PM IST",
-    description: "Closing the year in gratitude, prayer, and dedication to the Lord for the year ahead.",
-    location: "Shalom Tabernacle, Visakhapatnam"
-  }
-];
-
-
-/* ==========================================
    TOAST CONFIRMATION
 ========================================== */
 
@@ -371,8 +330,7 @@ function compactLibraryForCache(data) {
   return {
     success: true,
     videos: Array.isArray(data.videos) ? data.videos.map(trimVideo) : [],
-    playlists: Array.isArray(data.playlists) ? data.playlists.map(trimPlaylist) : [],
-    events: Array.isArray(data.events) ? data.events : []
+    playlists: Array.isArray(data.playlists) ? data.playlists.map(trimPlaylist) : []
   };
 }
 
@@ -511,7 +469,6 @@ function renderLibrary(data) {
   renderHomeVideos(videos);
   renderHomePlaylists(playlists);
 
-  renderEvents();
   renderFavorites();
   syncFavoriteButtons();
   markAlreadyLoadedThumbs();
@@ -1417,126 +1374,6 @@ function initDailyBibleVerse() {
 
 
 /* ==========================================
-   CHURCH EVENTS CALENDAR
-========================================== */
-
-function getNextWeekdayDate(weekday) {
-  const today = new Date();
-  const base = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const diff = (weekday - base.getDay() + 7) % 7;
-  base.setDate(base.getDate() + diff);
-  return base;
-}
-
-function getUpcomingEvents() {
-  const today = new Date();
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-
-  const sheetEvents = Array.isArray(libraryData?.events)
-    ? libraryData.events.filter(item => isVisible(item))
-    : [];
-
-  const combined = [...CHURCH_EVENTS, ...sheetEvents];
-
-  return combined
-    .map(ev => {
-      const title = String(ev.title || ev.Title || "").trim();
-      if (!title) return null;
-
-      const category = String(ev.category || ev.Category || "Special Event").trim();
-      const time = String(ev.time || ev.Time || "").trim();
-      const description = String(ev.description || ev.Description || "").trim();
-      const location = String(ev.location || ev.Location || "Shalom Tabernacle, Visakhapatnam").trim();
-
-      let dateObj = null;
-      if (typeof ev.recurringWeekday === "number") {
-        dateObj = getNextWeekdayDate(ev.recurringWeekday);
-      } else {
-        const rawDate = String(ev.date || ev.Date || "").trim();
-        const parsed = rawDate ? new Date(`${rawDate}T00:00:00`) : null;
-        if (parsed && Number.isFinite(parsed.getTime())) {
-          dateObj = parsed;
-        }
-      }
-
-      if (!dateObj || dateObj.getTime() < todayStart) {
-        return null;
-      }
-
-      const dateLabel = dateObj.toLocaleDateString(undefined, {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric"
-      });
-
-      return {
-        title,
-        category,
-        time,
-        description,
-        location,
-        dateTimestamp: dateObj.getTime(),
-        dateLabel
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.dateTimestamp - b.dateTimestamp);
-}
-
-function createEventCardHTML(eventItem) {
-  return `
-    <article class="event-card">
-      <span class="event-badge">${escapeHTML(eventItem.category)}</span>
-      <h3>${escapeHTML(eventItem.title)}</h3>
-      <div class="event-meta">
-        ${escapeHTML(eventItem.dateLabel)}${eventItem.time ? " · " + escapeHTML(eventItem.time) : ""}
-      </div>
-      <p class="event-desc">${escapeHTML(eventItem.description)}</p>
-      <div class="event-location">📍 ${escapeHTML(eventItem.location)}</div>
-    </article>
-  `;
-}
-
-function renderEvents() {
-  const upcoming = getUpcomingEvents();
-
-  const homeGrid = document.getElementById("homeEventsGrid");
-  const homeEmpty = document.getElementById("homeNoEvents");
-  if (homeGrid) {
-    const preview = upcoming.slice(0, 3);
-    homeGrid.innerHTML = preview.map(createEventCardHTML).join("");
-    if (homeEmpty) homeEmpty.hidden = preview.length !== 0;
-  }
-
-  const grid = document.getElementById("eventsGrid");
-  const empty = document.getElementById("noEvents");
-  if (grid) {
-    const filtered = upcoming.filter(
-      item => currentEventFilter === "All" || item.category === currentEventFilter
-    );
-    grid.innerHTML = filtered.map(createEventCardHTML).join("");
-    if (empty) empty.hidden = filtered.length !== 0;
-  }
-}
-
-function initEventFilters() {
-  const container = document.getElementById("eventFilters");
-  if (!container) return;
-
-  container.addEventListener("click", (event) => {
-    const btn = event.target.closest("[data-event-filter]");
-    if (!btn) return;
-
-    currentEventFilter = btn.dataset.eventFilter || "All";
-    container.querySelectorAll(".filter").forEach(el => el.classList.remove("active"));
-    btn.classList.add("active");
-    renderEvents();
-  });
-}
-
-
-/* ==========================================
    HOMEPAGE - RECENTLY ADDED, VIDEOS & PLAYLISTS
 ========================================== */
 
@@ -2016,20 +1853,17 @@ async function triggerInstallFlow() {
 
 function syncInstallUI() {
   const installed = isAppInstalled();
-  const installAppBtn = document.getElementById("installAppBtn");
   const aboutInstallBtn = document.getElementById("aboutInstallBtn");
   const banner = document.getElementById("pwaInstallBanner");
   const bannerSub = document.getElementById("pwaBannerSubtitle");
   const bannerBtn = document.getElementById("pwaBannerInstallBtn");
 
   if (installed) {
-    if (installAppBtn) installAppBtn.hidden = true;
     if (aboutInstallBtn) aboutInstallBtn.hidden = true;
     if (banner) banner.hidden = true;
     return;
   }
 
-  if (installAppBtn) installAppBtn.hidden = false;
   if (aboutInstallBtn) aboutInstallBtn.hidden = false;
 
   if (banner) {
@@ -2071,7 +1905,6 @@ function initPWAInstallPrompt() {
     displayModeQuery.addEventListener("change", syncInstallUI);
   }
 
-  document.getElementById("installAppBtn")?.addEventListener("click", triggerInstallFlow);
   document.getElementById("aboutInstallBtn")?.addEventListener("click", triggerInstallFlow);
   document.getElementById("pwaBannerInstallBtn")?.addEventListener("click", triggerInstallFlow);
   document.getElementById("pwaBannerDismissBtn")?.addEventListener("click", dismissInstallBanner);
@@ -2171,7 +2004,6 @@ function initCardAndShareInteractions() {
     });
   };
 
-  document.getElementById("shareWebsiteBtn")?.addEventListener("click", shareWebsiteHandler);
   document.getElementById("aboutShareWebsiteBtn")?.addEventListener("click", shareWebsiteHandler);
 }
 
@@ -2206,12 +2038,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initOfflineIndicator();
   initThumbnailDelegation();
   initDailyBibleVerse();
-  initEventFilters();
   initLoadMoreControls();
   initCardAndShareInteractions();
   initPWAInstallPrompt();
   renderContinueWatching();
-  renderEvents();
   renderFavorites();
   markAlreadyLoadedThumbs();
   loadLibrary();
