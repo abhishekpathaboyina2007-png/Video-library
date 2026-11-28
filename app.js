@@ -2290,7 +2290,6 @@ function closeVideoPlayer() {
 
 function initCardAndHistoryInteractions() {
   const watchBtn = document.getElementById("watchPageWatchedBtn");
-  const bgPlayBtn = document.getElementById("watchPageBgPlayBtn");
   const miniExpand = document.getElementById("miniPlayerExpandBtn");
   const miniTrigger = document.getElementById("miniPlayerExpandTrigger");
   const miniClose = document.getElementById("miniPlayerCloseBtn");
@@ -2300,15 +2299,6 @@ function initCardAndHistoryInteractions() {
       if (!activePlayerKey) return;
       const nowWatched = toggleWatched(activePlayerKey);
       showToast(nowWatched ? t("markedWatchedToast") : t("unmarkedWatchedToast"));
-    });
-  }
-
-  if (bgPlayBtn) {
-    bgPlayBtn.addEventListener("click", () => {
-      showToast(t("bgPlayActiveToast"));
-      if (typeof showView === "function") {
-        showView("videos");
-      }
     });
   }
 
