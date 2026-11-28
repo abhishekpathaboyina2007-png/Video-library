@@ -1,0 +1,1246 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Shalom Tabernacle | Admin</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 25px;
+      background: #090909;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 2px;
+    }
+
+    header p {
+      color: #999;
+      margin: 7px 0 0;
+    }
+
+    .panel {
+      background: #171717;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+      min-width: 0;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      color: #bbb;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    input, textarea {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      margin: 8px 0 15px;
+      border: 1px solid #444;
+      border-radius: 7px;
+      background: #252525;
+      color: white;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 10px 14px;
+      background: #e50914;
+      color: white;
+      border: 0;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 3px;
+    }
+
+    button:hover {
+      opacity: .85;
+    }
+
+    button.secondary {
+      background: #444;
+    }
+
+    button.danger {
+      background: #a40000;
+    }
+
+    button.success {
+      background: #167c42;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #status {
+      color: #ccc;
+      min-height: 24px;
+      margin-top: 15px;
+    }
+
+    /* SIDE-BY-SIDE DASHBOARD */
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+
+    .management-column {
+      min-width: 0;
+    }
+
+    .column-heading {
+      font-size: 19px;
+      color: #fff;
+      border-bottom: 2px solid #e50914;
+      padding-bottom: 12px;
+      margin: 0 0 16px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 470px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 9px;
+      border-bottom: 1px solid #333;
+      font-size: 13px;
+    }
+
+    th {
+      color: #aaa;
+    }
+
+    .visible {
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .invisible {
+      color: #f87171;
+      font-weight: bold;
+    }
+
+    .actions {
+      white-space: nowrap;
+    }
+
+    .actions button {
+      font-size: 11px;
+      padding: 8px 9px;
+    }
+
+    .empty-message {
+      color: #999;
+      padding: 18px 5px;
+    }
+
+    .logout {
+      margin-top: 5px;
+    }
+
+    @media(max-width: 950px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+
+      .panel {
+        padding: 15px;
+      }
+
+      header h1 {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <header>
+    <div>
+      <h1>SHALOM TABERNACLE</h1>
+      <p>Admin Dashboard</p>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+
+  <section class="panel" id="loginPanel">
+
+    <h2>Admin Login</h2>
+
+    <form id="loginForm">
+      <label>Admin Password</label>
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Enter admin password"
+        required
+      >
+
+      <button type="submit">Login</button>
+    </form>
+
+  </section>
+
+
+  <!-- DASHBOARD -->
+
+  <div id="dashboard" class="hidden">
+
+    <div class="dashboard-grid">
+
+      <!-- VIDEO COLUMN -->
+
+      <div class="management-column">
+
+        <h2 class="column-heading">VIDEO MANAGEMENT</h2>
+
+        <!-- ADD VIDEO -->
+
+        <section class="panel">
+
+          <h2>Add New Video</h2>
+
+          <form id="videoForm">
+
+            <label>Video Title</label>
+            <input id="title" required>
+
+            <label>YouTube URL</label>
+            <input
+              id="url"
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              required
+            >
+
+            <label>Category</label>
+            <input id="category" placeholder="Category">
+
+            <label>Description</label>
+            <textarea id="description"></textarea>
+
+            <button type="submit">Add Video</button>
+
+          </form>
+
+        </section>
+
+
+        <!-- MANAGE VIDEOS -->
+
+        <section class="panel">
+
+          <h2>Manage Videos</h2>
+
+          <button
+            type="button"
+            class="secondary"
+            id="refreshVideos"
+          >
+            Refresh Videos
+          </button>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody id="videoList">
+                <tr>
+                  <td colspan="3">Loading videos...</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </section>
+
+
+        <!-- EDIT VIDEO -->
+
+        <section class="panel hidden" id="editPanel">
+
+          <h2>Edit Video</h2>
+
+          <form id="editForm">
+
+            <input type="hidden" id="editId">
+
+            <label>Video Title</label>
+            <input id="editTitle" required>
+
+            <label>YouTube URL</label>
+            <input id="editUrl" type="url" required>
+
+            <label>Category</label>
+            <input id="editCategory">
+
+            <label>Description</label>
+            <textarea id="editDescription"></textarea>
+
+            <button type="submit">Save Changes</button>
+
+            <button
+              type="button"
+              class="secondary"
+              id="cancelEdit"
+            >
+              Cancel
+            </button>
+
+          </form>
+
+        </section>
+
+      </div>
+
+
+      <!-- PLAYLIST COLUMN -->
+
+      <div class="management-column">
+
+        <h2 class="column-heading">PLAYLIST MANAGEMENT</h2>
+
+        <!-- ADD PLAYLIST -->
+
+        <section class="panel">
+
+          <h2>Add New Playlist</h2>
+
+          <form id="playlistForm">
+
+            <label>Playlist Title</label>
+            <input id="playlistTitle" required>
+
+            <label>YouTube Playlist URL</label>
+            <input
+              id="playlistUrl"
+              type="url"
+              placeholder="https://www.youtube.com/playlist?list=..."
+              required
+            >
+
+            <label>Category</label>
+            <input id="playlistCategory" placeholder="Category">
+
+            <label>Description</label>
+            <textarea id="playlistDescription"></textarea>
+
+            <button type="submit">Add Playlist</button>
+
+          </form>
+
+        </section>
+
+
+        <!-- MANAGE PLAYLISTS -->
+
+        <section class="panel">
+
+          <h2>Manage Playlists</h2>
+
+          <button
+            type="button"
+            class="secondary"
+            id="refreshPlaylists"
+          >
+            Refresh Playlists
+          </button>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Playlist</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody id="playlistList">
+                <tr>
+                  <td colspan="3">Loading playlists...</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+
+
+    <!-- ACCOUNT -->
+
+    <section class="panel">
+      <button
+        type="button"
+        id="logout"
+        class="secondary logout"
+      >
+        Logout
+      </button>
+    </section>
+
+  </div>
+
+  <p id="status"></p>
+
+</div>
+
+
+<script>
+
+  let token = sessionStorage.getItem("adminToken");
+
+  let videos = [];
+  let playlists = [];
+
+  const loginPanel = document.getElementById("loginPanel");
+  const dashboard = document.getElementById("dashboard");
+  const status = document.getElementById("status");
+  const videoList = document.getElementById("videoList");
+  const playlistList = document.getElementById("playlistList");
+  const editPanel = document.getElementById("editPanel");
+
+
+  // HELPERS
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function(char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char];
+    });
+  }
+
+
+  function isVisible(value) {
+    return value === true ||
+      String(value).toUpperCase() === "TRUE";
+  }
+
+
+  function showDashboard() {
+    loginPanel.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+
+    loadVideos();
+    loadPlaylists();
+  }
+
+
+  function showLogin() {
+    dashboard.classList.add("hidden");
+    loginPanel.classList.remove("hidden");
+  }
+
+
+  if (token) {
+    showDashboard();
+  }
+
+
+  // LOGIN
+
+  document.getElementById("loginForm")
+    .addEventListener("submit", function(event) {
+
+      event.preventDefault();
+
+      status.textContent = "Checking password...";
+
+      const password =
+        document.getElementById("password").value;
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            token = result.token;
+
+            sessionStorage.setItem("adminToken", token);
+
+            showDashboard();
+
+            status.textContent = "Login successful!";
+
+          } else {
+
+            status.textContent =
+              result.error || "Login failed.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .login(password);
+
+    });
+
+
+  // ADD VIDEO
+
+  document.getElementById("videoForm")
+    .addEventListener("submit", function(event) {
+
+      event.preventDefault();
+
+      status.textContent = "Adding video...";
+
+      const record = {
+
+        Title: document.getElementById("title").value.trim(),
+
+        YouTube_URL: document.getElementById("url").value.trim(),
+
+        Category: document.getElementById("category").value.trim(),
+
+        Description: document.getElementById("description").value.trim(),
+
+        Featured: false,
+        Visible: true
+
+      };
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            status.textContent = "Video added successfully!";
+
+            document.getElementById("videoForm").reset();
+
+            loadVideos();
+
+          } else {
+
+            status.textContent =
+              result.error || "Could not add video.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .adminAddVideo(token, record);
+
+    });
+
+
+  // LOAD VIDEOS
+
+  function loadVideos() {
+
+    videoList.innerHTML =
+      '<tr><td colspan="3">Loading videos...</td></tr>';
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+
+        if (!result.success) {
+
+          status.textContent =
+            result.error || "Could not load videos.";
+
+          videoList.innerHTML =
+            '<tr><td colspan="3">Unable to load videos.</td></tr>';
+
+          return;
+        }
+
+        videos = result.videos || [];
+
+        renderVideos();
+
+      })
+      .withFailureHandler(function(error) {
+        status.textContent = error.message;
+      })
+      .adminListVideos(token);
+
+  }
+
+
+  // DISPLAY VIDEOS
+
+  function renderVideos() {
+
+    if (videos.length === 0) {
+
+      videoList.innerHTML =
+        '<tr><td colspan="3" class="empty-message">No videos found.</td></tr>';
+
+      return;
+    }
+
+    videoList.innerHTML = videos.map(function(video) {
+
+      const visible = isVisible(video.Visible);
+
+      return `
+        <tr>
+
+          <td>${escapeHTML(video.Title)}</td>
+
+          <td class="${visible ? "visible" : "invisible"}">
+            ${visible ? "Visible" : "Hidden"}
+          </td>
+
+          <td class="actions">
+
+            <button
+              class="secondary"
+              data-action="edit"
+              data-id="${escapeHTML(video.ID)}"
+            >
+              Edit
+            </button>
+
+            <button
+              class="success"
+              data-action="toggle"
+              data-id="${escapeHTML(video.ID)}"
+            >
+              ${visible ? "Hide" : "Show"}
+            </button>
+
+            <button
+              class="danger"
+              data-action="delete"
+              data-id="${escapeHTML(video.ID)}"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+  }
+
+
+  // VIDEO BUTTON ACTIONS
+
+  videoList.addEventListener("click", function(event) {
+
+    const button = event.target.closest("button[data-action]");
+
+    if (!button) return;
+
+    const id = button.dataset.id;
+    const action = button.dataset.action;
+
+    const video = videos.find(function(item) {
+      return String(item.ID) === String(id);
+    });
+
+    if (!video) return;
+
+    if (action === "edit") openEditForm(video);
+
+    if (action === "toggle") toggleVideoVisibility(video);
+
+    if (action === "delete") deleteVideo(video);
+
+  });
+
+
+  // EDIT VIDEO
+
+  function openEditForm(video) {
+
+    document.getElementById("editId").value = video.ID;
+
+    document.getElementById("editTitle").value =
+      video.Title || "";
+
+    document.getElementById("editUrl").value =
+      video.YouTube_URL || "";
+
+    document.getElementById("editCategory").value =
+      video.Category || "";
+
+    document.getElementById("editDescription").value =
+      video.Description || "";
+
+    editPanel.classList.remove("hidden");
+
+    editPanel.scrollIntoView({ behavior: "smooth" });
+
+  }
+
+
+  // SAVE VIDEO EDIT
+
+  document.getElementById("editForm")
+    .addEventListener("submit", function(event) {
+
+      event.preventDefault();
+
+      const id = document.getElementById("editId").value;
+
+      const original = videos.find(function(item) {
+        return String(item.ID) === String(id);
+      });
+
+      if (!original) {
+        status.textContent = "Video not found.";
+        return;
+      }
+
+      const record = {
+
+        ...original,
+
+        Title: document.getElementById("editTitle").value.trim(),
+
+        YouTube_URL: document.getElementById("editUrl").value.trim(),
+
+        Category: document.getElementById("editCategory").value.trim(),
+
+        Description: document.getElementById("editDescription").value.trim()
+
+      };
+
+      status.textContent = "Saving changes...";
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            status.textContent = "Video updated successfully!";
+
+            editPanel.classList.add("hidden");
+
+            loadVideos();
+
+          } else {
+
+            status.textContent =
+              result.error || "Could not update video.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .adminUpdateVideo(token, record);
+
+    });
+
+
+  // CANCEL VIDEO EDIT
+
+  document.getElementById("cancelEdit")
+    .addEventListener("click", function() {
+
+      editPanel.classList.add("hidden");
+
+    });
+
+
+  // HIDE / SHOW VIDEO
+
+  function toggleVideoVisibility(video) {
+
+    const updated = {
+      ...video,
+      Visible: !isVisible(video.Visible)
+    };
+
+    status.textContent = "Updating video visibility...";
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+
+        if (result.success) {
+
+          status.textContent = "Video visibility updated!";
+
+          loadVideos();
+
+        } else {
+
+          status.textContent =
+            result.error || "Could not update video.";
+
+        }
+
+      })
+      .withFailureHandler(function(error) {
+        status.textContent = error.message;
+      })
+      .adminUpdateVideo(token, updated);
+
+  }
+
+
+  // DELETE VIDEO
+
+  function deleteVideo(video) {
+
+    if (!confirm('Delete video "' + video.Title + '"?')) return;
+
+    status.textContent = "Deleting video...";
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+
+        if (result.success) {
+
+          status.textContent = "Video deleted successfully!";
+
+          editPanel.classList.add("hidden");
+
+          loadVideos();
+
+        } else {
+
+          status.textContent =
+            result.error || "Could not delete video.";
+
+        }
+
+      })
+      .withFailureHandler(function(error) {
+        status.textContent = error.message;
+      })
+      .adminDeleteVideo(token, video.ID);
+
+  }
+
+
+  // REFRESH VIDEOS
+
+  document.getElementById("refreshVideos")
+    .addEventListener("click", loadVideos);
+
+
+  // ADD PLAYLIST
+
+  document.getElementById("playlistForm")
+    .addEventListener("submit", function(event) {
+
+      event.preventDefault();
+
+      const record = {
+
+        Title: document.getElementById("playlistTitle").value.trim(),
+
+        YouTube_URL: document.getElementById("playlistUrl").value.trim(),
+
+        Category: document.getElementById("playlistCategory").value.trim(),
+
+        Description: document.getElementById("playlistDescription").value.trim(),
+
+        Featured: false,
+        Visible: true
+
+      };
+
+      status.textContent = "Adding playlist...";
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            status.textContent = "Playlist added successfully!";
+
+            document.getElementById("playlistForm").reset();
+
+            loadPlaylists();
+
+          } else {
+
+            status.textContent =
+              result.error || "Could not add playlist.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .adminAddPlaylist(token, record);
+
+    });
+
+
+  // LOAD PLAYLISTS
+
+  function loadPlaylists() {
+
+    playlistList.innerHTML =
+      '<tr><td colspan="3">Loading playlists...</td></tr>';
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+
+        if (!result.success) {
+
+          status.textContent =
+            result.error || "Could not load playlists.";
+
+          playlistList.innerHTML =
+            '<tr><td colspan="3">Unable to load playlists.</td></tr>';
+
+          return;
+        }
+
+        playlists = result.playlists || [];
+
+        renderPlaylists();
+
+      })
+      .withFailureHandler(function(error) {
+        status.textContent = error.message;
+      })
+      .adminListPlaylists(token);
+
+  }
+
+
+  // DISPLAY PLAYLISTS
+
+  function renderPlaylists() {
+
+    if (playlists.length === 0) {
+
+      playlistList.innerHTML =
+        '<tr><td colspan="3" class="empty-message">No playlists found.</td></tr>';
+
+      return;
+    }
+
+    playlistList.innerHTML = playlists.map(function(item) {
+
+      const visible = isVisible(item.Visible);
+
+      return `
+        <tr>
+
+          <td>${escapeHTML(item.Title)}</td>
+
+          <td class="${visible ? "visible" : "invisible"}">
+            ${visible ? "Visible" : "Hidden"}
+          </td>
+
+          <td class="actions">
+
+            <button
+              class="secondary"
+              data-playlist-action="edit"
+              data-id="${escapeHTML(item.ID)}"
+            >
+              Edit
+            </button>
+
+            <button
+              class="success"
+              data-playlist-action="toggle"
+              data-id="${escapeHTML(item.ID)}"
+            >
+              ${visible ? "Hide" : "Show"}
+            </button>
+
+            <button
+              class="danger"
+              data-playlist-action="delete"
+              data-id="${escapeHTML(item.ID)}"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+  }
+
+
+  // PLAYLIST BUTTON ACTIONS
+
+  playlistList.addEventListener("click", function(event) {
+
+    const button =
+      event.target.closest("button[data-playlist-action]");
+
+    if (!button) return;
+
+    const id = button.dataset.id;
+    const action = button.dataset.playlistAction;
+
+    const playlist = playlists.find(function(item) {
+      return String(item.ID) === String(id);
+    });
+
+    if (!playlist) return;
+
+
+    // EDIT PLAYLIST
+
+    if (action === "edit") {
+
+      const title = prompt(
+        "Playlist title:",
+        playlist.Title || ""
+      );
+
+      if (title === null) return;
+
+      const url = prompt(
+        "YouTube playlist URL:",
+        playlist.YouTube_URL || ""
+      );
+
+      if (url === null) return;
+
+      const category = prompt(
+        "Category:",
+        playlist.Category || ""
+      );
+
+      if (category === null) return;
+
+      const description = prompt(
+        "Description:",
+        playlist.Description || ""
+      );
+
+      if (description === null) return;
+
+      const updated = {
+
+        ...playlist,
+
+        Title: title.trim(),
+
+        YouTube_URL: url.trim(),
+
+        Category: category.trim(),
+
+        Description: description.trim()
+
+      };
+
+      status.textContent = "Updating playlist...";
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            status.textContent = "Playlist updated successfully!";
+
+            loadPlaylists();
+
+          } else {
+
+            status.textContent =
+              result.error || "Playlist update failed.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .adminUpdatePlaylist(token, updated);
+
+    }
+
+
+    // HIDE / SHOW PLAYLIST
+
+    if (action === "toggle") {
+
+      const updated = {
+        ...playlist,
+        Visible: !isVisible(playlist.Visible)
+      };
+
+      status.textContent = "Updating playlist visibility...";
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            status.textContent = "Playlist visibility updated!";
+
+            loadPlaylists();
+
+          } else {
+
+            status.textContent =
+              result.error || "Could not update playlist.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .adminUpdatePlaylist(token, updated);
+
+    }
+
+
+    // DELETE PLAYLIST
+
+    if (action === "delete") {
+
+      if (!confirm("Delete playlist: " + playlist.Title + "?")) {
+        return;
+      }
+
+      status.textContent = "Deleting playlist...";
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+
+          if (result.success) {
+
+            status.textContent = "Playlist deleted successfully!";
+
+            loadPlaylists();
+
+          } else {
+
+            status.textContent =
+              result.error || "Playlist deletion failed.";
+
+          }
+
+        })
+        .withFailureHandler(function(error) {
+          status.textContent = error.message;
+        })
+        .adminDeletePlaylist(token, id);
+
+    }
+
+  });
+
+
+  // REFRESH PLAYLISTS
+
+  document.getElementById("refreshPlaylists")
+    .addEventListener("click", loadPlaylists);
+
+
+  // LOGOUT
+
+  document.getElementById("logout")
+    .addEventListener("click", function() {
+
+      token = null;
+
+      sessionStorage.removeItem("adminToken");
+
+      editPanel.classList.add("hidden");
+
+      showLogin();
+
+      status.textContent = "Logged out.";
+
+    });
+
+</script>
+
+</body>
+</html>

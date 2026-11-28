@@ -1,4 +1,4 @@
-const CACHE_NAME = "shalom-tabernacle-v9";
+const CACHE_NAME = "shalom-tabernacle-v10";
 
 const FILES_TO_CACHE = [
   "./",
@@ -55,11 +55,13 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (event.request.headers.get("range")) return;
 
   const url = new URL(event.request.url);
 
-  // Never cache external APIs (e.g., Google Apps Script) or private admin pages.
+  // Never cache external APIs (e.g., Google Apps Script), video streams, or private admin pages.
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith("/intro.mp4")) return;
   if (isExcludedPath(url.pathname)) return;
 
   // Network-first for HTML/JS/manifest so updates arrive quickly while remaining offline-ready.

@@ -145,6 +145,10 @@ const I18N = {
     laterBtn: "Later",
     refreshNowBtn: "Refresh Now",
     updatingBtn: "Updating...",
+    introOverlayAria: "Shalom Tabernacle Intro Video",
+    introSkipBtn: "Skip Intro →",
+    introSoundBtn: "🔊 Tap for Sound",
+    introReplayBtn: "Watch Intro",
     installGuideIosHtml: "<p>Install <strong>Shalom Tabernacle</strong> directly to your iPhone or iPad home screen:</p><ol><li>Tap the <strong>Share</strong> icon in Safari's toolbar.</li><li>Scroll down and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong> in the top-right corner.</li></ol>",
     installGuideOtherHtml: "<p>Your browser does not show an automatic install prompt right now. You can still install or pin <strong>Shalom Tabernacle</strong>:</p><ol><li>Open your browser's menu (<strong>⋮</strong> or <strong>⋯</strong>) or address bar install icon.</li><li>Choose <strong>Install App</strong>, <strong>Add to Home Screen</strong>, or <strong>Create Shortcut</strong>.</li></ol>",
     installingToast: "Installing Shalom Tabernacle...",
@@ -282,6 +286,10 @@ const I18N = {
     laterBtn: "తర్వాత",
     refreshNowBtn: "ఇప్పుడే రిఫ్రెష్",
     updatingBtn: "అప్‌డేట్ అవుతోంది...",
+    introOverlayAria: "షాలోమ్ టబర్నికల్ పరిచయ వీడియో",
+    introSkipBtn: "దాటవేయండి →",
+    introSoundBtn: "🔊 సౌండ్ కోసం నొక్కండి",
+    introReplayBtn: "పరిచయ వీడియో చూడండి",
     installGuideIosHtml: "<p>మీ iPhone లేదా iPad హోమ్ స్క్రీన్‌పై నేరుగా <strong>షాలోమ్ టబర్నికల్</strong> ఇన్‌స్టాల్ చేయండి:</p><ol><li>సఫారి టూల్‌బార్‌లోని <strong>Share</strong> చిహ్నాన్ని నొక్కండి.</li><li>క్రిందికి స్క్రోల్ చేసి <strong>Add to Home Screen</strong> నొక్కండి.</li><li>పై కుడి మూలలో ఉన్న <strong>Add</strong> నొక్కండి.</li></ol>",
     installGuideOtherHtml: "<p>మీ బ్రౌజర్ ప్రస్తుతం ఆటోమేటిక్ ఇన్‌స్టాల్ ప్రాంప్ట్ చూపడం లేదు. అయినా మీరు <strong>షాలోమ్ టబర్నికల్</strong> ఇన్‌స్టాల్ చేయవచ్చు:</p><ol><li>మీ బ్రౌజర్ మెను (<strong>⋮</strong> లేదా <strong>⋯</strong>) లేదా అడ్రస్ బార్ ఇన్‌స్టాల్ చిహ్నాన్ని తెరవండి.</li><li><strong>Install App</strong>, <strong>Add to Home Screen</strong>, లేదా <strong>Create Shortcut</strong> ఎంచుకోండి.</li></ol>",
     installingToast: "షాలోమ్ టబర్నికల్ ఇన్‌స్టాల్ అవుతోంది...",
@@ -2185,6 +2193,126 @@ function showError(message) {
 
 
 /* ==========================================
+   LOGO REVEAL INTRO VIDEO (./intro.mp4)
+========================================== */
+
+const INTRO_VIDEO_SRC = "./intro.mp4";
+const INTRO_SEEN_KEY = "shalomIntroSeen";
+
+async function initIntroReveal() {
+  const overlay = document.getElementById("introOverlay");
+  const video = document.getElementById("introVideo");
+  const skipBtn = document.getElementById("introSkipBtn");
+  const soundBtn = document.getElementById("introSoundBtn");
+  const replayBtn = document.getElementById("aboutIntroBtn");
+
+  if (!overlay || !video || typeof window.fetch !== "function") return;
+
+  let hasIntroFile = false;
+  try {
+    const check = await fetch(INTRO_VIDEO_SRC, { method: "HEAD", cache: "no-store" });
+    hasIntroFile = check.ok;
+  } catch {
+    hasIntroFile = false;
+  }
+
+  if (!hasIntroFile) return;
+
+  if (replayBtn) replayBtn.hidden = false;
+
+  let leaveTimer = null;
+
+  const closeIntro = () => {
+    clearTimeout(leaveTimer);
+    try {
+      video.pause();
+    } catch {}
+    document.body.style.overflow = "";
+    try {
+      sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {}
+
+    if (overlay.hidden) return;
+    overlay.classList.add("is-leaving");
+    leaveTimer = setTimeout(() => {
+      overlay.hidden = true;
+      overlay.classList.remove("is-leaving");
+    }, 450);
+  };
+
+  const playIntro = async () => {
+    clearTimeout(leaveTimer);
+    if (video.getAttribute("src") !== INTRO_VIDEO_SRC) {
+      video.setAttribute("src", INTRO_VIDEO_SRC);
+    }
+
+    overlay.classList.remove("is-leaving");
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+    if (soundBtn) soundBtn.hidden = true;
+
+    try {
+      video.currentTime = 0;
+    } catch {}
+
+    try {
+      video.muted = false;
+      await video.play();
+    } catch {
+      try {
+        video.muted = true;
+        await video.play();
+        if (soundBtn) soundBtn.hidden = false;
+      } catch {
+        closeIntro();
+      }
+    }
+  };
+
+  if (soundBtn) {
+    soundBtn.addEventListener("click", () => {
+      video.muted = false;
+      if (video.currentTime < 2.5) {
+        try {
+          video.currentTime = 0;
+        } catch {}
+      }
+      video.play().catch(() => {});
+      soundBtn.hidden = true;
+    });
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener("click", closeIntro);
+  }
+
+  if (replayBtn) {
+    replayBtn.addEventListener("click", () => {
+      playIntro();
+    });
+  }
+
+  video.addEventListener("ended", closeIntro);
+  video.addEventListener("error", closeIntro);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !overlay.hidden) {
+      closeIntro();
+    }
+  });
+
+  let alreadySeen = false;
+  try {
+    alreadySeen = sessionStorage.getItem(INTRO_SEEN_KEY) === "1";
+  } catch {}
+
+  if (!alreadySeen) {
+    playIntro();
+  }
+}
+
+
+/* ==========================================
    START WEBSITE
 ========================================== */
 
@@ -2198,6 +2326,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLoadMoreControls();
   initCardAndShareInteractions();
   initPWAInstallPrompt();
+  initIntroReveal();
   if (typeof renderHistory === "function") renderHistory();
   renderContinueWatching();
   renderFavorites();
