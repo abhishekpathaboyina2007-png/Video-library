@@ -140,6 +140,11 @@ const I18N = {
     installBannerSubIos: "Tap below for Safari Add to Home Screen steps.",
     notNowBtn: "Not now",
     gotItBtn: "Got It",
+    updateAvailableTitle: "New Update Available",
+    updateAvailableSub: "Tap refresh to load the latest features and improvements.",
+    laterBtn: "Later",
+    refreshNowBtn: "Refresh Now",
+    updatingBtn: "Updating...",
     installGuideIosHtml: "<p>Install <strong>Shalom Tabernacle</strong> directly to your iPhone or iPad home screen:</p><ol><li>Tap the <strong>Share</strong> icon in Safari's toolbar.</li><li>Scroll down and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong> in the top-right corner.</li></ol>",
     installGuideOtherHtml: "<p>Your browser does not show an automatic install prompt right now. You can still install or pin <strong>Shalom Tabernacle</strong>:</p><ol><li>Open your browser's menu (<strong>⋮</strong> or <strong>⋯</strong>) or address bar install icon.</li><li>Choose <strong>Install App</strong>, <strong>Add to Home Screen</strong>, or <strong>Create Shortcut</strong>.</li></ol>",
     installingToast: "Installing Shalom Tabernacle...",
@@ -272,6 +277,11 @@ const I18N = {
     installBannerSubIos: "సఫారిలో హోమ్ స్క్రీన్‌కు జోడించే దశల కోసం క్రింద నొక్కండి.",
     notNowBtn: "ఇప్పుడు కాదు",
     gotItBtn: "అర్థమైంది",
+    updateAvailableTitle: "కొత్త అప్‌డేట్ అందుబాటులో ఉంది",
+    updateAvailableSub: "కొత్త ఫీచర్లు మరియు మార్పులను పొందడానికి ఇప్పుడే రిఫ్రెష్ చేయండి.",
+    laterBtn: "తర్వాత",
+    refreshNowBtn: "ఇప్పుడే రిఫ్రెష్",
+    updatingBtn: "అప్‌డేట్ అవుతోంది...",
     installGuideIosHtml: "<p>మీ iPhone లేదా iPad హోమ్ స్క్రీన్‌పై నేరుగా <strong>షాలోమ్ టబర్నికల్</strong> ఇన్‌స్టాల్ చేయండి:</p><ol><li>సఫారి టూల్‌బార్‌లోని <strong>Share</strong> చిహ్నాన్ని నొక్కండి.</li><li>క్రిందికి స్క్రోల్ చేసి <strong>Add to Home Screen</strong> నొక్కండి.</li><li>పై కుడి మూలలో ఉన్న <strong>Add</strong> నొక్కండి.</li></ol>",
     installGuideOtherHtml: "<p>మీ బ్రౌజర్ ప్రస్తుతం ఆటోమేటిక్ ఇన్‌స్టాల్ ప్రాంప్ట్ చూపడం లేదు. అయినా మీరు <strong>షాలోమ్ టబర్నికల్</strong> ఇన్‌స్టాల్ చేయవచ్చు:</p><ol><li>మీ బ్రౌజర్ మెను (<strong>⋮</strong> లేదా <strong>⋯</strong>) లేదా అడ్రస్ బార్ ఇన్‌స్టాల్ చిహ్నాన్ని తెరవండి.</li><li><strong>Install App</strong>, <strong>Add to Home Screen</strong>, లేదా <strong>Create Shortcut</strong> ఎంచుకోండి.</li></ol>",
     installingToast: "షాలోమ్ టబర్నికల్ ఇన్‌స్టాల్ అవుతోంది...",
@@ -2003,6 +2013,7 @@ function syncInstallUI() {
   const installed = isAppInstalled();
   const aboutInstallBtn = document.getElementById("aboutInstallBtn");
   const banner = document.getElementById("pwaInstallBanner");
+  const updateBanner = document.getElementById("pwaUpdateBanner");
   const bannerSub = document.getElementById("pwaBannerSubtitle");
   const bannerBtn = document.getElementById("pwaBannerInstallBtn");
 
@@ -2015,7 +2026,9 @@ function syncInstallUI() {
   if (aboutInstallBtn) aboutInstallBtn.hidden = false;
 
   if (banner) {
-    if (wasInstallDismissedRecently()) {
+    if (updateBanner && !updateBanner.hidden) {
+      banner.hidden = true;
+    } else if (wasInstallDismissedRecently()) {
       banner.hidden = true;
     } else if (deferredInstallPrompt) {
       if (bannerSub) bannerSub.textContent = t("installBannerSub");

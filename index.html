@@ -980,6 +980,11 @@ header {
   border-color:var(--gold);
 }
 
+.pwa-update-banner {
+  z-index:270;
+  border-color:var(--gold);
+}
+
 .modal-backdrop {
   position:fixed;
   inset:0;
@@ -1758,6 +1763,24 @@ footer strong {
   </div>
 </aside>
 
+<!-- APP UPDATE AVAILABLE BANNER -->
+
+<aside class="pwa-banner pwa-update-banner" id="pwaUpdateBanner" hidden role="status" aria-live="polite" aria-label="New Update Available" data-i18n-aria="updateAvailableTitle">
+  <div class="pwa-banner-brand">
+    <img src="./app-icon-192.png" alt="Shalom Tabernacle App Icon" width="42" height="42">
+    <div>
+      <div class="pwa-banner-title" data-i18n="updateAvailableTitle">New Update Available</div>
+      <div class="pwa-banner-sub" data-i18n="updateAvailableSub">
+        Tap refresh to load the latest features and improvements.
+      </div>
+    </div>
+  </div>
+  <div class="pwa-banner-actions">
+    <button type="button" class="pwa-banner-dismiss" id="pwaUpdateDismissBtn" data-i18n="laterBtn">Later</button>
+    <button type="button" class="gold-button pwa-banner-install" id="pwaUpdateRefreshBtn" data-i18n="refreshNowBtn">Refresh Now</button>
+  </div>
+</aside>
+
 <!-- INSTALL GUIDE MODAL -->
 
 <div class="modal-backdrop" id="installGuideModal" hidden role="dialog" aria-modal="true" aria-labelledby="installGuideTitle">
@@ -1775,7 +1798,7 @@ footer strong {
 <div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
 
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=10"></script>
+<script src="./app.js?v=11"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 
@@ -2094,7 +2117,67 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
 
     const hadController = Boolean(navigator.serviceWorker.controller);
+    const updateBanner = document.getElementById("pwaUpdateBanner");
+    const installBanner = document.getElementById("pwaInstallBanner");
+    const refreshBtn = document.getElementById("pwaUpdateRefreshBtn");
+    const dismissBtn = document.getElementById("pwaUpdateDismissBtn");
+    let waitingWorker = null;
+    let updateDismissed = false;
     let refreshing = false;
+
+    function showUpdatePrompt(worker) {
+      if (!worker || !navigator.serviceWorker.controller) return;
+      waitingWorker = worker;
+      if (updateDismissed || !updateBanner) return;
+      if (installBanner) installBanner.hidden = true;
+      updateBanner.hidden = false;
+    }
+
+    function watchRegistration(registration) {
+      if (registration.waiting && navigator.serviceWorker.controller) {
+        showUpdatePrompt(registration.waiting);
+      }
+
+      registration.addEventListener("updatefound", () => {
+        const newWorker = registration.installing;
+        if (!newWorker) return;
+
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            showUpdatePrompt(newWorker);
+          }
+        });
+      });
+    }
+
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", () => {
+        if (!waitingWorker) {
+          window.location.reload();
+          return;
+        }
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = typeof t === "function" ? t("updatingBtn") : "Updating...";
+        waitingWorker.postMessage({ type: "SKIP_WAITING" });
+
+        setTimeout(() => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        }, 1800);
+      });
+    }
+
+    if (dismissBtn && updateBanner) {
+      dismissBtn.addEventListener("click", () => {
+        updateDismissed = true;
+        updateBanner.hidden = true;
+        if (typeof syncInstallUI === "function") {
+          syncInstallUI();
+        }
+      });
+    }
 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (!hadController || refreshing) return;
@@ -2105,11 +2188,17 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" })
       .then((registration) => {
         console.log("Shalom App Ready");
+        watchRegistration(registration);
+
         document.addEventListener("visibilitychange", () => {
           if (document.visibilityState === "visible") {
             registration.update().catch(() => {});
           }
         });
+
+        setInterval(() => {
+          registration.update().catch(() => {});
+        }, 30 * 60 * 1000);
       })
       .catch(error => console.error("App setup error:", error));
 
