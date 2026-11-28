@@ -208,50 +208,45 @@ function createVideoCard(video) {
 
 
 
-function createPlaylistCard(item) {
 
+function createPlaylistCard(item) {
   const title = escapeHTML(item.Title);
   const url = safeYouTubeURL(item.YouTube_URL);
-
-  const customThumbnail = safeImageURL(
-    item.Thumbnail_URL || ""
-  );
-
-  const firstVideoId = String(
-    item.First_Video_ID || ""
-  ).trim();
+  const customThumbnail = safeImageURL(item.Thumbnail_URL || "");
+  const firstVideoId = String(item.First_Video_ID || "").trim();
 
   const thumbnail = customThumbnail ||
-    ( /^[A-Za-z0-9_-]{11}$/.test(firstVideoId)
-      ? "https://i.ytimg.com/vi/" + firstVideoId + "/hqdefault.jpg"
+    (/^[A-Za-z0-9_-]{11}$/.test(firstVideoId)
+      ? "https://i.ytimg.com/vi/" + firstVideoId + "/maxresdefault.jpg"
       : "./logo.png"
     );
 
   return `
     <article class="card">
-
-      <img
-        class="thumb"
+      <img class="thumb"
         src="${escapeHTML(thumbnail)}"
         alt="${title}"
         loading="lazy"
-        onerror="this.onerror=null;this.src='./logo.png';"
-      >
-
+        onerror="
+          if (this.dataset.fallback === '0') {
+            this.dataset.fallback = '1';
+            this.src = 'https://i.ytimg.com/vi/${firstVideoId}/hqdefault.jpg';
+          } else if (this.dataset.fallback === '1') {
+            this.dataset.fallback = '2';
+            this.src = 'https://i.ytimg.com/vi/${firstVideoId}/sddefault.jpg';
+          } else {
+            this.onerror = null;
+            this.src = './logo.png';
+          }
+        ">
       <div class="card-info">
         <h3>${title}</h3>
         <p>Shalom Tabernacle Collection</p>
-
-        <a
-          class="play"
-          href="${escapeHTML(url)}"
-          target="_blank"
-          rel="noopener"
-        >
+        <a class="play" href="${escapeHTML(url)}"
+          target="_blank" rel="noopener">
           ▶ OPEN PLAYLIST
         </a>
       </div>
-
     </article>
   `;
 }
