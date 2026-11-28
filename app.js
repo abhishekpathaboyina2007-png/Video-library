@@ -2,7 +2,7 @@
    SHALOM TABERNACLE - OPTIMIZED PUBLIC WEBSITE
    Google Sheets + Horizontal Home Rows
    + Performance-Optimized Thumbnails,
-     Pagination, Favorites, Share, PWA Install,
+     Pagination, Favorites, PWA Install,
      Continue Watching, Advanced Search,
      Bilingual Switcher & Theme Switcher
 ========================================== */
@@ -71,7 +71,6 @@ const I18N = {
     darkThemeToast: "Dark theme enabled",
     offlineBanner: "You are currently offline. Showing previously loaded messages, saved favorites, and local history.",
     heroEyebrow: "WELCOME TO SHALOM TABERNACLE",
-    heroTitleHtml: "Faith. Truth.\n<span>The Word of God.</span>",
     heroQuote: "🕊️ And in here, we don’t have no creed but Christ, that’s the creed; and no law but love; no book but the Bible. And Christ is the Head; and the Bible is our textbook; the world is my parish. So I like to just preach the way that I feel led to preach, and just the way that I see it. 🦅",
     heroAttributionHtml: "PAS. JOEL. P\n<span>Visakhapatnam</span>",
     continueEyebrow: "PICK UP WHERE YOU LEFT OFF",
@@ -129,12 +128,11 @@ const I18N = {
     aboutSubtitle: "Welcome to Shalom Tabernacle.",
     aboutPanelTitle: "Shalom Tabernacle",
     aboutPara1: "Welcome to Shalom Tabernacle, Visakhapatnam. This website is a place to explore our messages, teachings and worship collections.",
-    aboutPara2: "Watch, revisit and share the messages that inspire your faith and help you grow in the Word of God.",
+    aboutPara2: "Watch and revisit the messages that inspire your faith and help you grow in the Word of God.",
     prefsTitle: "Display & App Preferences",
-    prefsDesc: "Customize your reading theme, switch language, install the Shalom Tabernacle app for offline browsing, or share this library with others.",
+    prefsDesc: "Customize your reading theme, switch language, or install the Shalom Tabernacle app for offline browsing.",
     installAppBtn: "Install App",
     howToInstallBtn: "How to Install",
-    shareWebsiteBtn: "Share Website",
     installTitle: "Install Shalom Tabernacle",
     installBannerSub: "Add to your home screen for quick access to messages & playlists.",
     installBannerSubIos: "Tap below for Safari Add to Home Screen steps.",
@@ -164,21 +162,12 @@ const I18N = {
     addFavAria: "Add to favorites",
     removeFavAria: "Remove from favorites",
     saveFavTitle: "Save to favorites",
-    shareTitle: "Share",
     addedFavToast: "Added to Favorites",
     removedFavToast: "Removed from Favorites",
     clearedFavToast: "Favorites cleared",
     clearedHistoryToast: "Viewing history cleared",
     confirmClearFavorites: "Remove all saved favorites?",
     confirmClearHistory: "Clear all your recently watched videos?",
-    shareUnavailableToast: "Unable to share this link.",
-    websiteCopiedToast: "Website link copied to clipboard!",
-    linkCopiedToast: "Link copied to clipboard!",
-    copyManualToast: "Copy unavailable. Long-press the link to copy.",
-    shareTextTemplate: "Watch \"{title}\" from Shalom Tabernacle ({type})",
-    typeMessage: "message",
-    typePlaylist: "playlist",
-    websiteShareText: "Watch messages and explore playlists from Shalom Tabernacle, Visakhapatnam.",
     offlineNoCacheError: "You are offline and no previously loaded library is cached yet.",
     connectError: "Unable to connect. Please check your internet and refresh.",
     timeoutError: "Connection is taking too long. Please refresh the page.",
@@ -212,7 +201,6 @@ const I18N = {
     darkThemeToast: "డార్క్ థీమ్ ఆన్ చేయబడింది",
     offlineBanner: "మీరు ప్రస్తుతం ఆఫ్‌లైన్‌లో ఉన్నారు. గతంలో లోడ్ చేసిన సందేశాలు, సేవ్ చేసిన ఇష్టమైనవి మరియు స్థానిక చరిత్ర చూపబడుతున్నాయి.",
     heroEyebrow: "షాలోమ్ టబర్నికల్‌కు స్వాగతం",
-    heroTitleHtml: "విశ్వాసం. సత్యం.\n<span>దేవుని వాక్యం.</span>",
     heroQuote: "🕊️ ఇక్కడ మాకు క్రీస్తు తప్ప మరే విశ్వాస సూత్రం లేదు, అదే మా విశ్వాసం; ప్రేమ తప్ప మరే చట్టం లేదు; బైబిల్ తప్ప మరే గ్రంథం లేదు. క్రీస్తే శిరస్సు; బైబిలే మా పాఠ్యపుస్తకం; లోకమే నా పరిచర్య క్షేత్రం. కాబట్టి నాకు ప్రేరేపించబడిన రీతిలో, నేను చూసిన విధంగానే వాక్యాన్ని ప్రకటించడం నాకు ఇష్టం. 🦅",
     heroAttributionHtml: "పాస్టర్ జోయెల్. పి\n<span>విశాఖపట్నం</span>",
     continueEyebrow: "మీరు ఆపిన చోటు నుండి కొనసాగించండి",
@@ -270,12 +258,11 @@ const I18N = {
     aboutSubtitle: "షాలోమ్ టబర్నికల్‌కు స్వాగతం.",
     aboutPanelTitle: "షాలోమ్ టబర్నికల్",
     aboutPara1: "విశాఖపట్నంలోని షాలోమ్ టబర్నికల్‌కు స్వాగతం. ఈ వెబ్‌సైట్ మా సందేశాలు, బోధనలు మరియు ఆరాధన సేకరణలను అన్వేషించడానికి ఒక వేదిక.",
-    aboutPara2: "మీ విశ్వాసాన్ని ప్రేరేపించే మరియు దేవుని వాక్యంలో ఎదగడానికి సహాయపడే సందేశాలను చూడండి, మళ్లీ వీక్షించండి మరియు షేర్ చేయండి.",
+    aboutPara2: "మీ విశ్వాసాన్ని ప్రేరేపించే మరియు దేవుని వాక్యంలో ఎదగడానికి సహాయపడే సందేశాలను చూడండి మరియు మళ్లీ వీక్షించండి.",
     prefsTitle: "డిస్‌ప్లే & యాప్ ప్రాధాన్యతలు",
-    prefsDesc: "మీ థీమ్ మరియు భాషను మార్చుకోండి, ఆఫ్‌లైన్ బ్రౌజింగ్ కోసం షాలోమ్ టబర్నికల్ యాప్‌ను ఇన్‌స్టాల్ చేయండి లేదా ఈ లైబ్రరీని ఇతరులతో షేర్ చేయండి.",
+    prefsDesc: "మీ థీమ్ మరియు భాషను మార్చుకోండి లేదా ఆఫ్‌లైన్ బ్రౌజింగ్ కోసం షాలోమ్ టబర్నికల్ యాప్‌ను ఇన్‌స్టాల్ చేయండి.",
     installAppBtn: "యాప్ ఇన్‌స్టాల్ చేయండి",
     howToInstallBtn: "ఇన్‌స్టాల్ చేయడం ఎలా",
-    shareWebsiteBtn: "వెబ్‌సైట్ షేర్ చేయండి",
     installTitle: "షాలోమ్ టబర్నికల్ ఇన్‌స్టాల్ చేయండి",
     installBannerSub: "సందేశాలు & ప్లేలిస్ట్‌లను త్వరగా చూడటానికి మీ హోమ్ స్క్రీన్‌కు జోడించండి.",
     installBannerSubIos: "సఫారిలో హోమ్ స్క్రీన్‌కు జోడించే దశల కోసం క్రింద నొక్కండి.",
@@ -305,21 +292,12 @@ const I18N = {
     addFavAria: "ఇష్టమైన వాటిలో చేర్చండి",
     removeFavAria: "ఇష్టమైన వాటి నుండి తీసివేయండి",
     saveFavTitle: "ఇష్టమైన వాటిలో సేవ్ చేయండి",
-    shareTitle: "షేర్ చేయండి",
     addedFavToast: "ఇష్టమైన వాటిలో చేర్చబడింది",
     removedFavToast: "ఇష్టమైన వాటి నుండి తీసివేయబడింది",
     clearedFavToast: "ఇష్టమైనవి క్లియర్ చేయబడ్డాయి",
     clearedHistoryToast: "వీక్షణ చరిత్ర క్లియర్ చేయబడింది",
     confirmClearFavorites: "సేవ్ చేసిన అన్ని ఇష్టమైన వాటిని తీసివేయాలా?",
     confirmClearHistory: "మీరు ఇటీవల చూసిన అన్ని వీడియోలను క్లియర్ చేయాలా?",
-    shareUnavailableToast: "ఈ లింక్‌ను షేర్ చేయడం సాధ్యం కాలేదు.",
-    websiteCopiedToast: "వెబ్‌సైట్ లింక్ క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది!",
-    linkCopiedToast: "లింక్ క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది!",
-    copyManualToast: "కాపీ అందుబాటులో లేదు. కాపీ చేయడానికి లింక్‌ను నొక్కి ఉంచండి.",
-    shareTextTemplate: "షాలోమ్ టబర్నికల్ నుండి \"{title}\" ({type}) చూడండి",
-    typeMessage: "సందేశం",
-    typePlaylist: "ప్లేలిస్ట్",
-    websiteShareText: "విశాఖపట్నం షాలోమ్ టబర్నికల్ నుండి సందేశాలు మరియు ప్లేలిస్ట్‌లను చూడండి.",
     offlineNoCacheError: "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు మరియు గతంలో లోడ్ చేసిన లైబ్రరీ ఇంకా సేవ్ చేయబడలేదు.",
     connectError: "కనెక్ట్ చేయడం సాధ్యం కాలేదు. దయచేసి మీ ఇంటర్నెట్ తనిఖీ చేసి రిఫ్రెష్ చేయండి.",
     timeoutError: "కనెక్షన్ చాలా సమయం తీసుకుంటోంది. దయచేసి పేజీని రిఫ్రెష్ చేయండి.",
@@ -1081,30 +1059,16 @@ function heartIconSVG(filled) {
   `;
 }
 
-function shareIconSVG() {
-  return `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="18" cy="5" r="3"/>
-      <circle cx="6" cy="12" r="3"/>
-      <circle cx="18" cy="19" r="3"/>
-      <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-    </svg>
-  `;
-}
-
-
 /* ==========================================
-   CARD ACTION BUTTONS (FAVORITE & SHARE)
+   CARD ACTION BUTTONS (FAVORITE)
 ========================================== */
 
 function createCardIconActionsHTML(record) {
   const favActive = isFavorite(record.key);
   const safeKey = escapeHTML(record.key);
   const safeTitle = escapeHTML(record.title);
-  const safeUrl = escapeHTML(record.url);
   const favAria = escapeHTML(favActive ? t("removeFavAria") : t("addFavAria"));
   const favTitle = escapeHTML(favActive ? t("removeFavAria") : t("saveFavTitle"));
-  const shareLabel = escapeHTML(t("shareTitle"));
 
   return `
     <div class="card-icon-actions">
@@ -1117,18 +1081,6 @@ function createCardIconActionsHTML(record) {
         title="${favTitle}"
       >
         ${heartIconSVG(favActive)}
-      </button>
-      <button
-        type="button"
-        class="card-icon-btn share-btn"
-        data-share-key="${safeKey}"
-        data-share-url="${safeUrl}"
-        data-share-title="${safeTitle}"
-        data-share-type="${escapeHTML(record.type)}"
-        aria-label="${shareLabel} ${safeTitle}"
-        title="${shareLabel}"
-      >
-        ${shareIconSVG()}
       </button>
     </div>
   `;
@@ -1349,7 +1301,6 @@ function renderFavorites() {
     const isStandardYouTubeThumb =
       validFirstId && (!savedThumb || savedThumb.includes("ytimg.com") || savedThumb.includes("youtube.com"));
     const customThumb = isStandardYouTubeThumb ? "" : (savedThumb || "./logo.png");
-    const shareLabel = escapeHTML(t("shareTitle"));
 
     return `
       <article class="card" data-item-key="${key}" data-item-type="${escapeHTML(item.type || "video")}">
@@ -1380,18 +1331,6 @@ function renderFavorites() {
               >
                 ${heartIconSVG(true)}
               </button>
-              <button
-                type="button"
-                class="card-icon-btn share-btn"
-                data-share-key="${key}"
-                data-share-url="${escapeHTML(safeUrl)}"
-                data-share-title="${title}"
-                data-share-type="${escapeHTML(item.type || "video")}"
-                aria-label="${shareLabel} ${title}"
-                title="${shareLabel}"
-              >
-                ${shareIconSVG()}
-              </button>
             </div>
           </div>
         </div>
@@ -1410,66 +1349,6 @@ function renderFavorites() {
   }
 
   markAlreadyLoadedThumbs();
-}
-
-
-/* ==========================================
-   SHARE FUNCTIONALITY (WEB SHARE + COPY FALLBACK)
-========================================== */
-
-async function copyTextToClipboard(text) {
-  if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {}
-  }
-
-  try {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    document.body.appendChild(textarea);
-    textarea.select();
-    const ok = document.execCommand("copy");
-    textarea.remove();
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
-async function handleShare({ title, text, url, isWebsite = false }) {
-  const websiteUrl = new URL("./", window.location.href).href;
-  const safeTarget = isWebsite ? websiteUrl : safeYouTubeURL(url);
-  if (!safeTarget) {
-    showToast(t("shareUnavailableToast"));
-    return;
-  }
-
-  if (typeof navigator.share === "function") {
-    try {
-      await navigator.share({
-        title: title || t("orgName"),
-        text: text || title || `${t("orgName")}, ${t("locationText")}`,
-        url: safeTarget
-      });
-      return;
-    } catch (error) {
-      if (error && error.name === "AbortError") {
-        return;
-      }
-    }
-  }
-
-  const copied = await copyTextToClipboard(safeTarget);
-  if (copied) {
-    showToast(isWebsite ? t("websiteCopiedToast") : t("linkCopiedToast"));
-  } else {
-    showToast(t("copyManualToast"));
-  }
 }
 
 
@@ -1502,7 +1381,6 @@ function renderContinueWatching() {
   }
 
   section.hidden = false;
-  const shareLabel = escapeHTML(t("shareTitle"));
 
   row.innerHTML = history.slice(0, HOME_ROW_LIMIT).map(item => {
     const safeUrl =
@@ -1527,24 +1405,9 @@ function renderContinueWatching() {
         <div class="card-info">
           <h3>${title}</h3>
           <p>${escapeHTML(t("continueLabel"))}</p>
-          <div class="card-actions">
-            <a class="play" href="${url}" target="_blank" rel="noopener">
-              ${escapeHTML(t("watchAgainBtn"))}
-            </a>
-            <div class="card-icon-actions">
-              <button
-                type="button"
-                class="card-icon-btn share-btn"
-                data-share-url="${url}"
-                data-share-title="${title}"
-                data-share-type="video"
-                aria-label="${shareLabel} ${title}"
-                title="${shareLabel}"
-              >
-                ${shareIconSVG()}
-              </button>
-            </div>
-          </div>
+          <a class="play" href="${url}" target="_blank" rel="noopener">
+            ${escapeHTML(t("watchAgainBtn"))}
+          </a>
         </div>
       </article>
     `;
@@ -2086,35 +1949,15 @@ function initPWAInstallPrompt() {
 
 
 /* ==========================================
-   SINGLE DELEGATED CARD, HISTORY & SHARE HANDLER
+   SINGLE DELEGATED CARD & HISTORY HANDLER
 ========================================== */
 
-function initCardAndShareInteractions() {
+function initCardAndHistoryInteractions() {
   document.addEventListener("click", function(event) {
     const favBtn = event.target.closest(".fav-btn[data-fav-key]");
     if (favBtn) {
       event.preventDefault();
       toggleFavoriteByKey(favBtn.dataset.favKey);
-      return;
-    }
-
-    const shareBtn = event.target.closest(".share-btn");
-    if (shareBtn) {
-      event.preventDefault();
-      const key = shareBtn.dataset.shareKey || "";
-      const record = libraryItemMap.get(key);
-      const url = record?.url || shareBtn.dataset.shareUrl || "";
-      const title = record?.title || shareBtn.dataset.shareTitle || t("orgName");
-      const typeLabel =
-        (record?.type || shareBtn.dataset.shareType) === "playlist"
-          ? t("typePlaylist")
-          : t("typeMessage");
-
-      handleShare({
-        title,
-        text: t("shareTextTemplate", { title, type: typeLabel }),
-        url
-      });
       return;
     }
 
@@ -2160,16 +2003,6 @@ function initCardAndShareInteractions() {
     saveHistory([]);
     showToast(t("clearedHistoryToast"));
   });
-
-  const shareWebsiteHandler = () => {
-    handleShare({
-      title: t("pageTitle"),
-      text: t("websiteShareText"),
-      isWebsite: true
-    });
-  };
-
-  document.getElementById("aboutShareWebsiteBtn")?.addEventListener("click", shareWebsiteHandler);
 }
 
 
@@ -2324,7 +2157,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initOfflineIndicator();
   initThumbnailDelegation();
   initLoadMoreControls();
-  initCardAndShareInteractions();
+  initCardAndHistoryInteractions();
   initPWAInstallPrompt();
   initIntroReveal();
   if (typeof renderHistory === "function") renderHistory();

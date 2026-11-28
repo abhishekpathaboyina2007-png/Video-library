@@ -239,7 +239,6 @@ header {
 :root[lang="te"] .brand-name,
 :root[lang="te"] .brand-name span,
 :root[lang="te"] .eyebrow,
-:root[lang="te"] .hero h1,
 :root[lang="te"] .attribution,
 :root[lang="te"] .gold-button,
 :root[lang="te"] .outline-button,
@@ -248,11 +247,6 @@ header {
 :root[lang="te"] .row-hint,
 :root[lang="te"] footer strong {
   letter-spacing:0;
-}
-
-:root[lang="te"] .hero h1 {
-  font-size:clamp(46px,7vw,88px);
-  line-height:1.15;
 }
 
 :root[lang="te"] .page-heading h1 {
@@ -332,8 +326,8 @@ header {
 /* HERO */
 
 .hero {
-  min-height:500px;
-  padding:80px 9%;
+  min-height:360px;
+  padding:68px 9%;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -381,24 +375,10 @@ header {
   text-transform:uppercase;
 }
 
-.hero h1 {
-  font-family:var(--heading);
-  font-size:clamp(58px,8vw,100px);
-  line-height:.95;
-  font-weight:700;
-  margin:25px 0;
-  letter-spacing:-2px;
-}
-
-.hero h1 span {
-  display:block;
-  color:var(--gold);
-  font-style:italic;
-}
-
 .hero .quote {
   color:var(--text-quote);
   max-width:700px;
+  margin-top:20px;
   font-size:12px;
   line-height:2;
 }
@@ -1189,16 +1169,12 @@ footer strong {
   .lang-toggle { padding:8px 10px; font-size:10px; }
 
   .hero {
-    min-height:440px;
-    padding:60px 7%;
-  }
-
-  .hero h1 {
-    font-size:58px;
-    margin:20px 0;
+    min-height:300px;
+    padding:48px 7%;
   }
 
   .hero .quote {
+    margin-top:16px;
     font-size:11px;
     line-height:1.9;
   }
@@ -1370,8 +1346,6 @@ footer strong {
 
 @media(max-width:360px) {
   .grid { grid-template-columns:1fr; }
-  .hero h1 { font-size:50px; }
-  :root[lang="te"] .hero h1 { font-size:40px; }
   .bottom-nav button { font-size:7.5px; }
 }
 
@@ -1459,11 +1433,6 @@ footer strong {
       <div class="eyebrow" data-i18n="heroEyebrow">
         WELCOME TO SHALOM TABERNACLE
       </div>
-
-      <h1 data-i18n-html="heroTitleHtml">
-        Faith. Truth.
-        <span>The Word of God.</span>
-      </h1>
 
       <p class="quote" data-i18n="heroQuote">
         🕊️ And in here, we don’t have no creed but Christ, that’s the creed;
@@ -1757,7 +1726,7 @@ footer strong {
       </p>
 
       <p style="margin-top:15px" data-i18n="aboutPara2">
-        Watch, revisit and share the messages that inspire
+        Watch and revisit the messages that inspire
         your faith and help you grow in the Word of God.
       </p>
 
@@ -1770,7 +1739,7 @@ footer strong {
     <div class="settings-panel">
       <h3 data-i18n="prefsTitle">Display &amp; App Preferences</h3>
       <p data-i18n="prefsDesc">
-        Customize your reading theme, install the Shalom Tabernacle app for offline browsing, or share this library with others.
+        Customize your reading theme, switch language, or install the Shalom Tabernacle app for offline browsing.
       </p>
 
       <div class="settings-actions">
@@ -1782,9 +1751,6 @@ footer strong {
         </button>
         <button type="button" class="outline-button" id="aboutInstallBtn" hidden data-i18n="installAppBtn">
           Install App
-        </button>
-        <button type="button" class="outline-button" id="aboutShareWebsiteBtn" data-i18n="shareWebsiteBtn">
-          Share Website
         </button>
         <button type="button" class="outline-button" id="aboutIntroBtn" hidden data-i18n="introReplayBtn">
           Watch Intro
@@ -1897,7 +1863,7 @@ footer strong {
 <div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
 
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=12"></script>
+<script src="./app.js?v=13"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 
