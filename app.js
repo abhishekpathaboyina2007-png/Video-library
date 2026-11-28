@@ -206,14 +206,22 @@ function createVideoCard(video) {
    PLAYLIST CARD CREATOR
 ========================================== */
 
+
 function createPlaylistCard(item) {
 
   const title = escapeHTML(item.Title);
-
   const url = safeYouTubeURL(item.YouTube_URL);
 
-  const thumbnail =
-    safeImageURL(item.Thumbnail_URL || "") || "./logo.png";
+  const playlistId = String(item.Playlist_ID || "").trim();
+
+  const customThumbnail = safeImageURL(item.Thumbnail_URL || "");
+
+  // YouTube playlist thumbnail fallback
+  const youtubeThumbnail = playlistId
+    ? "https://i.ytimg.com/vi/" + playlistId + "/hqdefault.jpg"
+    : "";
+
+  const thumbnail = customThumbnail || youtubeThumbnail || "./logo.png";
 
   return `
     <article class="card">
@@ -247,6 +255,7 @@ function createPlaylistCard(item) {
   `;
 
 }
+
 
 
 /* ==========================================
