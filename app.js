@@ -4,7 +4,7 @@
    + Performance-Optimized Thumbnails,
      Pagination, Favorites, Share, PWA Install,
      Continue Watching, Advanced Search,
-     Daily Bible Verse, Events & Theme Switcher
+     Bilingual Switcher & Theme Switcher
 ========================================== */
 
 const API_URL = "https://script.google.com/macros/s/AKfycby_Lxcf0X0bDVZF6hqKcl42YB8AelRc8EoFENbz1D61LaJ9UxZHeqiu7jNtJosgtx05/exec";
@@ -39,328 +39,6 @@ const libraryItemMap = new Map();
 const resolvedThumbMap = new Map();
 const failedThumbUrls = new Set();
 const probedMaxResIds = new Set();
-
-
-/* ==========================================
-   MANUALLY MAINTAINED DAILY BIBLE VERSES
-========================================== */
-
-const DAILY_VERSES = [
-  {
-    reference: "Psalm 119:105",
-    text: "Thy word is a lamp unto my feet, and a light unto my path.",
-    note: "Let God's Word guide every step and decision before you today."
-  },
-  {
-    reference: "John 14:6",
-    text: "Jesus saith unto him, I am the way, the truth, and the life: no man cometh unto the Father, but by me.",
-    note: "Christ Himself is our creed, our direction, and our peace."
-  },
-  {
-    reference: "Isaiah 40:31",
-    text: "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles.",
-    note: "Wait patiently on the Lord; His strength rises above every trial."
-  },
-  {
-    reference: "Hebrews 13:8",
-    text: "Jesus Christ the same yesterday, and to day, and for ever.",
-    note: "In an ever-changing world, His faithfulness and power never change."
-  },
-  {
-    reference: "Romans 8:28",
-    text: "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
-    note: "Trust His sovereign hand even when the path is still unfolding."
-  },
-  {
-    reference: "Psalm 23:1",
-    text: "The LORD is my shepherd; I shall want.",
-    note: "You are watched over, provided for, and led by the Good Shepherd."
-  },
-  {
-    reference: "Proverbs 3:5–6",
-    text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.",
-    note: "Acknowledge Him in quiet prayer and watch Him make your way clear."
-  },
-  {
-    reference: "Philippians 4:6–7",
-    text: "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.",
-    note: "Trade every worry for thankful prayer and receive His guarding peace."
-  },
-  {
-    reference: "Matthew 11:28",
-    text: "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
-    note: "Lay down your burdens at Jesus' feet and find true rest for your soul."
-  },
-  {
-    reference: "Joshua 1:9",
-    text: "Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.",
-    note: "Step forward with confidence knowing the Lord walks right beside you."
-  },
-  {
-    reference: "Psalm 46:1",
-    text: "God is our refuge and strength, a very present help in trouble.",
-    note: "He is not distant—He is a present help in every moment of need."
-  },
-  {
-    reference: "2 Corinthians 5:7",
-    text: "For we walk by faith, not by sight.",
-    note: "Hold fast to God's promise even before you see the outcome."
-  },
-  {
-    reference: "John 8:32",
-    text: "And ye shall know the truth, and the truth shall make you free.",
-    note: "Standing in the truth of Scripture brings lasting freedom and clarity."
-  },
-  {
-    reference: "Lamentations 3:22–23",
-    text: "It is of the LORD'S mercies that we are not consumed, because his compassions fail not. They are new every morning.",
-    note: "Today carries fresh grace and new mercy straight from heaven."
-  },
-  {
-    reference: "1 Corinthians 16:14",
-    text: "Let all your things be done with charity.",
-    note: "Let Christ's love shape your words, patience, and service today."
-  },
-  {
-    reference: "Psalm 27:1",
-    text: "The LORD is my light and my salvation; whom shall I fear?",
-    note: "When the Lord shines over your life, fear loses its hold."
-  },
-  {
-    reference: "Romans 10:17",
-    text: "So then faith cometh by hearing, and hearing by the word of God.",
-    note: "Make time today to hear and meditate on the living Word."
-  },
-  {
-    reference: "Ephesians 2:8",
-    text: "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God.",
-    note: "Rest in the finished grace of Jesus Christ, freely given."
-  },
-  {
-    reference: "Psalm 34:8",
-    text: "O taste and see that the LORD is good: blessed is the man that trusteth in him.",
-    note: "Experience His goodness firsthand as you place your trust in Him."
-  },
-  {
-    reference: "Isaiah 26:3",
-    text: "Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.",
-    note: "Fix your thoughts on the Lord and guard your heart in peace."
-  },
-  {
-    reference: "Colossians 3:23",
-    text: "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
-    note: "Every faithful act done for Christ carries eternal worth."
-  },
-  {
-    reference: "John 16:33",
-    text: "In the world ye shall have tribulation: but be of good cheer; I have overcome the world.",
-    note: "Take heart today—our Savior has already won the victory."
-  },
-  {
-    reference: "Psalm 91:1–2",
-    text: "He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.",
-    note: "Remain close to God in prayer; there is safety under His shadow."
-  },
-  {
-    reference: "Matthew 6:33",
-    text: "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",
-    note: "Put God's kingdom first and trust Him with every daily provision."
-  },
-  {
-    reference: "1 Peter 5:7",
-    text: "Casting all your care upon him; for he careth for you.",
-    note: "You were never meant to carry tomorrow's worries alone."
-  },
-  {
-    reference: "Psalm 100:5",
-    text: "For the LORD is good; his mercy is everlasting; and his truth endureth to all generations.",
-    note: "Praise Him today for mercy that never runs out."
-  },
-  {
-    reference: "John 1:5",
-    text: "And the light shineth in darkness; and the darkness comprehended it not.",
-    note: "Christ's light overcomes every shadow—walk in His hope."
-  },
-  {
-    reference: "2 Timothy 1:7",
-    text: "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.",
-    note: "Receive God's spirit of courage, love, and steady clarity today."
-  },
-  {
-    reference: "Psalm 121:1–2",
-    text: "I will lift up mine eyes unto the hills, from whence cometh my help. My help cometh from the LORD.",
-    note: "Look up in expectation—your help comes from the Maker of heaven and earth."
-  },
-  {
-    reference: "Galatians 6:9",
-    text: "And let us not be weary in well doing: for in due season we shall reap, if we faint not.",
-    note: "Stay faithful in small things; God honors steady perseverance."
-  },
-  {
-    reference: "Revelation 22:20",
-    text: "He which testifieth these things saith, Surely I come quickly. Amen. Even so, come, Lord Jesus.",
-    note: "Live ready, hopeful, and anchored in the blessed hope of Christ's return."
-  }
-];
-
-
-const DAILY_VERSES_TE = [
-  {
-    reference: "కీర్తనలు 119:105",
-    text: "నీ వాక్యము నా పాదములకు దీపమును నా త్రోవకు వెలుగునై యున్నది.",
-    note: "ఈ రోజు మీరు తీసుకునే ప్రతి నిర్ణయంలో దేవుని వాక్యం మీకు మార్గదర్శిగా ఉండనివ్వండి."
-  },
-  {
-    reference: "యోహాను 14:6",
-    text: "యేసు నేనే మార్గమును, సత్యమును, జీవమును; నా ద్వారానే తప్ప యెవడును తండ్రి యొద్దకు రాడు అని చెప్పెను.",
-    note: "క్రీస్తే మన విశ్వాస సూత్రం, మన దిశానిర్దేశం, మన సమాధానం."
-  },
-  {
-    reference: "యెషయా 40:31",
-    text: "యెహోవా కొరకు ఎదురు చూచువారు నూతన బలము పొందుదురు; వారు పక్షిరాజులవలె రెక్కలు చాపి పైకి ఎగురుదురు.",
-    note: "ప్రభువు కొరకు సహనంతో ఎదురుచూడండి; ఆయన బలం ప్రతి శ్రమను అధిగమిస్తుంది."
-  },
-  {
-    reference: "హెబ్రీయులకు 13:8",
-    text: "యేసుక్రీస్తు నిన్న, నేడు, ఎల్లప్పుడు ఏకరీతిగా ఉన్నాడు.",
-    note: "మారిపోయే ఈ లోకంలో ఆయన నమ్మకత్వం మరియు శక్తి ఎన్నడూ మారదు."
-  },
-  {
-    reference: "రోమీయులకు 8:28",
-    text: "దేవుని ప్రేమించువారికి, అనగా ఆయన సంకల్పము చొప్పున పిలువబడినవారికి, మేలు కలుగుటకై సమస్తమును సమకూడి జరుగుచున్నవని యెరుగుదుము.",
-    note: "మార్గం ఇంకా స్పష్టంగా కనిపించకపోయినా ఆయన సర్వాధికార హస్తాన్ని నమ్మండి."
-  },
-  {
-    reference: "కీర్తనలు 23:1",
-    text: "యెహోవా నా కాపరి; నాకు లేమి కలుగదు.",
-    note: "మంచి కాపరియైన ప్రభువు మిమ్మల్ని కాపాడుతూ, పోషిస్తూ నడిపిస్తున్నారు."
-  },
-  {
-    reference: "సామెతలు 3:5–6",
-    text: "నీ స్వబుద్ధిని ఆధారము చేసికొనక నీ పూర్ణహృదయముతో యెహోవాయందు నమ్మకముంచుము. నీ ప్రవర్తన అంతటియందు ఆయన అధికారమునకు ఒప్పుకొనుము; అప్పుడు ఆయన నీ త్రోవలను సరాళము చేయును.",
-    note: "ప్రార్థనలో ఆయనను గుర్తించండి; ఆయన మీ మార్గాన్ని స్పష్టంగా నడిపిస్తారు."
-  },
-  {
-    reference: "ఫిలిప్పీయులకు 4:6–7",
-    text: "దేనిని గూర్చియు చింతపడకుడి గాని ప్రతి విషయములోను ప్రార్థన విజ్ఞాపనములచేత కృతజ్ఞతాపూర్వకముగా మీ విన్నపములు దేవునికి తెలియజేయుడి.",
-    note: "ప్రతి చింతను కృతజ్ఞతతో కూడిన ప్రార్థనగా మార్చి ఆయన సమాధానాన్ని పొందండి."
-  },
-  {
-    reference: "మత్తయి 11:28",
-    text: "ప్రయాసపడి భారము మోసికొనుచున్న సమస్త జనులారా, నా యొద్దకు రండి; నేను మీకు విశ్రాంతి కలుగజేతును.",
-    note: "యేసు పాదాల వద్ద మీ భారాలను దించి ఆత్మకు నిజమైన విశ్రాంతిని పొందండి."
-  },
-  {
-    reference: "యెహోషువ 1:9",
-    text: "నిబ్బరము కలిగి ధైర్యముగా నుండుము; దిగులుపడకుము జడియకుము; నీవు నడుచు మార్గమంతటిలో నీ దేవుడైన యెహోవా నీకు తోడైయుండును.",
-    note: "ప్రభువు మీతోనే నడుస్తున్నారనే ధైర్యంతో ముందుకు సాగండి."
-  },
-  {
-    reference: "కీర్తనలు 46:1",
-    text: "దేవుడు మనకు ఆశ్రయమును దుర్గమునై యున్నాడు; ఆపత్కాలములో ఆయన నమ్ముకొనదగిన సహాయకుడు.",
-    note: "ఆయన దూరంగా లేరు—ప్రతి అవసరంలోనూ సమీప సహాయకుడిగా ఉన్నారు."
-  },
-  {
-    reference: "2 కొరింథీయులకు 5:7",
-    text: "వెలుపటి చూపువలన కాక విశ్వాసమువలననే నడుచుకొనుచున్నాము.",
-    note: "ఫలితాన్ని చూడకముందే దేవుని వాగ్దానాన్ని గట్టిగా పట్టుకోండి."
-  },
-  {
-    reference: "యోహాను 8:32",
-    text: "అప్పుడు మీరు సత్యమును గ్రహించెదరు; మరియు ఆ సత్యము మిమ్మును స్వతంత్రులనుగా చేయును.",
-    note: "లేఖన సత్యంలో నిలబడటం శాశ్వతమైన స్వాతంత్ర్యాన్ని మరియు స్పష్టతను ఇస్తుంది."
-  },
-  {
-    reference: "విలాపవాక్యములు 3:22–23",
-    text: "యెహోవా కృప ఎడతెగకయుండును; ఆయన వాత్సల్యమునకు అంతము లేదు. అనుదినము నూతనముగా అది పుట్టుచుండును.",
-    note: "ఈ రోజు పరలోకం నుండి నూతన కృప మరియు దయ మీకు అనుగ్రహించబడింది."
-  },
-  {
-    reference: "1 కొరింథీయులకు 16:14",
-    text: "మీ కార్యములన్నియు ప్రేమతో జరిగించుడి.",
-    note: "ఈ రోజు మీ మాటలలో, సహనంలో, సేవలో క్రీస్తు ప్రేమ ప్రతిఫలించనివ్వండి."
-  },
-  {
-    reference: "కీర్తనలు 27:1",
-    text: "యెహోవా నాకు వెలుగును రక్షణయునై యున్నాడు; నేను ఎవరికి భయపడుదును?",
-    note: "ప్రభువు మీ జీవితంపై ప్రకాశించినప్పుడు భయానికి చోటు ఉండదు."
-  },
-  {
-    reference: "రోమీయులకు 10:17",
-    text: "కాగా వినుట వలన విశ్వాసము కలుగును; వినుట క్రీస్తును గూర్చిన మాట వలన కలుగును.",
-    note: "జీవముగల దేవుని వాక్యాన్ని వినడానికి మరియు ధ్యానించడానికి సమయం కేటాయించండి."
-  },
-  {
-    reference: "ఎఫెసీయులకు 2:8",
-    text: "మీరు విశ్వాసము ద్వారా కృపచేతనే రక్షింపబడియున్నారు; ఇది మీవలన కలిగినది కాదు, దేవుని వరమే.",
-    note: "యేసుక్రీస్తు ఉచితంగా ఇచ్చిన పరిపూర్ణ కృపలో విశ్రమించండి."
-  },
-  {
-    reference: "కీర్తనలు 34:8",
-    text: "యెహోవా ఉత్తముడని రుచి చూచి తెలిసికొనుడి; ఆయనను ఆశ్రయించు నరుడు ధన్యుడు.",
-    note: "ఆయనపై నమ్మకం ఉంచి ఆయన మంచితనాన్ని అనుభవపూర్వకంగా చూడండి."
-  },
-  {
-    reference: "యెషయా 26:3",
-    text: "ఎవని మనస్సు నీమీద ఆనుకొనునో వానిని నీవు పూర్ణశాంతిగలవానిగా కాపాడుదువు; ఏలయనగా వాడు నీయందు విశ్వాసముంచియున్నాడు.",
-    note: "మీ ఆలోచనలను ప్రభువుపై నిలిపి మీ హృదయాన్ని సమాధానంలో కాపాడుకోండి."
-  },
-  {
-    reference: "కొలొస్సయులకు 3:23",
-    text: "మీరేమి చేసినను అది మనుష్యుల నిమిత్తము కాక ప్రభువు నిమిత్తమని మనస్ఫూర్తిగా చేయుడి.",
-    note: "క్రీస్తు కొరకు విశ్వాసంతో చేసే ప్రతి పనికి నిత్యమైన విలువ ఉంది."
-  },
-  {
-    reference: "యోహాను 16:33",
-    text: "లోకములో మీకు శ్రమ కలుగును; అయినను ధైర్యము తెచ్చుకొనుడి, నేను లోకమును జయించియున్నాను.",
-    note: "ఈ రోజు ధైర్యంగా ఉండండి—మన రక్షకుడు ఇప్పటికే విజయం సాధించారు."
-  },
-  {
-    reference: "కీర్తనలు 91:1–2",
-    text: "మహోన్నతుని చాటున నివసించువాడే సర్వశక్తుని నీడను విశ్రమించువాడు.",
-    note: "ప్రార్థనలో దేవునికి సమీపంగా ఉండండి; ఆయన నీడలో భద్రత ఉంది."
-  },
-  {
-    reference: "మత్తయి 6:33",
-    text: "కాబట్టి మీరు ఆయన రాజ్యమును నీతిని మొదట వెదకుడి; అప్పుడవన్నియు మీకు అనుగ్రహింపబడును.",
-    note: "దేవుని రాజ్యానికి మొదటి స్థానం ఇచ్చి ప్రతి అవసరాన్ని ఆయన చేతికి అప్పగించండి."
-  },
-  {
-    reference: "1 పేతురు 5:7",
-    text: "ఆయన మిమ్మును గూర్చి చింతించుచున్నాడు గనుక మీ చింత యావత్తు ఆయనమీద వేయుడి.",
-    note: "రేపటి చింతలను మీరు ఒంటరిగా మోయాల్సిన అవసరం లేదు."
-  },
-  {
-    reference: "కీర్తనలు 100:5",
-    text: "యెహోవా దయాళుడు; ఆయన కృప నిత్యముండును; ఆయన సత్యము తరతరములకు ఉండును.",
-    note: "ఎన్నటికీ తరగని ఆయన కృపకై ఈ రోజు ఆయనను స్తుతించండి."
-  },
-  {
-    reference: "యోహాను 1:5",
-    text: "ఆ వెలుగు చీకటిలో ప్రకాశించుచున్నది గాని చీకటి దానిని గ్రహింపకుండెను.",
-    note: "క్రీస్తు వెలుగు ప్రతి చీకటిని జయిస్తుంది—ఆయన నిరీక్షణలో నడవండి."
-  },
-  {
-    reference: "2 తిమోతి 1:7",
-    text: "దేవుడు మనకు శక్తియు ప్రేమయు ఇంద్రియనిగ్రహమును గల ఆత్మనే ఇచ్చెను గాని పిరికితనము గల ఆత్మను ఇయ్యలేదు.",
-    note: "ఈ రోజు ధైర్యం, ప్రేమ మరియు స్థిరమైన మనస్సును దేవుని నుండి పొందండి."
-  },
-  {
-    reference: "కీర్తనలు 121:1–2",
-    text: "కొండలతట్టు నా కన్నులెత్తుచున్నాను; నాకు సహాయము ఎక్కడనుండి వచ్చును? భూమ్యాకాశములను సృజించిన యెహోవా వలననే నాకు సహాయము కలుగును.",
-    note: "విశ్వాసంతో పైకి చూడండి—భూమ్యాకాశాలను సృష్టించిన దేవుని నుండే మీకు సహాయం వస్తుంది."
-  },
-  {
-    reference: "గలతీయులకు 6:9",
-    text: "మనము మేలుచేయుటయందు విసుకక యుందము; మనము అలయక యుంటిమేని తగిన కాలమందు పంట కోతుము.",
-    note: "చిన్న విషయాలలో నమ్మకంగా ఉండండి; సహనంతో కూడిన విశ్వాసాన్ని దేవుడు ఘనపరుస్తారు."
-  },
-  {
-    reference: "ప్రకటన 22:20",
-    text: "ఈ సంగతులను గూర్చి సాక్ష్యమిచ్చుచున్నవాడు—అవును, త్వరగా వచ్చుచున్నాను అనుచున్నాడు. ఆమేన్; ప్రభువైన యేసూ రమ్ము.",
-    note: "క్రీస్తు రాకడపై ఆశతో సిద్ధంగా మరియు స్థిరంగా జీవించండి."
-  }
-];
 
 
 /* ==========================================
@@ -400,14 +78,6 @@ const I18N = {
     continueTitle: "Continue Watching",
     clearBtn: "CLEAR",
     viewAllBtn: "VIEW ALL →",
-    verseEyebrow: "DAILY WORD",
-    verseTitle: "Daily Bible Verse",
-    copyVerseBtn: "Copy Verse",
-    shareVerseBtn: "Share Verse",
-    verseCopiedToast: "Bible verse copied!",
-    verseCopiedShareToast: "Bible verse copied for sharing!",
-    verseCopyErrorToast: "Could not copy verse.",
-    dailyVerseShareTitle: "Daily Bible Verse",
     recentEyebrow: "FRESH UPLOADS",
     recentTitle: "Recently Added",
     browseLibraryBtn: "BROWSE LIBRARY →",
@@ -540,14 +210,6 @@ const I18N = {
     continueTitle: "చూడటం కొనసాగించండి",
     clearBtn: "క్లియర్",
     viewAllBtn: "అన్నీ చూడండి →",
-    verseEyebrow: "దినసరి వాక్యం",
-    verseTitle: "నేటి బైబిల్ వాక్యం",
-    copyVerseBtn: "వాక్యం కాపీ చేయండి",
-    shareVerseBtn: "వాక్యం షేర్ చేయండి",
-    verseCopiedToast: "బైబిల్ వాక్యం కాపీ చేయబడింది!",
-    verseCopiedShareToast: "షేర్ చేయడానికి బైబిల్ వాక్యం కాపీ చేయబడింది!",
-    verseCopyErrorToast: "వాక్యాన్ని కాపీ చేయలేకపోయాము.",
-    dailyVerseShareTitle: "నేటి బైబిల్ వాక్యం",
     recentEyebrow: "కొత్తగా చేర్చబడినవి",
     recentTitle: "ఇటీవల చేర్చబడినవి",
     browseLibraryBtn: "లైబ్రరీ చూడండి →",
@@ -724,7 +386,6 @@ function applyLanguage(lang, { rerenderDynamic = true } = {}) {
   syncInstallUI();
 
   if (rerenderDynamic) {
-    renderDailyBibleVerse();
     if (typeof renderHistory === "function") renderHistory();
     renderContinueWatching();
     if (libraryData) {
@@ -1876,71 +1537,6 @@ function renderContinueWatching() {
 
 
 /* ==========================================
-   DAILY BIBLE VERSE (LOCAL DATE ROTATION)
-========================================== */
-
-function getTodaysBibleVerse() {
-  const now = new Date();
-  const daySeed =
-    now.getFullYear() * 372 +
-    (now.getMonth() + 1) * 31 +
-    now.getDate();
-  const idx = daySeed % DAILY_VERSES.length;
-  if (currentLanguage === "te" && DAILY_VERSES_TE[idx]) {
-    return DAILY_VERSES_TE[idx];
-  }
-  return DAILY_VERSES[idx];
-}
-
-function getFormattedDailyVerseShareText() {
-  const verse = getTodaysBibleVerse();
-  if (!verse) return "";
-  return `"${verse.text}" — ${verse.reference}\n${verse.note}\n${t("orgName")}, ${t("locationText")}`;
-}
-
-function renderDailyBibleVerse() {
-  const verse = getTodaysBibleVerse();
-  const textEl = document.getElementById("dailyVerseText");
-  const refEl = document.getElementById("dailyVerseRef");
-  const noteEl = document.getElementById("dailyVerseNote");
-
-  if (!verse || !textEl || !refEl || !noteEl) return;
-
-  textEl.textContent = `“${verse.text}”`;
-  refEl.textContent = verse.reference;
-  noteEl.textContent = verse.note;
-}
-
-function initDailyBibleVerse() {
-  renderDailyBibleVerse();
-
-  document.getElementById("copyVerseBtn")?.addEventListener("click", async () => {
-    const copied = await copyTextToClipboard(getFormattedDailyVerseShareText());
-    showToast(copied ? t("verseCopiedToast") : t("verseCopyErrorToast"));
-  });
-
-  document.getElementById("shareVerseBtn")?.addEventListener("click", async () => {
-    const verse = getTodaysBibleVerse();
-    const formattedShareText = getFormattedDailyVerseShareText();
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share({
-          title: `${t("dailyVerseShareTitle")} — ${verse.reference}`,
-          text: formattedShareText,
-          url: new URL("./", window.location.href).href
-        });
-        return;
-      } catch (error) {
-        if (error && error.name === "AbortError") return;
-      }
-    }
-    const copied = await copyTextToClipboard(formattedShareText);
-    showToast(copied ? t("verseCopiedShareToast") : t("verseCopyErrorToast"));
-  });
-}
-
-
-/* ==========================================
    HOMEPAGE - RECENTLY ADDED, VIDEOS & PLAYLISTS
 ========================================== */
 
@@ -2586,7 +2182,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initThemeSwitcher();
   initOfflineIndicator();
   initThumbnailDelegation();
-  initDailyBibleVerse();
   initLoadMoreControls();
   initCardAndShareInteractions();
   initPWAInstallPrompt();

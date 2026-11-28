@@ -241,7 +241,6 @@ header {
 :root[lang="te"] .eyebrow,
 :root[lang="te"] .hero h1,
 :root[lang="te"] .attribution,
-:root[lang="te"] .verse-ref,
 :root[lang="te"] .gold-button,
 :root[lang="te"] .outline-button,
 :root[lang="te"] .view-all,
@@ -509,47 +508,6 @@ header {
   margin-top:-12px;
   margin-bottom:10px;
   letter-spacing:.3px;
-}
-
-/* DAILY BIBLE VERSE */
-
-.verse-panel {
-  background:var(--about-bg);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:clamp(22px,4vw,36px);
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.verse-quote {
-  font-family:var(--heading);
-  font-size:clamp(24px,3.2vw,34px);
-  line-height:1.35;
-  color:var(--white);
-  font-weight:600;
-}
-
-.verse-ref {
-  color:var(--gold);
-  font-size:12px;
-  font-weight:800;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-}
-
-.verse-note {
-  color:var(--text-soft);
-  font-size:12px;
-  max-width:760px;
-}
-
-.verse-actions {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:4px;
 }
 
 /* OTHER PAGES */
@@ -1443,26 +1401,6 @@ footer strong {
     <div class="horizontal-row" id="homeContinueRow"></div>
   </div>
 
-  <!-- DAILY BIBLE VERSE -->
-  <div class="home-content" id="dailyVerseSection">
-    <div class="home-section-heading">
-      <div>
-        <div class="eyebrow" data-i18n="verseEyebrow">DAILY WORD</div>
-        <h2 data-i18n="verseTitle">Daily Bible Verse</h2>
-      </div>
-    </div>
-
-    <article class="verse-panel">
-      <p class="verse-quote" id="dailyVerseText"></p>
-      <div class="verse-ref" id="dailyVerseRef"></div>
-      <p class="verse-note" id="dailyVerseNote"></p>
-      <div class="verse-actions">
-        <button type="button" class="gold-button" id="copyVerseBtn" data-i18n="copyVerseBtn">Copy Verse</button>
-        <button type="button" class="outline-button" id="shareVerseBtn" data-i18n="shareVerseBtn">Share Verse</button>
-      </div>
-    </article>
-  </div>
-
   <!-- RECENTLY ADDED (LATEST VIDEOS & PLAYLISTS) -->
   <div class="home-content">
     <div class="home-section-heading">
@@ -1837,7 +1775,7 @@ footer strong {
 <div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
 
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=9"></script>
+<script src="./app.js?v=10"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 
