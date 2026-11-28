@@ -9,7 +9,6 @@
 <meta name="description" content="Watch messages and explore playlists from Shalom Tabernacle, Visakhapatnam.">
 <meta name="theme-color" content="#090909">
 
-<!-- CUSTOM TYPOGRAPHY -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,7 +17,6 @@
 :root {
   --bg:#090909;
   --surface:#141414;
-  --surface2:#1d1d1d;
   --gold:#D6B56D;
   --gold-light:#F0D69E;
   --white:#fff;
@@ -34,9 +32,7 @@
   padding:0;
 }
 
-html {
-  scroll-behavior:smooth;
-}
+html { scroll-behavior:smooth; }
 
 body {
   background:var(--bg);
@@ -46,22 +42,10 @@ body {
   min-height:100vh;
 }
 
-button,input {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-a {
-  color:inherit;
-  -webkit-tap-highlight-color:transparent;
-}
-
-[hidden] {
-  display:none !important;
-}
+button,input { font:inherit; }
+button { cursor:pointer; }
+a { color:inherit; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
 
 /* HEADER */
 
@@ -72,7 +56,7 @@ header {
   align-items:center;
   justify-content:space-between;
   gap:25px;
-  background:rgba(9,9,9,.94);
+  background:rgba(9,9,9,.95);
   border-bottom:1px solid var(--border);
   position:sticky;
   top:0;
@@ -95,7 +79,6 @@ header {
 }
 
 .brand-name {
-  font-family:var(--body);
   font-size:15px;
   font-weight:800;
   letter-spacing:2px;
@@ -124,39 +107,38 @@ header {
   border-radius:30px;
   font-size:12px;
   font-weight:700;
-  letter-spacing:.3px;
   transition:.25s;
 }
 
-.nav-link:hover {
-  color:var(--gold);
-  border-color:#403722;
-}
-
+.nav-link:hover,
 .nav-link.active {
   color:var(--gold);
-  background:rgba(214,181,109,.09);
   border-color:rgba(214,181,109,.3);
+  background:rgba(214,181,109,.09);
 }
 
-/* GENERAL BUTTONS */
+/* BUTTONS */
 
-.gold-button {
+.gold-button,
+.outline-button {
   display:inline-flex;
   justify-content:center;
   align-items:center;
   gap:9px;
   padding:13px 23px;
-  border:1px solid var(--gold);
   border-radius:30px;
-  background:linear-gradient(135deg,#F0D69E,#C39B4D);
-  color:#17120A;
   font-size:11px;
   font-weight:800;
-  letter-spacing:1.1px;
+  letter-spacing:1px;
   text-decoration:none;
+  transition:.25s;
+}
+
+.gold-button {
+  border:1px solid var(--gold);
+  background:linear-gradient(135deg,#F0D69E,#C39B4D);
+  color:#17120A;
   box-shadow:0 5px 22px rgba(214,181,109,.13);
-  transition:transform .25s,box-shadow .25s;
 }
 
 .gold-button:hover {
@@ -165,20 +147,9 @@ header {
 }
 
 .outline-button {
-  display:inline-flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  padding:12px 21px;
   border:1px solid rgba(214,181,109,.55);
-  border-radius:30px;
   background:transparent;
   color:var(--gold);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:.7px;
-  text-decoration:none;
-  transition:.25s;
 }
 
 .outline-button:hover {
@@ -194,22 +165,14 @@ header {
   animation:viewFade .35s ease;
 }
 
-.view.active {
-  display:block;
-}
+.view.active { display:block; }
 
 @keyframes viewFade {
-  from {
-    opacity:0;
-    transform:translateY(8px);
-  }
-  to {
-    opacity:1;
-    transform:translateY(0);
-  }
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
 }
 
-/* HOME HERO */
+/* HERO */
 
 .hero {
   min-height:510px;
@@ -309,64 +272,82 @@ header {
   margin-top:30px;
 }
 
-/* HOME QUICK LINKS */
+/* HOMEPAGE VIDEO AND PLAYLIST SECTIONS */
 
-.home-links {
-  padding:35px 7% 55px;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:17px;
+.home-content {
+  padding:42px 7% 25px;
+  max-width:1500px;
+  margin:auto;
+  overflow:hidden;
 }
 
-.quick-card {
-  background:linear-gradient(145deg,#1b1b1b,#111);
-  border:1px solid #292929;
-  border-radius:14px;
-  padding:23px;
-  text-align:left;
-  color:white;
-  transition:.25s;
-}
-
-.quick-card:hover {
-  border-color:rgba(214,181,109,.5);
-  transform:translateY(-4px);
-}
-
-.quick-icon {
+.home-section-heading {
   display:flex;
   align-items:center;
-  justify-content:center;
-  width:43px;
-  height:43px;
-  border-radius:12px;
-  background:rgba(214,181,109,.1);
-  color:var(--gold);
-  font-size:20px;
-  margin-bottom:14px;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:20px;
 }
 
-.quick-card h3 {
+.home-section-heading h2 {
   font-family:var(--heading);
-  font-size:25px;
-  font-weight:700;
-}
-
-.quick-card p {
-  color:var(--muted);
-  font-size:11px;
+  font-size:clamp(28px,4vw,38px);
+  line-height:1.2;
   margin-top:5px;
 }
 
-.quick-card .quick-arrow {
-  display:block;
+.view-all {
+  background:transparent;
+  border:1px solid rgba(214,181,109,.5);
   color:var(--gold);
-  margin-top:13px;
-  font-size:12px;
+  padding:10px 17px;
+  border-radius:30px;
+  font-size:10px;
   font-weight:800;
+  letter-spacing:.7px;
+  white-space:nowrap;
+  transition:.25s;
 }
 
-/* PAGE CONTENT */
+.view-all:hover {
+  background:var(--gold);
+  color:#090909;
+  box-shadow:0 5px 20px rgba(214,181,109,.2);
+}
+
+.horizontal-row {
+  display:flex;
+  gap:18px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:5px 2px 22px;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:var(--gold) transparent;
+}
+
+.horizontal-row .card {
+  flex:0 0 31%;
+  min-width:240px;
+  scroll-snap-align:start;
+}
+
+.horizontal-row .card:hover {
+  transform:translateY(-5px);
+  border-color:var(--gold);
+}
+
+.row-hint {
+  color:#777;
+  font-size:10px;
+  margin-top:-12px;
+  margin-bottom:15px;
+  letter-spacing:.3px;
+}
+
+/* OTHER PAGES */
 
 .page-content {
   padding:55px 7% 75px;
@@ -374,24 +355,17 @@ header {
   margin:auto;
 }
 
-.page-heading {
-  margin-bottom:35px;
-}
+.page-heading { margin-bottom:35px; }
 
-.page-heading .eyebrow {
-  margin-bottom:8px;
-}
+.page-heading .eyebrow { margin-bottom:8px; }
 
 .page-heading h1 {
   font-family:var(--heading);
   font-size:clamp(40px,5vw,60px);
   line-height:1.1;
-  font-weight:700;
 }
 
-.page-heading h1 span {
-  color:var(--gold);
-}
+.page-heading h1 span { color:var(--gold); }
 
 .page-heading p {
   color:var(--muted);
@@ -399,38 +373,7 @@ header {
   margin-top:9px;
 }
 
-/* SECTION HEAD */
-
-.section-head {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:22px;
-}
-
-.section-head h2 {
-  font-family:var(--heading);
-  font-size:30px;
-  font-weight:700;
-}
-
-.section-head h2::before {
-  content:"";
-  display:inline-block;
-  width:3px;
-  height:23px;
-  background:var(--gold);
-  margin-right:12px;
-  vertical-align:middle;
-}
-
-.section-head small {
-  color:var(--muted);
-  font-size:11px;
-}
-
-/* SEARCH */
+/* SEARCH AND FILTERS */
 
 .search {
   width:100%;
@@ -451,8 +394,6 @@ header {
   box-shadow:0 0 0 3px rgba(214,181,109,.07);
 }
 
-/* FILTERS */
-
 .filters {
   display:flex;
   gap:9px;
@@ -467,9 +408,9 @@ header {
   padding:9px 18px;
   border-radius:30px;
   white-space:nowrap;
-  transition:.2s;
   font-size:11px;
   font-weight:700;
+  transition:.2s;
 }
 
 .filter.active,
@@ -479,7 +420,7 @@ header {
   border-color:var(--gold);
 }
 
-/* VIDEO AND PLAYLIST CARDS */
+/* CARDS */
 
 .grid {
   display:grid;
@@ -508,12 +449,9 @@ header {
   background:#222;
 }
 
-.card-info {
-  padding:16px;
-}
+.card-info { padding:16px; }
 
 .card-info h3 {
-  font-family:var(--body);
   font-size:13px;
   font-weight:700;
   line-height:1.6;
@@ -575,13 +513,6 @@ header {
   padding:10px 17px;
   font-size:10px;
   font-weight:800;
-  letter-spacing:.7px;
-  transition:.2s;
-}
-
-.clear-button:hover {
-  background:rgba(220,120,100,.1);
-  border-color:#dca18d;
 }
 
 .history-remove {
@@ -591,10 +522,6 @@ header {
   font-size:10px;
   margin-top:9px;
   padding:5px 0;
-}
-
-.history-remove:hover {
-  color:white;
 }
 
 .history-card .play {
@@ -645,6 +572,7 @@ footer {
   border-top:1px solid var(--border);
   font-size:11px;
   line-height:2;
+  margin-top:45px;
 }
 
 footer strong {
@@ -654,31 +582,15 @@ footer strong {
 
 /* MOBILE NAV */
 
-.bottom-nav {
-  display:none;
-}
+.bottom-nav { display:none; }
 
 /* RESPONSIVE */
 
 @media(max-width:800px) {
-  header {
-    padding:11px 5%;
-  }
-
-  .desktop-nav {
-    gap:3px;
-  }
-
-  .nav-link {
-    padding:9px 10px;
-    font-size:10px;
-  }
-
-  .home-links {
-    padding-left:5%;
-    padding-right:5%;
-  }
-
+  header { padding:11px 5%; }
+  .desktop-nav { gap:3px; }
+  .nav-link { padding:9px 10px; font-size:10px; }
+  .home-content,
   .page-content {
     padding-left:5%;
     padding-right:5%;
@@ -686,7 +598,6 @@ footer strong {
 }
 
 @media(max-width:650px) {
-
   body {
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
@@ -696,28 +607,11 @@ footer strong {
     padding:9px 5%;
   }
 
-  .brand {
-    gap:9px;
-  }
-
-  .brand img {
-    width:38px;
-    height:38px;
-  }
-
-  .brand-name {
-    font-size:13px;
-    letter-spacing:1.5px;
-  }
-
-  .brand-name span {
-    font-size:9px;
-    letter-spacing:3px;
-  }
-
-  .desktop-nav {
-    display:none;
-  }
+  .brand { gap:9px; }
+  .brand img { width:38px; height:38px; }
+  .brand-name { font-size:13px; letter-spacing:1.5px; }
+  .brand-name span { font-size:9px; letter-spacing:3px; }
+  .desktop-nav { display:none; }
 
   .hero {
     min-height:450px;
@@ -739,9 +633,7 @@ footer strong {
     letter-spacing:2.5px;
   }
 
-  .hero-actions {
-    gap:9px;
-  }
+  .hero-actions { gap:9px; }
 
   .gold-button,
   .outline-button {
@@ -749,62 +641,29 @@ footer strong {
     font-size:9px;
   }
 
-  .home-links {
-    grid-template-columns:1fr;
-    gap:11px;
-    padding:25px 5% 40px;
+  .home-content {
+    padding-top:28px;
+    padding-bottom:12px;
   }
 
-  .quick-card {
-    padding:17px;
-    display:grid;
-    grid-template-columns:43px 1fr auto;
-    align-items:center;
-    column-gap:13px;
-  }
+  .home-section-heading h2 { font-size:27px; }
 
-  .quick-icon {
-    margin:0;
-    grid-row:span 2;
-  }
-
-  .quick-card h3 {
-    font-size:23px;
-  }
-
-  .quick-card p {
-    margin:0;
-  }
-
-  .quick-card .quick-arrow {
-    grid-column:3;
-    grid-row:1 / span 2;
-    margin:0;
-  }
-
-  .page-content {
-    padding:38px 5% 55px;
-  }
-
-  .page-heading {
-    margin-bottom:28px;
-  }
-
-  .page-heading h1 {
-    font-size:46px;
-  }
-
-  .page-heading p {
-    font-size:11px;
-  }
-
-  .section-head h2 {
-    font-size:25px;
-  }
-
-  .section-head small {
+  .view-all {
+    padding:9px 12px;
     font-size:9px;
   }
+
+  .horizontal-row { gap:12px; }
+
+  .horizontal-row .card {
+    flex:0 0 47%;
+    min-width:0;
+  }
+
+  .page-content { padding:38px 5% 55px; }
+  .page-heading { margin-bottom:28px; }
+  .page-heading h1 { font-size:46px; }
+  .page-heading p { font-size:11px; }
 
   .filters {
     flex-wrap:nowrap;
@@ -813,67 +672,27 @@ footer strong {
     scrollbar-width:none;
   }
 
-  .filters::-webkit-scrollbar {
-    display:none;
-  }
-
-  .filter {
-    flex-shrink:0;
-  }
+  .filters::-webkit-scrollbar { display:none; }
+  .filter { flex-shrink:0; }
 
   .grid {
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:12px;
   }
 
-  .card {
-    border-radius:9px;
-  }
+  .card { border-radius:9px; }
+  .card-info { padding:10px; }
+  .card-info h3 { font-size:11px; }
+  .card-info p { font-size:9px; }
+  .play { padding:9px 10px; font-size:9px; margin-top:11px; }
 
-  .card-info {
-    padding:10px;
-  }
+  .history-tools { align-items:center; }
+  .clear-button { padding:9px 12px; font-size:9px; }
+  .about-panel { padding:25px 20px; }
+  .about-panel h2 { font-size:33px; }
+  .about-panel p { font-size:12px; }
 
-  .card-info h3 {
-    font-size:11px;
-  }
-
-  .card-info p {
-    font-size:9px;
-  }
-
-  .play {
-    padding:9px 10px;
-    font-size:9px;
-    margin-top:11px;
-  }
-
-  .history-tools {
-    align-items:center;
-  }
-
-  .clear-button {
-    padding:9px 12px;
-    font-size:9px;
-  }
-
-  .about-panel {
-    padding:25px 20px;
-  }
-
-  .about-panel h2 {
-    font-size:33px;
-  }
-
-  .about-panel p {
-    font-size:12px;
-  }
-
-  footer {
-    padding:30px 5% 35px;
-  }
-
-  /* FIXED BOTTOM NAV */
+  footer { padding:30px 5% 35px; }
 
   .bottom-nav {
     display:flex;
@@ -912,28 +731,13 @@ footer strong {
     line-height:1.2;
   }
 
-  .bottom-nav button.active {
-    color:var(--gold);
-  }
-
-  .bottom-nav button.active .nav-icon {
-    text-shadow:0 0 15px rgba(214,181,109,.5);
-  }
+  .bottom-nav button.active { color:var(--gold); }
 }
 
 @media(max-width:360px) {
-  .grid {
-    grid-template-columns:1fr;
-  }
-
-  .hero h1 {
-    font-size:51px;
-  }
-
-  .bottom-nav button {
-    min-width:47px;
-    font-size:8px;
-  }
+  .grid { grid-template-columns:1fr; }
+  .hero h1 { font-size:51px; }
+  .bottom-nav button { min-width:47px; font-size:8px; }
 }
 
 @media(prefers-reduced-motion:reduce) {
@@ -943,95 +747,6 @@ footer strong {
     transition-duration:.01ms !important;
   }
 }
-  
-/* HOME HORIZONTAL CONTENT */
-
-.home-content {
-  margin: 55px 0;
-  overflow: hidden;
-}
-
-.home-section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 22px;
-}
-
-.home-section-heading h2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(28px, 4vw, 38px);
-  margin: 4px 0 0;
-}
-
-.view-all {
-  background: transparent;
-  border: 1px solid rgba(214,181,109,.5);
-  color: #d6b56d;
-  padding: 10px 16px;
-  border-radius: 30px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.view-all:hover {
-  background: #d6b56d;
-  color: #111;
-}
-
-.horizontal-row {
-  display: flex;
-  gap: 18px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 5px 2px 18px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #b99754 transparent;
-}
-
-.horizontal-row .card {
-  flex: 0 0 31%;
-  min-width: 240px;
-  scroll-snap-align: start;
-}
-
-.horizontal-row::-webkit-scrollbar {
-  height: 5px;
-}
-
-.horizontal-row::-webkit-scrollbar-thumb {
-  background: #b99754;
-  border-radius: 10px;
-}
-
-@media (max-width: 600px) {
-  .home-content {
-    margin: 38px 0;
-  }
-
-  .horizontal-row {
-    gap: 12px;
-  }
-
-  .horizontal-row .card {
-    flex: 0 0 47%;
-    min-width: 0;
-  }
-
-  .home-section-heading h2 {
-    font-size: 27px;
-  }
-
-  .view-all {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-}
-
 </style>
 </head>
 
@@ -1058,41 +773,64 @@ footer strong {
   </nav>
 </header>
 
-
 <main>
 
 <!-- HOME VIEW -->
 
-
 <section class="view active" id="home">
 
-  <!-- HERO -->
+  <!-- ORIGINAL HERO -->
+
   <div class="hero">
-    <p class="eyebrow">SHALOM TABERNACLE · VISAKHAPATNAM</p>
+    <div class="hero-content">
 
-    <h1>Welcome to<br><span>Shalom Tabernacle</span></h1>
+      <div class="eyebrow">
+        WELCOME TO SHALOM TABERNACLE
+      </div>
 
-    <p class="hero-description">
-      Watch messages, worship and inspiring moments.
-    </p>
+      <h1>
+        Faith. Truth.
+        <span>The Word of God.</span>
+      </h1>
 
-    <button class="gold-button" onclick="showView('videos')">
-      EXPLORE VIDEOS
-    </button>
+      <p class="quote">
+        🕊️ And in here, we don’t have no creed but Christ, that’s the creed;
+        and no law but love; no book but the Bible. And Christ is the Head;
+        and the Bible is our textbook; the world is my parish. So I like to
+        just preach the way that I feel led to preach, and just the way that
+        I see it. 🦅
+      </p>
+
+      <div class="attribution">
+        PAS. JOEL. P
+        <span>Visakhapatnam</span>
+      </div>
+
+      <div class="hero-actions">
+        <button class="gold-button" data-view="videos">
+          ▶ WATCH VIDEOS
+        </button>
+
+        <button class="outline-button" data-view="playlists">
+          EXPLORE PLAYLISTS ↗
+        </button>
+      </div>
+
+    </div>
   </div>
 
-
   <!-- LATEST VIDEOS -->
-  <section class="home-content">
+
+  <div class="home-content">
 
     <div class="home-section-heading">
       <div>
-        <p class="eyebrow">WATCH & BE INSPIRED</p>
-        <h2>Latest Videos</h2>
+        <div class="eyebrow">WATCH AND GROW</div>
+        <h2>Latest Messages</h2>
       </div>
 
       <button class="view-all" onclick="showView('videos')">
-        View All →
+        VIEW ALL →
       </button>
     </div>
 
@@ -1100,20 +838,22 @@ footer strong {
       <p class="empty">Loading videos...</p>
     </div>
 
-  </section>
+    <p class="row-hint">← Swipe to explore more videos →</p>
 
+  </div>
 
   <!-- FEATURED PLAYLISTS -->
-  <section class="home-content">
+
+  <div class="home-content">
 
     <div class="home-section-heading">
       <div>
-        <p class="eyebrow">EXPLORE COLLECTIONS</p>
+        <div class="eyebrow">EXPLORE OUR COLLECTIONS</div>
         <h2>Featured Playlists</h2>
       </div>
 
       <button class="view-all" onclick="showView('playlists')">
-        View All →
+        VIEW ALL →
       </button>
     </div>
 
@@ -1121,7 +861,9 @@ footer strong {
       <p class="empty">Loading playlists...</p>
     </div>
 
-  </section>
+    <p class="row-hint">← Swipe to explore more playlists →</p>
+
+  </div>
 
 </section>
 
@@ -1303,18 +1045,16 @@ footer strong {
 </nav>
 
 
-<!-- EXISTING GOOGLE SHEETS CONNECTION -->
+<!-- GOOGLE SHEETS CONNECTION -->
 
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
 
 
-<!-- NAVIGATION AND RECENT HISTORY -->
+<!-- NAVIGATION AND WATCH HISTORY -->
 
 <script>
 
-/* --------------------------------
-   PAGE NAVIGATION
--------------------------------- */
+/* PAGE NAVIGATION */
 
 function showView(viewName) {
 
@@ -1335,14 +1075,16 @@ function showView(viewName) {
   });
 
   document.querySelectorAll("[data-view]").forEach(button => {
+
+    const isNavigation =
+      button.classList.contains("nav-link") ||
+      button.closest(".bottom-nav");
+
     button.classList.toggle(
       "active",
-      button.dataset.view === viewName &&
-      (
-        button.classList.contains("nav-link") ||
-        button.closest(".bottom-nav")
-      )
+      isNavigation && button.dataset.view === viewName
     );
+
   });
 
   window.scrollTo({
@@ -1350,38 +1092,24 @@ function showView(viewName) {
     behavior:"smooth"
   });
 
-  if (viewName === "videos") {
-    setTimeout(() => {
-      document.getElementById("search")?.focus({
-        preventScroll:true
-      });
-    },350);
-  }
 }
 
 document.querySelectorAll("[data-view]").forEach(button => {
 
   button.addEventListener("click", event => {
-
     event.preventDefault();
-
     showView(button.dataset.view);
-
   });
 
 });
 
 
-/* --------------------------------
-   RECENTLY WATCHED
--------------------------------- */
+/* WATCH HISTORY */
 
 const HISTORY_KEY = "shalomRecentlyWatched";
 const MAX_HISTORY = 20;
 
-
 function historyEscape(value) {
-
   return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;",
     "<":"&lt;",
@@ -1389,68 +1117,66 @@ function historyEscape(value) {
     '"':"&quot;",
     "'":"&#39;"
   })[char]);
-
 }
 
+function safeHistoryURL(value) {
+  try {
+    const url = new URL(value);
+    if (
+      url.protocol === "https:" &&
+      (
+        url.hostname === "youtube.com" ||
+        url.hostname.endsWith(".youtube.com") ||
+        url.hostname === "youtu.be"
+      )
+    ) {
+      return url.href;
+    }
+  } catch (error) {}
+  return "";
+}
 
 function getHistory() {
-
   try {
-
     const saved = JSON.parse(
       localStorage.getItem(HISTORY_KEY) || "[]"
     );
-
     return Array.isArray(saved) ? saved : [];
-
   } catch {
-
     return [];
-
   }
-
 }
 
-
 function saveHistory(history) {
-
   try {
-
     localStorage.setItem(
       HISTORY_KEY,
       JSON.stringify(history.slice(0,MAX_HISTORY))
     );
-
-  } catch {
-
+  } catch (error) {
     console.warn("Browser history storage is unavailable.");
-
   }
-
   renderHistory();
-
 }
-
 
 function addToHistory(video) {
 
+  const safeURL = safeHistoryURL(video.url);
+  if (!safeURL) return;
+
   let history = getHistory();
 
-  // Remove an older entry for the same video.
-  history = history.filter(item => item.url !== video.url);
+  history = history.filter(item => item.url !== safeURL);
 
-  // Put the newest entry at the top.
   history.unshift({
-    title:video.title,
-    url:video.url,
-    thumbnail:video.thumbnail,
+    title:String(video.title || "Shalom Tabernacle Video"),
+    url:safeURL,
+    thumbnail:String(video.thumbnail || "./logo.png"),
     watchedAt:Date.now()
   });
 
   saveHistory(history);
-
 }
-
 
 function renderHistory() {
 
@@ -1465,9 +1191,12 @@ function renderHistory() {
 
   grid.innerHTML = history.map((item,index) => {
 
+    const safeURL = safeHistoryURL(item.url);
+    if (!safeURL) return "";
+
     const title = historyEscape(item.title);
-    const url = historyEscape(item.url);
-    const thumbnail = historyEscape(item.thumbnail);
+    const url = historyEscape(safeURL);
+    const thumbnail = historyEscape(item.thumbnail || "./logo.png");
 
     return `
       <article class="card history-card">
@@ -1510,9 +1239,7 @@ function renderHistory() {
 
   }).join("");
 
-  if (empty) {
-    empty.hidden = history.length !== 0;
-  }
+  if (empty) empty.hidden = history.length !== 0;
 
   if (count) {
     count.textContent = history.length
@@ -1528,18 +1255,16 @@ function renderHistory() {
 }
 
 
-/* RECORD VIDEO CLICKS */
+/* RECORD VIDEO CLICKS IN VIDEOS PAGE */
 
 document.getElementById("videoGrid").addEventListener(
   "click",
   function(event) {
 
     const link = event.target.closest("a.play");
-
     if (!link) return;
 
     const card = link.closest(".card");
-
     if (!card) return;
 
     const title =
@@ -1548,32 +1273,26 @@ document.getElementById("videoGrid").addEventListener(
 
     const image = card.querySelector("img.thumb");
 
-    const thumbnail = image?.src || "./logo.png";
-
-    const url = link.href;
-
     addToHistory({
-      title,
-      thumbnail,
-      url
+      title:title,
+      thumbnail:image?.src || "./logo.png",
+      url:link.href
     });
 
   }
 );
 
 
-/* REMOVE ONE VIDEO */
+/* REMOVE ONE HISTORY ITEM */
 
 document.getElementById("historyGrid").addEventListener(
   "click",
   function(event) {
 
     const button = event.target.closest("[data-remove-history]");
-
     if (!button) return;
 
     const index = Number(button.dataset.removeHistory);
-
     const history = getHistory();
 
     if (!Number.isInteger(index) || index < 0 || index >= history.length) {
@@ -1581,28 +1300,24 @@ document.getElementById("historyGrid").addEventListener(
     }
 
     history.splice(index,1);
-
     saveHistory(history);
 
   }
 );
 
 
-/* CLEAR ALL HISTORY */
+/* CLEAR HISTORY */
 
 document.getElementById("clearHistory").addEventListener(
   "click",
   function() {
 
     const history = getHistory();
-
     if (!history.length) return;
 
-    const confirmed = window.confirm(
-      "Clear all your recently watched videos?"
-    );
-
-    if (!confirmed) return;
+    if (!window.confirm("Clear all your recently watched videos?")) {
+      return;
+    }
 
     saveHistory([]);
 
