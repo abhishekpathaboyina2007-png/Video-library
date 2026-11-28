@@ -991,7 +991,7 @@ header {
   position:fixed;
   inset:0;
   z-index:500;
-  background:#050505;
+  background:linear-gradient(180deg,#e7effd 0%,#eef4ff 52%,#f4f8fe 100%);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1010,7 +1010,7 @@ header {
   height:100%;
   object-fit:contain;
   display:block;
-  background:#050505;
+  background:transparent;
 }
 
 .intro-controls {
@@ -1393,7 +1393,7 @@ footer strong {
 
 <!-- INTRO VIDEO OVERLAY -->
 <div class="intro-overlay" id="introOverlay" hidden role="dialog" aria-modal="true" aria-label="Intro Video" data-i18n-aria="introOverlayAria">
-  <video class="intro-video" id="introVideo" playsinline preload="auto" poster="./logo.png"></video>
+  <video class="intro-video" id="introVideo" playsinline preload="auto"></video>
   <div class="intro-controls">
     <div class="intro-top-bar">
       <button type="button" class="intro-pill-btn" id="introSkipBtn" data-i18n="introSkipBtn">Skip Intro →</button>
