@@ -681,6 +681,29 @@ header {
   margin-bottom:45px;
 }
 
+.watch-back-btn {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  color:var(--gold-light);
+  padding:8px 16px;
+  border-radius:12px;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s ease;
+  margin-bottom:14px;
+}
+
+.watch-back-btn:hover {
+  background:rgba(214,181,109,.15);
+  border-color:var(--gold);
+  color:#fff;
+  transform:translateX(-2px);
+}
+
 .watch-frame-wrap {
   position:relative;
   width:100%;
@@ -1728,7 +1751,6 @@ footer strong {
       <button class="nav-link active" data-view="home" data-i18n="navHome">Home</button>
       <button class="nav-link" data-view="videos" data-i18n="navVideos">Videos</button>
       <button class="nav-link" data-view="playlists" data-i18n="navPlaylists">Playlists</button>
-      <button class="nav-link" data-view="watch" data-i18n="navWatch">Watch</button>
       <button class="nav-link" data-view="favorites" data-i18n="navFavorites">Favorites</button>
       <button class="nav-link" data-view="history" data-i18n="navHistory">History</button>
       <button class="nav-link" data-view="about" data-i18n="navAbout">About</button>
@@ -2042,8 +2064,16 @@ footer strong {
 
 <section class="view" id="watch">
   <div class="watch-page-content">
+    <button type="button" class="watch-back-btn" id="watchPageBackBtn" aria-label="Go Back" data-i18n="watchBack">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span data-i18n="watchBack">← Back</span>
+    </button>
+
     <div class="watch-player-layout">
-      <div class="watch-frame-wrap">
+      <div class="watch-frame-wrap" id="watchFrameWrap">
         <iframe
           id="watchPageFrame"
           title="Shalom Tabernacle Video Player"
@@ -2053,6 +2083,7 @@ footer strong {
           allowfullscreen
         ></iframe>
       </div>
+
       <div class="watch-info-bar">
         <div>
           <h1 class="watch-title" id="watchPageTitle"></h1>
@@ -2062,9 +2093,6 @@ footer strong {
           <button type="button" class="outline-button watch-watched-btn" id="watchPageWatchedBtn" data-i18n="playerMarkWatchedBtn">
             Mark as Watched
           </button>
-          <a class="outline-button" id="watchPageExternalLink" href="https://www.youtube.com" target="_blank" rel="noopener" data-i18n="playerOpenYoutubeBtn">
-            Open on YouTube ↗
-          </a>
         </div>
       </div>
     </div>
@@ -2169,11 +2197,6 @@ footer strong {
     <span data-i18n="navPlaylists">Playlists</span>
   </button>
 
-  <button data-view="watch">
-    <span class="nav-icon">📺</span>
-    <span data-i18n="navWatch">Watch</span>
-  </button>
-
   <button data-view="favorites">
     <span class="nav-icon">♥</span>
     <span data-i18n="navFavorites">Favorites</span>
@@ -2264,9 +2287,6 @@ footer strong {
       <button type="button" class="outline-button player-watched-btn" id="videoPlayerWatchedBtn" data-i18n="playerMarkWatchedBtn">
         Mark as Watched
       </button>
-      <a class="outline-button" id="videoPlayerExternalLink" href="https://www.youtube.com" target="_blank" rel="noopener" data-i18n="playerOpenYoutubeBtn">
-        Open on YouTube ↗
-      </a>
     </div>
   </div>
 </div>
@@ -2294,7 +2314,7 @@ footer strong {
 <div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
 
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=17"></script>
+<script src="./app.js?v=19"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 

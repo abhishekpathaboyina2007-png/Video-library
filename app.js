@@ -188,7 +188,17 @@ const I18N = {
     relatedTitle: "Related Videos",
     bgPlayToggle: "🎧 Background Play",
     bgPlayActiveToast: "Background play active! You can browse other tabs while listening.",
-    miniPlayerActiveSub: "Background Play Active"
+    miniPlayerActiveSub: "Background Play Active",
+    ctrlPlay: "Play",
+    ctrlPause: "Pause",
+    ctrlRewind: "Rewind 10 seconds",
+    ctrlForward: "Forward 10 seconds",
+    ctrlMute: "Mute",
+    ctrlUnmute: "Unmute",
+    ctrlSpeed: "Playback Speed",
+    ctrlFullscreen: "Fullscreen",
+    ctrlAutoRotate: "Auto-rotate Fullscreen",
+    watchBack: "← Back"
   },
   te: {
     pageTitle: "షాలోమ్ టబర్నికల్ | విశాఖపట్నం",
@@ -331,7 +341,17 @@ const I18N = {
     relatedTitle: "సంబంధిత వీడియోలు",
     bgPlayToggle: "🎧 బ్యాక్‌గ్రౌండ్ ప్లే",
     bgPlayActiveToast: "బ్యాక్‌గ్రౌండ్ ప్లే ఆన్‌లో ఉంది! మీరు వింటూ ఇతర ట్యాబ్‌లను బ్రౌజ్ చేయవచ్చు.",
-    miniPlayerActiveSub: "బ్యాక్‌గ్రౌండ్ ప్లే ఆన్‌లో ఉంది"
+    miniPlayerActiveSub: "బ్యాక్‌గ్రౌండ్ ప్లే ఆన్‌లో ఉంది",
+    ctrlPlay: "ప్లే",
+    ctrlPause: "పాజ్",
+    ctrlRewind: "10 సె వెనక్కి",
+    ctrlForward: "10 సె ముందుకు",
+    ctrlMute: "మ్యూట్",
+    ctrlUnmute: "అన్‌మ్యూట్",
+    ctrlSpeed: "ప్లేబ్యాక్ వేగం",
+    ctrlFullscreen: "పూర్తి స్క్రీన్",
+    ctrlAutoRotate: "ఆటో రొటేట్ ఫుల్‌స్క్రీన్",
+    watchBack: "← వెనుకకు"
   }
 };
 
@@ -707,6 +727,11 @@ function renderLibrary(data) {
   syncFavoriteButtons();
   syncWatchedBadges();
   markAlreadyLoadedThumbs();
+
+  if (activePlayerKey) {
+    const activeRec = libraryItemMap.get(activePlayerKey);
+    renderRelatedVideos(activePlayerKey, activeRec?.category || "", activeRec?.preacher || "");
+  }
 }
 
 
@@ -2137,31 +2162,43 @@ function syncPlayerWatchedButton() {
 
 function renderRelatedVideos(currentKey, category = "", preacher = "") {
   const grid = document.getElementById("relatedVideosGrid");
-  if (!grid || !libraryData || !Array.isArray(libraryData.videos)) return;
+  if (!grid) return;
+  if (!libraryData || !Array.isArray(libraryData.videos) || !libraryData.videos.length) {
+    grid.innerHTML = `<p class="empty">${escapeHTML(t("noVideosAvailable"))}</p>`;
+    return;
+  }
 
   const allVideos = libraryData.videos.filter(v => isVisible(v) && validVideo(v));
-  const scored = allVideos.map((v, idx) => {
+  const scored = [];
+
+  allVideos.forEach((v, idx) => {
     const record = buildVideoRecord(v, idx);
-    if (!record || record.key === currentKey) return { record: null, score: -1 };
+    if (!record || record.key === currentKey) return;
     let score = 0;
-    if (category && record.category.toLowerCase() === category.toLowerCase()) score += 3;
-    if (preacher && record.preacher && record.preacher.toLowerCase() === preacher.toLowerCase()) score += 5;
-    return { record, score, timestamp: record.dateTimestamp ?? idx };
-  }).filter(item => item.record);
+    if (category && record.category && record.category.toLowerCase() === category.toLowerCase()) {
+      score += 5;
+    }
+    if (preacher && record.preacher && record.preacher.toLowerCase() === preacher.toLowerCase()) {
+      score += 7;
+    }
+    scored.push({ raw: v, record, score, timestamp: record.dateTimestamp ?? idx });
+  });
 
   scored.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     return b.timestamp - a.timestamp;
   });
 
-  const related = scored.slice(0, 8).map(item => item.record);
+  // Display up to 10-12 related videos fast
+  const related = scored.slice(0, 10);
   if (!related.length) {
     grid.innerHTML = `<p class="empty">${escapeHTML(t("noVideosAvailable"))}</p>`;
     return;
   }
 
+  // Pass raw item `item.raw` into createVideoCard
   grid.innerHTML = related
-    .map(record => createVideoCard(record, record.sourceIndex))
+    .map(item => createVideoCard(item.raw, item.record.sourceIndex))
     .join("");
 
   markAlreadyLoadedThumbs();
@@ -2211,30 +2248,43 @@ function buildYouTubeEmbedURL(rawUrl, itemType = "video", fallbackId = "") {
     extractAnyYouTubeVideoId(safeUrl) ||
     (/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "") ? fallbackId : "");
 
+  // Native, robust YouTube player with native playback controls
+  const baseControls = "autoplay=1&controls=1&rel=0&playsinline=1&modestbranding=1";
+
   if (itemType === "playlist" && listId) {
     if (videoId) {
-      return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+      return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?list=${encodeURIComponent(listId)}&${baseControls}`;
     }
-    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&${baseControls}`;
   }
 
   if (videoId) {
     const listQuery = listId ? `&list=${encodeURIComponent(listId)}` : "";
-    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0${listQuery}`;
+    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${baseControls}${listQuery}`;
   }
 
   if (listId) {
-    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&${baseControls}`;
   }
 
   return "";
+}
+
+function initWatchPageNavigation() {
+  const backBtn = document.getElementById("watchPageBackBtn");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      if (typeof showView === "function") {
+        showView("videos");
+      }
+    });
+  }
 }
 
 function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type = "video", videoId = "", thumbnail = "" } = {}) {
   const frame = document.getElementById("watchPageFrame");
   const titleEl = document.getElementById("watchPageTitle");
   const subEl = document.getElementById("watchPageSub");
-  const externalLink = document.getElementById("watchPageExternalLink");
 
   const embedUrl = buildYouTubeEmbedURL(url, type, videoId);
   if (!frame || !embedUrl) return false;
@@ -2251,9 +2301,6 @@ function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type =
       subEl.textContent = "";
       subEl.hidden = true;
     }
-  }
-  if (externalLink && safeExternal) {
-    externalLink.href = safeExternal;
   }
 
   frame.src = embedUrl;
@@ -2568,6 +2615,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initThumbnailDelegation();
   initLoadMoreControls();
   initCardAndHistoryInteractions();
+  initWatchPageNavigation();
   initPWAInstallPrompt();
   initIntroReveal();
   if (typeof renderHistory === "function") renderHistory();
