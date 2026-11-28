@@ -1,6 +1,6 @@
 
 /* ==========================================
-   SHALOM TABERNACLE - PUBLIC WEBSITE
+   SHALOM TABERNACLE - OPTIMIZED PUBLIC WEBSITE
    Google Sheets + Horizontal Home Rows
 ========================================== */
 
@@ -9,51 +9,139 @@ const API_URL = "https://script.google.com/macros/s/AKfycby_Lxcf0X0bDVZF6hqKcl42
 let libraryData = null;
 let currentCategory = "All";
 
+const CACHE_KEY = "shalomLibraryCache";
+const CACHE_TIME = 5 * 60 * 1000;
+
+let requestTimeout = null;
+
 
 /* ==========================================
-   LOAD GOOGLE SHEETS DATA
+   LOAD CACHED DATA
+========================================== */
+
+function loadCachedLibrary() {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+
+    if (!cached) return false;
+
+    const parsed = JSON.parse(cached);
+
+    if (!parsed.data || !parsed.time) return false;
+
+    // Display cached data immediately, even if stale.
+    libraryData = parsed.data;
+    renderLibrary(libraryData);
+
+    return true;
+
+  } catch (error) {
+    console.warn("Library cache unavailable:", error);
+    return false;
+  }
+}
+
+
+/* ==========================================
+   LOAD FRESH GOOGLE SHEETS DATA
 ========================================== */
 
 function loadLibrary() {
 
+  // Show cached content first.
+  loadCachedLibrary();
+
+  // Request fresh data.
+  const oldScript = document.getElementById("library-api-script");
+
+  if (oldScript) oldScript.remove();
+
   const script = document.createElement("script");
+
+  script.id = "library-api-script";
 
   script.src = API_URL +
     "?action=publicData&callback=window.videoLibraryCallback&t=" +
     Date.now();
 
+  script.async = true;
+
   script.onerror = () => {
-    showError("Unable to connect. Please refresh the page.");
+    clearTimeout(requestTimeout);
+
+    if (!libraryData) {
+      showError("Unable to connect. Please check your internet and refresh.");
+    }
+
+    console.warn("Google Sheets connection failed.");
   };
 
   document.body.appendChild(script);
 
+  // Avoid waiting forever if the API does not respond.
+  clearTimeout(requestTimeout);
+
+  requestTimeout = setTimeout(() => {
+    if (!libraryData) {
+      showError("Connection is taking too long. Please refresh the page.");
+    }
+  }, 15000);
 }
 
 
+/* ==========================================
+   RECEIVE FRESH DATA
+========================================== */
+
 window.videoLibraryCallback = function(data) {
 
+  clearTimeout(requestTimeout);
+
   if (!data || !data.success) {
-    showError("Unable to load the video library.");
+
+    if (!libraryData) {
+      showError("Unable to load the video library.");
+    }
+
     return;
   }
 
   libraryData = data;
+
+  // Save fresh data for future visits.
+  try {
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        time: Date.now(),
+        data: data
+      })
+    );
+  } catch (error) {
+    console.warn("Could not save library cache:", error);
+  }
+
+  renderLibrary(data);
+};
+
+
+/* ==========================================
+   RENDER ALL LIBRARY SECTIONS
+========================================== */
+
+function renderLibrary(data) {
 
   const videos = data.videos || [];
   const playlists = data.playlists || [];
 
   renderCategories();
 
-  // Complete libraries
   renderVideos(videos);
   renderPlaylists(playlists);
 
-  // Homepage horizontal rows
   renderHomeVideos(videos);
   renderHomePlaylists(playlists);
-
-};
+}
 
 
 /* ==========================================
@@ -151,6 +239,47 @@ function validPlaylist(item) {
 
 
 /* ==========================================
+   THUMBNAIL FALLBACK
+========================================== */
+
+function createThumbnailHTML(id, title, customThumbnail = "") {
+
+  const validId = /^[A-Za-z0-9_-]{11}$/.test(id);
+
+  const thumbnail = customThumbnail ||
+    (validId
+      ? "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg"
+      : "./logo.png"
+    );
+
+  return `
+    <img
+      class="thumb"
+      src="${escapeHTML(thumbnail)}"
+      alt="${escapeHTML(title)}"
+      loading="lazy"
+      decoding="async"
+      onerror="
+        const step = Number(this.dataset.fallback || 0);
+        const videoId = '${escapeHTML(validId ? id : "")}';
+
+        if (videoId && step === 0) {
+          this.dataset.fallback = '1';
+          this.src = 'https://i.ytimg.com/vi/' + videoId + '/mqdefault.jpg';
+        } else if (videoId && step === 1) {
+          this.dataset.fallback = '2';
+          this.src = 'https://i.ytimg.com/vi/' + videoId + '/default.jpg';
+        } else {
+          this.onerror = null;
+          this.src = './logo.png';
+        }
+      "
+    >
+  `;
+}
+
+
+/* ==========================================
    VIDEO CARD CREATOR
 ========================================== */
 
@@ -166,18 +295,10 @@ function createVideoCard(video) {
     video.Category || "Message"
   );
 
-  const thumbnail =
-    "https://img.youtube.com/vi/" + id + "/hqdefault.jpg";
-
   return `
     <article class="card" data-title="${title}">
 
-      <img
-        class="thumb"
-        src="${thumbnail}"
-        alt="${title}"
-        loading="lazy"
-      >
+      ${createThumbnailHTML(id, title)}
 
       <div class="card-info">
 
@@ -198,7 +319,6 @@ function createVideoCard(video) {
 
     </article>
   `;
-
 }
 
 
@@ -206,47 +326,42 @@ function createVideoCard(video) {
    PLAYLIST CARD CREATOR
 ========================================== */
 
-
-
-
 function createPlaylistCard(item) {
-  const title = escapeHTML(item.Title);
-  const url = safeYouTubeURL(item.YouTube_URL);
-  const customThumbnail = safeImageURL(item.Thumbnail_URL || "");
-  const firstVideoId = String(item.First_Video_ID || "").trim();
 
-  const thumbnail = customThumbnail ||
-    (/^[A-Za-z0-9_-]{11}$/.test(firstVideoId)
-      ? "https://i.ytimg.com/vi/" + firstVideoId + "/maxresdefault.jpg"
-      : "./logo.png"
-    );
+  const title = escapeHTML(item.Title);
+
+  const url = safeYouTubeURL(item.YouTube_URL);
+
+  const customThumbnail = safeImageURL(item.Thumbnail_URL || "");
+
+  const firstVideoId = String(item.First_Video_ID || "").trim();
 
   return `
     <article class="card">
-      <img class="thumb"
-        src="${escapeHTML(thumbnail)}"
-        alt="${title}"
-        loading="lazy"
-        onerror="
-          if (this.dataset.fallback === '0') {
-            this.dataset.fallback = '1';
-            this.src = 'https://i.ytimg.com/vi/${firstVideoId}/hqdefault.jpg';
-          } else if (this.dataset.fallback === '1') {
-            this.dataset.fallback = '2';
-            this.src = 'https://i.ytimg.com/vi/${firstVideoId}/sddefault.jpg';
-          } else {
-            this.onerror = null;
-            this.src = './logo.png';
-          }
-        ">
+
+      ${createThumbnailHTML(
+        firstVideoId,
+        title,
+        customThumbnail
+      )}
+
       <div class="card-info">
+
         <h3>${title}</h3>
+
         <p>Shalom Tabernacle Collection</p>
-        <a class="play" href="${escapeHTML(url)}"
-          target="_blank" rel="noopener">
+
+        <a
+          class="play"
+          href="${escapeHTML(url)}"
+          target="_blank"
+          rel="noopener"
+        >
           ▶ OPEN PLAYLIST
         </a>
+
       </div>
+
     </article>
   `;
 }
@@ -273,13 +388,11 @@ function renderHomeVideos(videos) {
     `;
 
     return;
-
   }
 
   row.innerHTML = visibleVideos
     .map(createVideoCard)
     .join("");
-
 }
 
 
@@ -304,13 +417,11 @@ function renderHomePlaylists(playlists) {
     `;
 
     return;
-
   }
 
   row.innerHTML = visiblePlaylists
     .map(createPlaylistCard)
     .join("");
-
 }
 
 
@@ -361,7 +472,6 @@ function renderCategories() {
     filters.appendChild(button);
 
   });
-
 }
 
 
@@ -376,15 +486,16 @@ function setLibraryCategory(category, button) {
   button.classList.add("active");
 
   renderVideos(libraryData?.videos || []);
-
 }
 
 
 /* CATEGORY BUTTON EVENTS */
 
-document.getElementById("filters").addEventListener(
-  "click",
-  function(event) {
+const filterContainer = document.getElementById("filters");
+
+if (filterContainer) {
+
+  filterContainer.addEventListener("click", function(event) {
 
     const button = event.target.closest(".filter");
 
@@ -395,8 +506,9 @@ document.getElementById("filters").addEventListener(
       button
     );
 
-  }
-);
+  });
+
+}
 
 
 /* ==========================================
@@ -413,7 +525,6 @@ function renderVideos(videos) {
   const query = (
     document.getElementById("search")?.value || ""
   ).trim().toLowerCase();
-
 
   const filtered = videos.filter(video => {
 
@@ -436,16 +547,13 @@ function renderVideos(videos) {
 
   });
 
-
   grid.innerHTML = filtered
     .map(createVideoCard)
     .join("");
 
-
   if (empty) {
     empty.hidden = filtered.length !== 0;
   }
-
 }
 
 
@@ -471,7 +579,6 @@ function renderPlaylists(playlists) {
   if (empty) {
     empty.hidden = visible.length !== 0;
   }
-
 }
 
 
@@ -492,9 +599,11 @@ function filterVideos() {
    HISTORY - HOMEPAGE VIDEO CLICKS
 ========================================== */
 
-document.getElementById("homeVideoRow").addEventListener(
-  "click",
-  function(event) {
+const homeVideoContainer = document.getElementById("homeVideoRow");
+
+if (homeVideoContainer) {
+
+  homeVideoContainer.addEventListener("click", function(event) {
 
     const link = event.target.closest("a.play");
 
@@ -521,8 +630,9 @@ document.getElementById("homeVideoRow").addEventListener(
 
     }
 
-  }
-);
+  });
+
+}
 
 
 /* ==========================================
