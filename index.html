@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,15 +6,32 @@
 
   <title>Shalom Tabernacle | Visakhapatnam</title>
   <meta name="description" content="Watch messages and explore playlists from Shalom Tabernacle, Visakhapatnam.">
-  <meta name="theme-color" content="#090909">
+  <meta name="theme-color" content="#090909" id="metaThemeColor">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Shalom">
 
   <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./app-icon-192.png">
+
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem("shalomTheme");
+        if (savedTheme === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+          var meta = document.getElementById("metaThemeColor");
+          if (meta) meta.setAttribute("content", "#F8F5EE");
+        }
+      } catch (e) {}
+    })();
+  </script>
 
   <!-- Faster external resource connections -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://i.ytimg.com">
-  <link rel="preconnect" href="https://img.youtube.com">
+  <link rel="preconnect" href="https://img.youtube.com" crossorigin>
 
   <!-- Fonts with non-blocking text display -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,13 +40,51 @@
 :root {
   --bg:#090909;
   --surface:#141414;
+  --surface-alt:#1b1b1b;
+  --header-bg:rgba(9,9,9,.97);
+  --bottom-nav-bg:rgba(12,12,12,.98);
   --gold:#D6B56D;
   --gold-light:#F0D69E;
   --white:#fff;
+  --text-soft:#bbb;
+  --text-quote:#aaa;
   --muted:#999;
   --border:#292929;
+  --card-border:#252525;
+  --input-bg:#151515;
+  --input-border:#303030;
+  --button-text:#17120A;
+  --danger-border:#59443a;
+  --danger-text:#dca18d;
+  --banner-bg:linear-gradient(145deg,#181510,#0d0d0d);
+  --about-bg:radial-gradient(ellipse at 90% 0%,rgba(214,181,109,.12),transparent 50%),#151515;
+  --hero-bg:radial-gradient(ellipse at 85% 30%,rgba(214,181,109,.15),transparent 36%),radial-gradient(ellipse at 5% 100%,rgba(214,181,109,.07),transparent 38%),#090909;
   --heading:'Cormorant Garamond',Georgia,serif;
   --body:'Manrope',Arial,sans-serif;
+}
+
+:root[data-theme="light"] {
+  --bg:#F8F5EE;
+  --surface:#FFFFFF;
+  --surface-alt:#F2ECE0;
+  --header-bg:rgba(248,245,238,.96);
+  --bottom-nav-bg:rgba(255,253,249,.98);
+  --gold:#9E7728;
+  --gold-light:#7E5C18;
+  --white:#191611;
+  --text-soft:#3C372E;
+  --text-quote:#4A4338;
+  --muted:#675F52;
+  --border:#E4DCCB;
+  --card-border:#E2D9C7;
+  --input-bg:#FFFFFF;
+  --input-border:#D6CCB8;
+  --button-text:#17120A;
+  --danger-border:#C79C8D;
+  --danger-text:#9E4730;
+  --banner-bg:linear-gradient(145deg,#FFFDF8,#F4EDE0);
+  --about-bg:radial-gradient(ellipse at 90% 0%,rgba(158,119,40,.1),transparent 50%),#FFFFFF;
+  --hero-bg:radial-gradient(ellipse at 85% 30%,rgba(214,181,109,.22),transparent 40%),radial-gradient(ellipse at 5% 100%,rgba(214,181,109,.14),transparent 42%),#F8F5EE;
 }
 
 * {
@@ -51,9 +105,10 @@ body {
   line-height:1.65;
   min-height:100vh;
   overflow-x:hidden;
+  transition:background-color .2s ease,color .2s ease;
 }
 
-button,input { font:inherit; }
+button,input,select { font:inherit; }
 button { cursor:pointer; }
 a {
   color:inherit;
@@ -69,8 +124,8 @@ header {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:25px;
-  background:rgba(9,9,9,.97);
+  gap:16px;
+  background:var(--header-bg);
   border-bottom:1px solid var(--border);
   position:sticky;
   top:0;
@@ -108,28 +163,81 @@ header {
   margin-top:3px;
 }
 
+.header-right {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
 .desktop-nav {
   display:flex;
   align-items:center;
-  gap:9px;
+  gap:6px;
 }
 
 .nav-link {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   background:transparent;
   border:1px solid transparent;
-  color:#aaa;
-  padding:10px 15px;
+  color:var(--muted);
+  padding:9px 13px;
   border-radius:30px;
   font-size:12px;
   font-weight:700;
+  line-height:1.2;
+  text-align:center;
+  white-space:nowrap;
   transition:color .2s,border-color .2s,background .2s;
 }
 
 .nav-link:hover,
 .nav-link.active {
   color:var(--gold);
-  border-color:rgba(214,181,109,.3);
-  background:rgba(214,181,109,.09);
+  border-color:rgba(214,181,109,.35);
+  background:rgba(214,181,109,.1);
+}
+
+.theme-toggle {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  background:var(--surface-alt);
+  border:1px solid var(--border);
+  color:var(--gold-light);
+  padding:8px 13px;
+  border-radius:30px;
+  font-size:11px;
+  font-weight:700;
+  line-height:1.2;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:border-color .2s,background .2s;
+}
+
+.theme-toggle:hover {
+  border-color:var(--gold);
+  background:rgba(214,181,109,.12);
+}
+
+.theme-toggle svg {
+  width:14px;
+  height:14px;
+  flex-shrink:0;
+}
+
+/* OFFLINE BANNER */
+
+.offline-banner {
+  background:rgba(214,181,109,.14);
+  border-bottom:1px solid rgba(214,181,109,.35);
+  color:var(--gold-light);
+  padding:9px 7%;
+  font-size:12px;
+  font-weight:600;
+  text-align:center;
 }
 
 /* BUTTONS */
@@ -139,12 +247,15 @@ header {
   display:inline-flex;
   justify-content:center;
   align-items:center;
-  gap:9px;
+  gap:8px;
+  max-width:100%;
   padding:13px 23px;
   border-radius:30px;
   font-size:11px;
   font-weight:800;
+  line-height:1.2;
   letter-spacing:1px;
+  text-align:center;
   text-decoration:none;
   transition:transform .2s,background .2s,box-shadow .2s;
 }
@@ -152,8 +263,8 @@ header {
 .gold-button {
   border:1px solid var(--gold);
   background:linear-gradient(135deg,#F0D69E,#C39B4D);
-  color:#17120A;
-  box-shadow:0 5px 22px rgba(214,181,109,.13);
+  color:var(--button-text);
+  box-shadow:0 5px 22px rgba(214,181,109,.15);
 }
 
 .gold-button:hover {
@@ -162,7 +273,7 @@ header {
 }
 
 .outline-button {
-  border:1px solid rgba(214,181,109,.55);
+  border:1px solid rgba(214,181,109,.65);
   background:transparent;
   color:var(--gold);
 }
@@ -190,17 +301,14 @@ header {
 /* HERO */
 
 .hero {
-  min-height:510px;
-  padding:85px 9%;
+  min-height:500px;
+  padding:80px 9%;
   display:flex;
   flex-direction:column;
   justify-content:center;
   position:relative;
   overflow:hidden;
-  background:
-    radial-gradient(ellipse at 85% 30%,rgba(214,181,109,.15),transparent 36%),
-    radial-gradient(ellipse at 5% 100%,rgba(214,181,109,.07),transparent 38%),
-    #090909;
+  background:var(--hero-bg);
 }
 
 .hero::before {
@@ -210,7 +318,7 @@ header {
   height:360px;
   right:-130px;
   top:40px;
-  border:1px solid rgba(214,181,109,.13);
+  border:1px solid rgba(214,181,109,.18);
   border-radius:50%;
   box-shadow:0 0 100px rgba(214,181,109,.07);
   pointer-events:none;
@@ -223,7 +331,7 @@ header {
   height:220px;
   right:-60px;
   top:110px;
-  border:1px solid rgba(214,181,109,.09);
+  border:1px solid rgba(214,181,109,.12);
   border-radius:50%;
   pointer-events:none;
 }
@@ -258,7 +366,7 @@ header {
 }
 
 .hero .quote {
-  color:#aaa;
+  color:var(--text-quote);
   max-width:700px;
   font-size:12px;
   line-height:2;
@@ -274,7 +382,7 @@ header {
 
 .attribution span {
   display:block;
-  color:#888;
+  color:var(--muted);
   font-weight:500;
   letter-spacing:0;
   margin-top:3px;
@@ -296,10 +404,48 @@ header {
   white-space:nowrap;
 }
 
+.hero-utility-row {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+  margin-top:16px;
+}
+
+.utility-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:9px 15px;
+  border-radius:30px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--gold-light);
+  font-size:11px;
+  font-weight:700;
+  line-height:1.2;
+  letter-spacing:.4px;
+  text-align:center;
+  transition:border-color .2s,background .2s,transform .2s;
+}
+
+.utility-button:hover {
+  border-color:var(--gold);
+  background:rgba(214,181,109,.12);
+  transform:translateY(-1px);
+}
+
+.utility-button svg {
+  width:14px;
+  height:14px;
+  flex-shrink:0;
+}
+
 /* HOMEPAGE ROWS */
 
 .home-content {
-  padding:42px 7% 25px;
+  padding:38px 7% 20px;
   max-width:1500px;
   margin:auto;
   overflow:hidden;
@@ -307,9 +453,10 @@ header {
 
 .home-section-heading {
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
-  gap:15px;
+  gap:12px 15px;
   margin-bottom:20px;
 }
 
@@ -320,14 +467,25 @@ header {
   margin-top:5px;
 }
 
+.heading-actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+
 .view-all {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   background:transparent;
-  border:1px solid rgba(214,181,109,.5);
+  border:1px solid rgba(214,181,109,.55);
   color:var(--gold);
   padding:10px 17px;
   border-radius:30px;
   font-size:10px;
   font-weight:800;
+  line-height:1.2;
   letter-spacing:.7px;
   white-space:nowrap;
   transition:background .2s,color .2s;
@@ -335,6 +493,10 @@ header {
 
 .view-all:hover {
   background:var(--gold);
+  color:#fff;
+}
+
+:root:not([data-theme="light"]) .view-all:hover {
   color:#090909;
 }
 
@@ -364,11 +526,116 @@ header {
 }
 
 .row-hint {
-  color:#777;
+  color:var(--muted);
   font-size:10px;
   margin-top:-12px;
-  margin-bottom:15px;
+  margin-bottom:10px;
   letter-spacing:.3px;
+}
+
+/* DAILY BIBLE VERSE */
+
+.verse-panel {
+  background:var(--about-bg);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:clamp(22px,4vw,36px);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.verse-quote {
+  font-family:var(--heading);
+  font-size:clamp(24px,3.2vw,34px);
+  line-height:1.35;
+  color:var(--white);
+  font-weight:600;
+}
+
+.verse-ref {
+  color:var(--gold);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+.verse-note {
+  color:var(--text-soft);
+  font-size:12px;
+  max-width:760px;
+}
+
+.verse-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:4px;
+}
+
+/* EVENTS */
+
+.events-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:18px;
+}
+
+.event-card {
+  background:var(--surface);
+  border:1px solid var(--card-border);
+  border-radius:14px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  transition:transform .2s,border-color .2s;
+}
+
+.event-card:hover {
+  transform:translateY(-3px);
+  border-color:rgba(214,181,109,.55);
+}
+
+.event-badge {
+  display:inline-flex;
+  align-self:flex-start;
+  padding:4px 10px;
+  border-radius:20px;
+  background:rgba(214,181,109,.14);
+  border:1px solid rgba(214,181,109,.35);
+  color:var(--gold-light);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+}
+
+.event-card h3 {
+  font-family:var(--heading);
+  font-size:25px;
+  line-height:1.2;
+}
+
+.event-meta {
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
+}
+
+.event-desc {
+  color:var(--text-soft);
+  font-size:12px;
+  line-height:1.65;
+}
+
+.event-location {
+  color:var(--muted);
+  font-size:11px;
+  margin-top:auto;
+  padding-top:8px;
+  border-top:1px solid var(--border);
 }
 
 /* OTHER PAGES */
@@ -396,24 +663,45 @@ header {
   margin-top:9px;
 }
 
-/* SEARCH AND FILTERS */
+/* SEARCH, SORT AND FILTERS */
+
+.search-toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+  margin:0 0 22px;
+}
 
 .search {
-  width:100%;
-  max-width:500px;
-  padding:15px 19px;
-  background:#151515;
-  border:1px solid #303030;
+  flex:1 1 300px;
+  max-width:520px;
+  padding:14px 19px;
+  background:var(--input-bg);
+  border:1px solid var(--input-border);
   border-radius:30px;
-  color:white;
+  color:var(--white);
   outline:none;
-  margin:0 0 22px;
+  margin:0;
   font-size:12px;
   transition:border-color .2s;
 }
 
-.search:focus {
+.search:focus,
+.sort-select:focus {
   border-color:var(--gold);
+}
+
+.sort-select {
+  padding:14px 16px;
+  background:var(--input-bg);
+  border:1px solid var(--input-border);
+  border-radius:30px;
+  color:var(--white);
+  font-size:12px;
+  font-weight:600;
+  outline:none;
+  min-width:180px;
 }
 
 .filters {
@@ -424,21 +712,26 @@ header {
 }
 
 .filter {
-  border:1px solid #383838;
-  background:#171717;
-  color:#bbb;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--border);
+  background:var(--surface-alt);
+  color:var(--text-soft);
   padding:9px 18px;
   border-radius:30px;
   white-space:nowrap;
   font-size:11px;
   font-weight:700;
-  transition:background .2s,color .2s;
+  line-height:1.2;
+  text-align:center;
+  transition:background .2s,color .2s,border-color .2s;
 }
 
 .filter.active,
 .filter:hover {
   background:var(--gold);
-  color:#090909;
+  color:#17120A;
   border-color:var(--gold);
 }
 
@@ -452,25 +745,64 @@ header {
 
 .card {
   background:var(--surface);
-  border:1px solid #252525;
+  border:1px solid var(--card-border);
   border-radius:12px;
   overflow:hidden;
   transition:transform .2s,border-color .2s;
   min-width:0;
+  contain:layout style;
+}
+
+.grid .card {
+  content-visibility:auto;
+  contain-intrinsic-size:270px;
 }
 
 .card:hover {
   transform:translateY(-3px);
-  border-color:rgba(214,181,109,.5);
+  border-color:rgba(214,181,109,.55);
+}
+
+.thumb-wrap {
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:var(--surface-alt);
+}
+
+.thumb-wrap::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(214,181,109,.09) 50%,transparent 100%);
+  transform:translateX(-100%);
+  animation:thumbShimmer 1.4s infinite;
+  pointer-events:none;
+}
+
+.thumb-wrap.is-loaded::before {
+  display:none;
+  animation:none;
+}
+
+@keyframes thumbShimmer {
+  to { transform:translateX(100%); }
 }
 
 .thumb {
   width:100%;
+  height:100%;
   aspect-ratio:16/9;
   object-fit:cover;
   display:block;
-  background:#222;
-  content-visibility:auto;
+  background:transparent;
+  opacity:0;
+  transition:opacity .2s ease;
+}
+
+.thumb.is-loaded {
+  opacity:1;
 }
 
 .card-info { padding:16px; }
@@ -478,7 +810,7 @@ header {
 .card-info h3 {
   font-size:13px;
   font-weight:700;
-  line-height:1.6;
+  line-height:1.5;
   margin-bottom:6px;
 }
 
@@ -491,21 +823,86 @@ header {
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:7px;
+  gap:6px;
   margin-top:14px;
-  padding:10px 16px;
+  padding:10px 15px;
   border-radius:25px;
   background:linear-gradient(135deg,#F0D69E,#C39B4D);
-  color:#17120A;
+  color:var(--button-text);
   text-decoration:none;
   font-size:10px;
   font-weight:800;
+  line-height:1.2;
   letter-spacing:.5px;
+  text-align:center;
   transition:box-shadow .2s;
 }
 
 .play:hover {
-  box-shadow:0 5px 15px rgba(214,181,109,.2);
+  box-shadow:0 5px 15px rgba(214,181,109,.25);
+}
+
+.card-actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:14px;
+}
+
+.card-actions .play {
+  margin-top:0;
+  flex:1 1 auto;
+  min-width:fit-content;
+  padding:9px 13px;
+  white-space:nowrap;
+}
+
+.card-icon-actions {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.card-icon-btn {
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--surface-alt);
+  color:var(--muted);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:border-color .2s,background .2s,color .2s,transform .15s;
+}
+
+.load-more-wrap {
+  display:flex;
+  justify-content:center;
+  margin-top:32px;
+}
+
+.card-icon-btn:hover {
+  border-color:var(--gold);
+  color:var(--gold);
+  background:rgba(214,181,109,.12);
+  transform:translateY(-1px);
+}
+
+.card-icon-btn.fav-btn.active {
+  border-color:var(--gold);
+  background:rgba(214,181,109,.18);
+  color:var(--gold);
+}
+
+.card-icon-btn svg {
+  width:15px;
+  height:15px;
+  display:block;
 }
 
 .empty {
@@ -514,7 +911,7 @@ header {
   font-size:13px;
 }
 
-/* HISTORY */
+/* HISTORY & FAVORITES */
 
 .history-tools {
   display:flex;
@@ -530,36 +927,45 @@ header {
 }
 
 .clear-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   background:transparent;
-  border:1px solid #59443a;
-  color:#dca18d;
+  border:1px solid var(--danger-border);
+  color:var(--danger-text);
   border-radius:25px;
   padding:10px 17px;
   font-size:10px;
   font-weight:800;
+  line-height:1.2;
+  text-align:center;
+  white-space:nowrap;
+  flex-shrink:0;
 }
 
 .history-remove {
+  display:inline-flex;
+  align-items:center;
   background:transparent;
   border:0;
-  color:#dca18d;
+  color:var(--danger-text);
   font-size:10px;
+  line-height:1.2;
   margin-top:9px;
   padding:5px 0;
 }
 
 .history-card .play {
-  display:flex;
+  display:inline-flex;
   width:fit-content;
+  max-width:100%;
 }
 
 /* ABOUT */
 
 .about-panel {
-  background:
-    radial-gradient(ellipse at 90% 0%,rgba(214,181,109,.12),transparent 50%),
-    #151515;
-  border:1px solid #302a20;
+  background:var(--about-bg);
+  border:1px solid var(--border);
   border-radius:18px;
   padding:clamp(25px,5vw,55px);
   max-width:850px;
@@ -573,7 +979,7 @@ header {
 }
 
 .about-panel p {
-  color:#bbb;
+  color:var(--text-soft);
   font-size:13px;
   line-height:2;
 }
@@ -581,10 +987,186 @@ header {
 .about-details {
   margin-top:25px;
   padding-top:20px;
-  border-top:1px solid #333;
+  border-top:1px solid var(--border);
   color:var(--gold-light);
   font-size:12px;
   font-weight:700;
+}
+
+.settings-panel {
+  margin-top:24px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:clamp(22px,4vw,38px);
+  max-width:850px;
+}
+
+.settings-panel h3 {
+  font-family:var(--heading);
+  color:var(--gold);
+  font-size:30px;
+  margin-bottom:8px;
+}
+
+.settings-panel p {
+  color:var(--text-soft);
+  font-size:12px;
+  line-height:1.8;
+}
+
+.settings-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+/* SMART PWA INSTALL BANNER & MODAL */
+
+.pwa-banner {
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  width:min(92vw,540px);
+  z-index:260;
+  background:var(--banner-bg);
+  border:1px solid rgba(214,181,109,.5);
+  border-radius:16px;
+  padding:14px 16px;
+  box-shadow:0 18px 45px rgba(0,0,0,.35);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  animation:viewFade .25s ease;
+}
+
+.pwa-banner-brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+
+.pwa-banner-brand img {
+  width:42px;
+  height:42px;
+  border-radius:10px;
+  object-fit:contain;
+  background:#090909;
+  border:1px solid #2f2a1f;
+  flex-shrink:0;
+}
+
+.pwa-banner-title {
+  font-size:13px;
+  font-weight:800;
+  color:var(--gold-light);
+  line-height:1.3;
+}
+
+.pwa-banner-sub {
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.4;
+  margin-top:2px;
+}
+
+.pwa-banner-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+
+.pwa-banner-install {
+  padding:9px 14px;
+  font-size:10px;
+  white-space:nowrap;
+}
+
+.pwa-banner-dismiss {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--muted);
+  border-radius:30px;
+  padding:8px 12px;
+  font-size:10px;
+  font-weight:700;
+  line-height:1.2;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.pwa-banner-dismiss:hover {
+  color:var(--white);
+  border-color:var(--gold);
+}
+
+.modal-backdrop {
+  position:fixed;
+  inset:0;
+  z-index:320;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(6px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal-card {
+  width:min(94vw,430px);
+  background:var(--surface);
+  border:1px solid rgba(214,181,109,.5);
+  border-radius:18px;
+  padding:26px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+.modal-card h3 {
+  font-family:var(--heading);
+  font-size:30px;
+  color:var(--gold-light);
+  margin-bottom:10px;
+}
+
+.modal-card p,
+.modal-card li {
+  color:var(--text-soft);
+  font-size:12px;
+  line-height:1.8;
+}
+
+.modal-card ol {
+  margin:12px 0 20px 18px;
+}
+
+.modal-card strong {
+  color:var(--gold);
+}
+
+.toast {
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  z-index:350;
+  background:var(--surface);
+  color:var(--gold-light);
+  border:1px solid rgba(214,181,109,.6);
+  border-radius:30px;
+  padding:10px 18px;
+  font-size:12px;
+  font-weight:700;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  max-width:90vw;
+  text-align:center;
 }
 
 /* FOOTER */
@@ -592,7 +1174,7 @@ header {
 footer {
   text-align:center;
   padding:35px 7% 45px;
-  color:#777;
+  color:var(--muted);
   border-top:1px solid var(--border);
   font-size:11px;
   line-height:2;
@@ -600,7 +1182,7 @@ footer {
 }
 
 footer strong {
-  color:white;
+  color:var(--white);
   letter-spacing:2px;
 }
 
@@ -610,10 +1192,10 @@ footer strong {
 
 /* TABLET */
 
-@media(max-width:800px) {
+@media(max-width:920px) {
   header { padding:11px 5%; }
-  .desktop-nav { gap:3px; }
-  .nav-link { padding:9px 10px; font-size:10px; }
+  .desktop-nav { gap:2px; }
+  .nav-link { padding:8px 9px; font-size:11px; }
 
   .home-content,
   .page-content {
@@ -624,7 +1206,7 @@ footer strong {
 
 /* MOBILE */
 
-@media(max-width:650px) {
+@media(max-width:680px) {
   body {
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
@@ -641,15 +1223,17 @@ footer strong {
   .brand-name { font-size:13px; letter-spacing:1.5px; }
   .brand-name span { font-size:9px; letter-spacing:3px; }
   .desktop-nav { display:none; }
+  .theme-toggle span { display:none; }
+  .theme-toggle { padding:8px 10px; }
 
   .hero {
-    min-height:450px;
-    padding:65px 7%;
+    min-height:440px;
+    padding:60px 7%;
   }
 
   .hero h1 {
-    font-size:61px;
-    margin:22px 0;
+    font-size:58px;
+    margin:20px 0;
   }
 
   .hero .quote {
@@ -671,7 +1255,7 @@ footer strong {
   }
 
   .home-content {
-    padding-top:28px;
+    padding-top:26px;
     padding-bottom:12px;
   }
 
@@ -693,6 +1277,13 @@ footer strong {
   .page-heading { margin-bottom:28px; }
   .page-heading h1 { font-size:46px; }
   .page-heading p { font-size:11px; }
+
+  .search-toolbar { gap:10px; }
+  .search,
+  .sort-select {
+    width:100%;
+    max-width:100%;
+  }
 
   .filters {
     flex-wrap:nowrap;
@@ -719,6 +1310,53 @@ footer strong {
     margin-top:11px;
   }
 
+  .card-actions {
+    flex-direction:column;
+    align-items:stretch;
+    margin-top:10px;
+    gap:7px;
+  }
+
+  .card-actions .play {
+    margin-top:0;
+    width:100%;
+    flex:none;
+    padding:9px 10px;
+    font-size:9.5px;
+    white-space:normal;
+  }
+
+  .card-icon-actions {
+    width:100%;
+    justify-content:flex-end;
+    gap:6px;
+  }
+
+  .card-icon-btn {
+    width:30px;
+    height:30px;
+  }
+
+  .card-icon-btn svg {
+    width:14px;
+    height:14px;
+  }
+
+  .pwa-banner {
+    bottom:calc(80px + env(safe-area-inset-bottom));
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+
+  .pwa-banner-actions {
+    justify-content:flex-end;
+  }
+
+  .toast {
+    bottom:calc(84px + env(safe-area-inset-bottom));
+  }
+
   .history-tools { align-items:center; }
   .clear-button { padding:9px 12px; font-size:9px; }
   .about-panel { padding:25px 20px; }
@@ -737,8 +1375,8 @@ footer strong {
     padding:7px 2% calc(7px + env(safe-area-inset-bottom));
     justify-content:space-around;
     align-items:center;
-    background:rgba(12,12,12,.98);
-    border-top:1px solid #302b22;
+    background:var(--bottom-nav-bg);
+    border-top:1px solid var(--border);
     z-index:200;
   }
 
@@ -750,16 +1388,22 @@ footer strong {
     gap:3px;
     background:transparent;
     border:0;
-    color:#888;
-    font-size:9px;
+    color:var(--muted);
+    font-size:8.5px;
     font-weight:700;
-    min-width:53px;
+    line-height:1.2;
+    text-align:center;
+    min-width:44px;
     padding:5px 2px;
     transition:color .2s;
   }
 
+  .bottom-nav button span:last-child {
+    white-space:nowrap;
+  }
+
   .bottom-nav .nav-icon {
-    font-size:19px;
+    font-size:18px;
     line-height:1.2;
   }
 
@@ -768,8 +1412,9 @@ footer strong {
 
 @media(max-width:360px) {
   .grid { grid-template-columns:1fr; }
-  .hero h1 { font-size:51px; }
-  .bottom-nav button { min-width:47px; font-size:8px; }
+  .hero h1 { font-size:50px; }
+  .hero-actions button { white-space:normal; }
+  .bottom-nav button { min-width:40px; font-size:8px; }
 }
 
 /* ACCESSIBILITY AND REDUCED MOTION */
@@ -799,14 +1444,30 @@ footer strong {
     </div>
   </a>
 
-  <nav class="desktop-nav" aria-label="Main navigation">
-    <button class="nav-link active" data-view="home">Home</button>
-    <button class="nav-link" data-view="videos">Videos</button>
-    <button class="nav-link" data-view="playlists">Playlists</button>
-    <button class="nav-link" data-view="history">History</button>
-    <button class="nav-link" data-view="about">About</button>
-  </nav>
+  <div class="header-right">
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <button class="nav-link active" data-view="home">Home</button>
+      <button class="nav-link" data-view="videos">Videos</button>
+      <button class="nav-link" data-view="playlists">Playlists</button>
+      <button class="nav-link" data-view="events">Events</button>
+      <button class="nav-link" data-view="favorites">Favorites</button>
+      <button class="nav-link" data-view="history">History</button>
+      <button class="nav-link" data-view="about">About</button>
+    </nav>
+
+    <button type="button" class="theme-toggle" id="themeToggleBtn" aria-label="Switch theme">
+      <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      <span id="themeToggleLabel">Light Mode</span>
+    </button>
+  </div>
 </header>
+
+<div class="offline-banner" id="offlineBanner" role="status" hidden>
+  You are currently offline. Showing previously loaded messages, saved favorites, and local history.
+</div>
 
 <main>
 
@@ -849,18 +1510,106 @@ footer strong {
         </button>
       </div>
 
+      <div class="hero-utility-row">
+        <button type="button" class="utility-button" id="installAppBtn" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+          </svg>
+          <span>Install App</span>
+        </button>
+
+        <button type="button" class="utility-button" data-view="events">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+          <span>Church Events</span>
+        </button>
+
+        <button type="button" class="utility-button" id="shareWebsiteBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+          </svg>
+          <span>Share Website</span>
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <div class="home-content">
+  <!-- CONTINUE WATCHING (SHOWN WHEN HISTORY HAS ITEMS) -->
+  <div class="home-content" id="homeContinueSection" hidden>
+    <div class="home-section-heading">
+      <div>
+        <div class="eyebrow">PICK UP WHERE YOU LEFT OFF</div>
+        <h2>Continue Watching</h2>
+      </div>
 
+      <div class="heading-actions">
+        <button class="view-all" type="button" id="homeClearHistoryBtn">
+          CLEAR
+        </button>
+        <button class="view-all" type="button" onclick="showView('history')">
+          VIEW ALL →
+        </button>
+      </div>
+    </div>
+
+    <div class="horizontal-row" id="homeContinueRow"></div>
+  </div>
+
+  <!-- DAILY BIBLE VERSE -->
+  <div class="home-content" id="dailyVerseSection">
+    <div class="home-section-heading">
+      <div>
+        <div class="eyebrow">DAILY WORD</div>
+        <h2>Daily Bible Verse</h2>
+      </div>
+    </div>
+
+    <article class="verse-panel">
+      <p class="verse-quote" id="dailyVerseText"></p>
+      <div class="verse-ref" id="dailyVerseRef"></div>
+      <p class="verse-note" id="dailyVerseNote"></p>
+      <div class="verse-actions">
+        <button type="button" class="gold-button" id="copyVerseBtn">Copy Verse</button>
+        <button type="button" class="outline-button" id="shareVerseBtn">Share Verse</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- RECENTLY ADDED (LATEST VIDEOS & PLAYLISTS) -->
+  <div class="home-content">
+    <div class="home-section-heading">
+      <div>
+        <div class="eyebrow">FRESH UPLOADS</div>
+        <h2>Recently Added</h2>
+      </div>
+
+      <button class="view-all" type="button" onclick="showView('videos')">
+        BROWSE LIBRARY →
+      </button>
+    </div>
+
+    <div class="horizontal-row" id="homeRecentRow">
+      <p class="empty">Loading recent additions...</p>
+    </div>
+
+    <p class="row-hint">← Swipe to explore recent videos &amp; playlists →</p>
+  </div>
+
+  <!-- LATEST MESSAGES -->
+  <div class="home-content">
     <div class="home-section-heading">
       <div>
         <div class="eyebrow">WATCH AND GROW</div>
         <h2>Latest Messages</h2>
       </div>
 
-      <button class="view-all" onclick="showView('videos')">
+      <button class="view-all" type="button" onclick="showView('videos')">
         VIEW ALL →
       </button>
     </div>
@@ -870,18 +1619,17 @@ footer strong {
     </div>
 
     <p class="row-hint">← Swipe to explore more videos →</p>
-
   </div>
 
+  <!-- FEATURED PLAYLISTS -->
   <div class="home-content">
-
     <div class="home-section-heading">
       <div>
         <div class="eyebrow">EXPLORE OUR COLLECTIONS</div>
         <h2>Featured Playlists</h2>
       </div>
 
-      <button class="view-all" onclick="showView('playlists')">
+      <button class="view-all" type="button" onclick="showView('playlists')">
         VIEW ALL →
       </button>
     </div>
@@ -891,7 +1639,23 @@ footer strong {
     </div>
 
     <p class="row-hint">← Swipe to explore more playlists →</p>
+  </div>
 
+  <!-- UPCOMING CHURCH EVENTS PREVIEW -->
+  <div class="home-content">
+    <div class="home-section-heading">
+      <div>
+        <div class="eyebrow">FELLOWSHIP &amp; SERVICES</div>
+        <h2>Upcoming Gatherings</h2>
+      </div>
+
+      <button class="view-all" type="button" onclick="showView('events')">
+        FULL CALENDAR →
+      </button>
+    </div>
+
+    <div class="events-grid" id="homeEventsGrid"></div>
+    <p class="empty" id="homeNoEvents" hidden>No upcoming events scheduled right now.</p>
   </div>
 
 </section>
@@ -905,26 +1669,41 @@ footer strong {
     <div class="page-heading">
       <div class="eyebrow">SHALOM TABERNACLE</div>
       <h1>Latest <span>Messages.</span></h1>
-      <p>Watch our messages, teachings and services.</p>
+      <p>Search by title, preacher, description or category, and sort messages below.</p>
     </div>
 
-    <input
-      class="search"
-      id="search"
-      type="search"
-      placeholder="Search for a video..."
-      aria-label="Search videos"
-      oninput="filterVideos()"
-    >
+    <div class="search-toolbar">
+      <input
+        class="search"
+        id="search"
+        type="search"
+        placeholder="Search by title, preacher, description or category..."
+        aria-label="Search videos"
+        oninput="filterVideos()"
+      >
+
+      <select class="sort-select" id="videoSort" aria-label="Sort videos" onchange="filterVideos()">
+        <option value="default">Sort: Default Order</option>
+        <option value="newest">Sort: Newest First</option>
+        <option value="oldest">Sort: Oldest First</option>
+        <option value="title">Sort: Title (A–Z)</option>
+      </select>
+    </div>
 
     <div class="filters" id="filters">
-      <button class="filter active">All</button>
+      <button class="filter active" type="button">All</button>
     </div>
 
     <div class="grid" id="videoGrid"></div>
 
+    <div class="load-more-wrap" id="loadMoreVideosWrap" hidden>
+      <button type="button" class="outline-button" id="loadMoreVideosBtn">
+        Load More Messages
+      </button>
+    </div>
+
     <p class="empty" id="noVideos" hidden>
-      No videos found. Try another search.
+      No videos found. Try another search or category.
     </p>
 
   </div>
@@ -943,10 +1722,99 @@ footer strong {
       <p>Find collections of messages and worship videos.</p>
     </div>
 
+    <div class="search-toolbar">
+      <input
+        class="search"
+        id="playlistSearch"
+        type="search"
+        placeholder="Search playlists by title, preacher, description or category..."
+        aria-label="Search playlists"
+        oninput="filterPlaylists()"
+      >
+
+      <select class="sort-select" id="playlistSort" aria-label="Sort playlists" onchange="filterPlaylists()">
+        <option value="default">Sort: Default Order</option>
+        <option value="newest">Sort: Newest First</option>
+        <option value="oldest">Sort: Oldest First</option>
+        <option value="title">Sort: Title (A–Z)</option>
+      </select>
+    </div>
+
+    <div class="filters" id="playlistFilters" hidden></div>
+
     <div class="grid" id="playlistGrid"></div>
+
+    <div class="load-more-wrap" id="loadMorePlaylistsWrap" hidden>
+      <button type="button" class="outline-button" id="loadMorePlaylistsBtn">
+        Load More Playlists
+      </button>
+    </div>
 
     <p class="empty" id="noPlaylists">
       Playlists will appear here once added.
+    </p>
+
+  </div>
+
+</section>
+
+<!-- CHURCH EVENTS -->
+
+<section class="view" id="events">
+
+  <div class="page-content">
+
+    <div class="page-heading">
+      <div class="eyebrow">CHURCH CALENDAR</div>
+      <h1>Upcoming <span>Events.</span></h1>
+      <p>Join our Sunday services, Wednesday fellowship, and special gatherings in Visakhapatnam.</p>
+    </div>
+
+    <div class="filters" id="eventFilters">
+      <button class="filter active" type="button" data-event-filter="All">All Events</button>
+      <button class="filter" type="button" data-event-filter="Sunday Service">Sunday Services</button>
+      <button class="filter" type="button" data-event-filter="Wednesday Service">Wednesday Services</button>
+      <button class="filter" type="button" data-event-filter="Special Event">Special Events</button>
+    </div>
+
+    <div class="events-grid" id="eventsGrid"></div>
+
+    <p class="empty" id="noEvents" hidden>
+      There are no upcoming events in this category right now. Please check back soon.
+    </p>
+
+  </div>
+
+</section>
+
+<!-- FAVORITES -->
+
+<section class="view" id="favorites">
+
+  <div class="page-content">
+
+    <div class="page-heading">
+      <div class="eyebrow">SAVED MESSAGES &amp; PLAYLISTS</div>
+      <h1>Your <span>Favorites.</span></h1>
+      <p>Messages and playlists saved on this device.</p>
+    </div>
+
+    <div class="history-tools">
+
+      <span class="history-count" id="favoritesCount">
+        No saved favorites yet
+      </span>
+
+      <button class="clear-button" id="clearFavorites" type="button" hidden>
+        CLEAR FAVORITES
+      </button>
+
+    </div>
+
+    <div class="grid" id="favoritesGrid"></div>
+
+    <p class="empty" id="emptyFavorites">
+      You haven't saved any favorites yet. Tap the heart icon on any video or playlist.
     </p>
 
   </div>
@@ -1020,6 +1888,28 @@ footer strong {
 
     </div>
 
+    <div class="settings-panel">
+      <h3>Display &amp; App Preferences</h3>
+      <p>
+        Customize your reading theme, install the Shalom Tabernacle app for offline browsing, view upcoming services, or share this library with others.
+      </p>
+
+      <div class="settings-actions">
+        <button type="button" class="gold-button" id="aboutThemeBtn">
+          Switch to Light Mode
+        </button>
+        <button type="button" class="outline-button" id="aboutInstallBtn" hidden>
+          Install App
+        </button>
+        <button type="button" class="outline-button" data-view="events">
+          Church Events
+        </button>
+        <button type="button" class="outline-button" id="aboutShareWebsiteBtn">
+          Share Website
+        </button>
+      </div>
+    </div>
+
   </div>
 
 </section>
@@ -1055,6 +1945,11 @@ footer strong {
     <span>Playlists</span>
   </button>
 
+  <button data-view="favorites">
+    <span class="nav-icon">♥</span>
+    <span>Favorites</span>
+  </button>
+
   <button data-view="history">
     <span class="nav-icon">◷</span>
     <span>History</span>
@@ -1067,8 +1962,42 @@ footer strong {
 
 </nav>
 
+<!-- SMART PWA INSTALL PROMPT -->
+
+<aside class="pwa-banner" id="pwaInstallBanner" hidden aria-label="Install Shalom Tabernacle app">
+  <div class="pwa-banner-brand">
+    <img src="./app-icon-192.png" alt="Shalom Tabernacle App Icon" width="42" height="42">
+    <div>
+      <div class="pwa-banner-title">Install Shalom Tabernacle</div>
+      <div class="pwa-banner-sub" id="pwaBannerSubtitle">
+        Add to your home screen for quick access to messages &amp; playlists.
+      </div>
+    </div>
+  </div>
+  <div class="pwa-banner-actions">
+    <button type="button" class="pwa-banner-dismiss" id="pwaBannerDismissBtn">Not now</button>
+    <button type="button" class="gold-button pwa-banner-install" id="pwaBannerInstallBtn">Install App</button>
+  </div>
+</aside>
+
+<!-- INSTALL GUIDE MODAL -->
+
+<div class="modal-backdrop" id="installGuideModal" hidden role="dialog" aria-modal="true" aria-labelledby="installGuideTitle">
+  <div class="modal-card">
+    <h3 id="installGuideTitle">Install Shalom Tabernacle</h3>
+    <div id="installGuideBody"></div>
+    <button type="button" class="gold-button" id="closeInstallGuideBtn" style="width:100%;">
+      Got It
+    </button>
+  </div>
+</div>
+
+<!-- TOAST CONFIRMATION -->
+
+<div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
+
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=4"></script>
+<script src="./app.js?v=7"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 
@@ -1081,6 +2010,8 @@ function showView(viewName) {
     "home",
     "videos",
     "playlists",
+    "events",
+    "favorites",
     "history",
     "about"
   ];
@@ -1112,13 +2043,11 @@ function showView(viewName) {
   });
 }
 
-document.querySelectorAll("[data-view]").forEach(button => {
-
-  button.addEventListener("click", event => {
-    event.preventDefault();
-    showView(button.dataset.view);
-  });
-
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-view]");
+  if (!button) return;
+  event.preventDefault();
+  showView(button.dataset.view);
 });
 
 /* WATCH HISTORY */
@@ -1186,6 +2115,9 @@ function saveHistory(history) {
   }
 
   renderHistory();
+  if (typeof renderContinueWatching === "function") {
+    renderContinueWatching();
+  }
 }
 
 function addToHistory(video) {
@@ -1208,6 +2140,18 @@ function addToHistory(video) {
   saveHistory(history);
 }
 
+function extractHistoryVideoId(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === "youtu.be") {
+      return parsed.pathname.replace("/", "").trim();
+    }
+    return (parsed.searchParams.get("v") || "").trim();
+  } catch {
+    return "";
+  }
+}
+
 function renderHistory() {
 
   const grid = document.getElementById("historyGrid");
@@ -1227,19 +2171,33 @@ function renderHistory() {
 
     const title = historyEscape(item.title);
     const url = historyEscape(safeURL);
-    const thumbnail = historyEscape(item.thumbnail || "./logo.png");
+    const videoId = extractHistoryVideoId(safeURL);
+    const validId = /^[A-Za-z0-9_-]{11}$/.test(videoId);
+    const rawThumb = String(item.thumbnail || "");
+    const resolvedThumb =
+      validId && (!rawThumb || rawThumb.includes("ytimg.com") || rawThumb.includes("youtube.com"))
+        ? (typeof getPreferredThumbnail === "function"
+            ? getPreferredThumbnail(videoId)
+            : "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg")
+        : (rawThumb || "./logo.png");
+    const thumbnail = historyEscape(resolvedThumb);
 
     return `
       <article class="card history-card">
 
-        <img
-          class="thumb"
-          src="${thumbnail}"
-          alt="${title}"
-          loading="lazy"
-          decoding="async"
-          onerror="this.onerror=null;this.src='./logo.png'"
-        >
+        <div class="thumb-wrap">
+          <img
+            class="thumb"
+            width="480"
+            height="270"
+            src="${thumbnail}"
+            alt="${title}"
+            loading="lazy"
+            decoding="async"
+            data-video-id="${historyEscape(validId ? videoId : "")}"
+            data-fallback="0"
+          >
+        </div>
 
         <div class="card-info">
 
@@ -1283,36 +2241,13 @@ function renderHistory() {
   if (clearButton) {
     clearButton.hidden = history.length === 0;
   }
+
+  if (typeof markAlreadyLoadedThumbs === "function") {
+    markAlreadyLoadedThumbs();
+  }
 }
 
-/* VIDEO PAGE HISTORY */
-
-document.getElementById("videoGrid").addEventListener(
-  "click",
-  function(event) {
-
-    const link = event.target.closest("a.play");
-
-    if (!link) return;
-
-    const card = link.closest(".card");
-
-    if (!card) return;
-
-    const title =
-      card.querySelector("h3")?.textContent?.trim() ||
-      "Shalom Tabernacle Video";
-
-    const image = card.querySelector("img.thumb");
-
-    addToHistory({
-      title:title,
-      thumbnail:image?.src || "./logo.png",
-      url:link.href
-    });
-
-  }
-);
+/* VIDEO HISTORY TRACKING IS DELEGATED IN app.js */
 
 /* REMOVE ONE HISTORY ITEM */
 

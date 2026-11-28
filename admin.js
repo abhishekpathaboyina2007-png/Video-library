@@ -1,4 +1,3 @@
-
 const API_URL = "https://script.google.com/macros/s/AKfycby_Lxcf0XbDVZF6hqKcl42YB8AelRc8EoFENbz1D61LaJ9UxZHeqiu7jNtJosgtx05/exec";
 
 let adminToken = sessionStorage.getItem("adminToken");
@@ -60,7 +59,7 @@ document.getElementById("videoForm").addEventListener("submit", async event => {
   const record = {
     Title: document.getElementById("title").value.trim(),
     YouTube_URL: document.getElementById("youtubeUrl").value.trim(),
-    Category: document.getElementById("category").value.trim(),
+    Category: document.getElementById("category")?.value.trim() || "Message",
     Description: document.getElementById("description").value.trim(),
     Featured: false,
     Visible: true
@@ -78,6 +77,38 @@ document.getElementById("videoForm").addEventListener("submit", async event => {
       document.getElementById("videoForm").reset();
     } else {
       statusText.textContent = result.message || "Could not add video.";
+    }
+  } catch (error) {
+    statusText.textContent =
+      "Request failed. We may need to fix the API connection.";
+  }
+});
+
+document.getElementById("playlistForm")?.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  statusText.textContent = "Adding playlist...";
+
+  const record = {
+    Title: document.getElementById("playlistTitle").value.trim(),
+    YouTube_URL: document.getElementById("playlistUrl").value.trim(),
+    Description: document.getElementById("playlistDescription").value.trim(),
+    Thumbnail_URL: document.getElementById("playlistThumbnail").value.trim(),
+    Visible: true
+  };
+
+  try {
+    const result = await postData({
+      action: "addPlaylist",
+      token: adminToken,
+      record: JSON.stringify(record)
+    });
+
+    if (result.success) {
+      statusText.textContent = "Playlist added successfully!";
+      document.getElementById("playlistForm").reset();
+    } else {
+      statusText.textContent = result.message || "Could not add playlist.";
     }
   } catch (error) {
     statusText.textContent =

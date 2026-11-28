@@ -1,15 +1,24 @@
-
-const CACHE_NAME = "shalom-tabernacle-v3";
+const CACHE_NAME = "shalom-tabernacle-v5";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./app.js",
   "./manifest.json",
-  "./logo.png"
+  "./logo.png",
   "./app-icon-192.png",
-"./app-icon-512.png"
+  "./app-icon-512.png"
 ];
+
+const EXCLUDED_PATHS = [
+  "/admin",
+  "/admin.html",
+  "/admin.js"
+];
+
+function isExcludedPath(pathname) {
+  return EXCLUDED_PATHS.some((excluded) => pathname === excluded || pathname.startsWith(`${excluded}/`));
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -40,12 +49,15 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
+  // Never cache external APIs (e.g., Google Apps Script) or private admin pages.
   if (url.origin !== self.location.origin) return;
+  if (isExcludedPath(url.pathname)) return;
 
+  // Network-first for HTML/JS/manifest so updates arrive quickly while remaining offline-ready.
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type === "basic") {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, copy);
@@ -53,6 +65,14 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(async () => {
+        const cached = await caches.match(event.request, { ignoreSearch: true });
+        if (cached) return cached;
+
+        if (event.request.mode === "navigate") {
+          return caches.match("./index.html");
+        }
+        return Response.error();
+      })
   );
 });
