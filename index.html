@@ -9,15 +9,23 @@
 <meta name="description" content="Watch messages and explore playlists from Shalom Tabernacle, Visakhapatnam.">
 <meta name="theme-color" content="#090909">
 
+<!-- CUSTOM TYPOGRAPHY -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --bg:#090909;
-  --surface:#171717;
-  --surface2:#222;
+  --surface:#141414;
+  --surface2:#1d1d1d;
   --gold:#D6B56D;
+  --gold-light:#F0D69E;
   --white:#fff;
   --muted:#999;
   --border:#292929;
+  --heading:'Cormorant Garamond',Georgia,serif;
+  --body:'Manrope',Arial,sans-serif;
 }
 
 * {
@@ -28,39 +36,56 @@
 
 html {
   scroll-behavior:smooth;
-  scroll-padding-top:90px;
 }
 
 body {
   background:var(--bg);
   color:var(--white);
-  font-family:Arial,sans-serif;
-  line-height:1.6;
+  font-family:var(--body);
+  line-height:1.65;
+  min-height:100vh;
 }
 
-a { color:inherit; }
+button,input {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+}
+
+a {
+  color:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
+
+[hidden] {
+  display:none !important;
+}
 
 /* HEADER */
 
 header {
-  min-height:76px;
-  padding:12px 6%;
+  min-height:78px;
+  padding:12px 7%;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:20px;
-  background:rgba(9,9,9,.96);
+  gap:25px;
+  background:rgba(9,9,9,.94);
   border-bottom:1px solid var(--border);
   position:sticky;
   top:0;
   z-index:100;
-  backdrop-filter:blur(15px);
+  backdrop-filter:blur(18px);
 }
 
 .brand {
   display:flex;
   align-items:center;
   gap:12px;
+  text-decoration:none;
+  flex-shrink:0;
 }
 
 .brand img {
@@ -69,146 +94,332 @@ header {
   object-fit:contain;
 }
 
-.logo {
-  font-size:19px;
+.brand-name {
+  font-family:var(--body);
+  font-size:15px;
   font-weight:800;
-  letter-spacing:1px;
+  letter-spacing:2px;
+  line-height:1.3;
 }
 
-.logo span { color:var(--gold); }
+.brand-name span {
+  display:block;
+  color:var(--gold);
+  font-size:11px;
+  letter-spacing:4px;
+  margin-top:3px;
+}
 
-nav {
+.desktop-nav {
   display:flex;
   align-items:center;
-  gap:30px;
+  gap:9px;
 }
 
-nav a {
-  color:#ccc;
-  text-decoration:none;
-  font-size:14px;
-  transition:.2s;
+.nav-link {
+  background:transparent;
+  border:1px solid transparent;
+  color:#aaa;
+  padding:10px 15px;
+  border-radius:30px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.3px;
+  transition:.25s;
 }
 
-nav a:hover { color:var(--gold); }
-
-.header-search {
+.nav-link:hover {
   color:var(--gold);
-  font-size:20px;
-  text-decoration:none;
+  border-color:#403722;
 }
 
-/* HERO */
+.nav-link.active {
+  color:var(--gold);
+  background:rgba(214,181,109,.09);
+  border-color:rgba(214,181,109,.3);
+}
+
+/* GENERAL BUTTONS */
+
+.gold-button {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:9px;
+  padding:13px 23px;
+  border:1px solid var(--gold);
+  border-radius:30px;
+  background:linear-gradient(135deg,#F0D69E,#C39B4D);
+  color:#17120A;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.1px;
+  text-decoration:none;
+  box-shadow:0 5px 22px rgba(214,181,109,.13);
+  transition:transform .25s,box-shadow .25s;
+}
+
+.gold-button:hover {
+  transform:translateY(-3px);
+  box-shadow:0 8px 28px rgba(214,181,109,.25);
+}
+
+.outline-button {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  padding:12px 21px;
+  border:1px solid rgba(214,181,109,.55);
+  border-radius:30px;
+  background:transparent;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.7px;
+  text-decoration:none;
+  transition:.25s;
+}
+
+.outline-button:hover {
+  background:rgba(214,181,109,.1);
+  border-color:var(--gold);
+}
+
+/* VIEW SYSTEM */
+
+.view {
+  display:none;
+  min-height:65vh;
+  animation:viewFade .35s ease;
+}
+
+.view.active {
+  display:block;
+}
+
+@keyframes viewFade {
+  from {
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* HOME HERO */
 
 .hero {
-  min-height:460px;
-  padding:85px 8%;
+  min-height:510px;
+  padding:85px 9%;
   display:flex;
   flex-direction:column;
   justify-content:center;
   position:relative;
   overflow:hidden;
   background:
-    radial-gradient(ellipse at 85% 30%,rgba(214,181,109,.13),transparent 35%),
-    radial-gradient(ellipse at 5% 100%,rgba(214,181,109,.07),transparent 35%),
+    radial-gradient(ellipse at 85% 30%,rgba(214,181,109,.15),transparent 36%),
+    radial-gradient(ellipse at 5% 100%,rgba(214,181,109,.07),transparent 38%),
     #090909;
+}
+
+.hero::before {
+  content:"";
+  position:absolute;
+  width:360px;
+  height:360px;
+  right:-130px;
+  top:40px;
+  border:1px solid rgba(214,181,109,.13);
+  border-radius:50%;
+  box-shadow:0 0 100px rgba(214,181,109,.07);
+  pointer-events:none;
 }
 
 .hero::after {
   content:"";
   position:absolute;
-  width:280px;
-  height:280px;
-  right:-100px;
-  top:60px;
+  width:220px;
+  height:220px;
+  right:-60px;
+  top:110px;
+  border:1px solid rgba(214,181,109,.09);
   border-radius:50%;
-  border:1px solid rgba(214,181,109,.12);
-  box-shadow:0 0 100px rgba(214,181,109,.08);
   pointer-events:none;
 }
 
-.tag {
+.hero-content {
+  position:relative;
+  z-index:2;
+  max-width:850px;
+}
+
+.eyebrow {
   color:var(--gold);
-  font-size:11px;
+  font-size:10px;
+  font-weight:800;
   letter-spacing:4px;
-  font-weight:bold;
+  text-transform:uppercase;
 }
 
 .hero h1 {
-  font-size:clamp(40px,7vw,76px);
-  line-height:1.08;
-  margin:22px 0;
-  max-width:850px;
+  font-family:var(--heading);
+  font-size:clamp(58px,8vw,100px);
+  line-height:.95;
+  font-weight:700;
+  margin:25px 0;
   letter-spacing:-2px;
 }
 
-.hero h1 span { color:var(--gold); }
+.hero h1 span {
+  display:block;
+  color:var(--gold);
+  font-style:italic;
+}
 
 .hero .quote {
-  color:#bbb;
-  max-width:720px;
-  font-size:14px;
-  line-height:1.9;
+  color:#aaa;
+  max-width:700px;
+  font-size:12px;
+  line-height:2;
 }
 
 .attribution {
   margin-top:20px;
-  font-weight:bold;
-  font-size:14px;
+  color:var(--gold-light);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:1px;
 }
 
 .attribution span {
   display:block;
+  color:#888;
+  font-weight:500;
+  letter-spacing:0;
+  margin-top:3px;
+}
+
+.hero-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:30px;
+}
+
+/* HOME QUICK LINKS */
+
+.home-links {
+  padding:35px 7% 55px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:17px;
+}
+
+.quick-card {
+  background:linear-gradient(145deg,#1b1b1b,#111);
+  border:1px solid #292929;
+  border-radius:14px;
+  padding:23px;
+  text-align:left;
+  color:white;
+  transition:.25s;
+}
+
+.quick-card:hover {
+  border-color:rgba(214,181,109,.5);
+  transform:translateY(-4px);
+}
+
+.quick-icon {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:43px;
+  height:43px;
+  border-radius:12px;
+  background:rgba(214,181,109,.1);
+  color:var(--gold);
+  font-size:20px;
+  margin-bottom:14px;
+}
+
+.quick-card h3 {
+  font-family:var(--heading);
+  font-size:25px;
+  font-weight:700;
+}
+
+.quick-card p {
   color:var(--muted);
-  font-weight:normal;
+  font-size:11px;
+  margin-top:5px;
 }
 
-.hero-button {
-  display:inline-block;
-  margin-top:25px;
-  width:fit-content;
-  padding:12px 22px;
-  background:var(--gold);
-  color:#090909;
-  border-radius:5px;
-  text-decoration:none;
+.quick-card .quick-arrow {
+  display:block;
+  color:var(--gold);
+  margin-top:13px;
   font-size:12px;
-  font-weight:bold;
-  letter-spacing:1px;
-  transition:.2s;
+  font-weight:800;
 }
 
-.hero-button:hover {
-  background:#efd49a;
-  transform:translateY(-2px);
+/* PAGE CONTENT */
+
+.page-content {
+  padding:55px 7% 75px;
+  max-width:1500px;
+  margin:auto;
 }
 
-/* CONTENT */
-
-.content {
-  padding:48px 6%;
-  scroll-margin-top:85px;
+.page-heading {
+  margin-bottom:35px;
 }
+
+.page-heading .eyebrow {
+  margin-bottom:8px;
+}
+
+.page-heading h1 {
+  font-family:var(--heading);
+  font-size:clamp(40px,5vw,60px);
+  line-height:1.1;
+  font-weight:700;
+}
+
+.page-heading h1 span {
+  color:var(--gold);
+}
+
+.page-heading p {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:9px;
+}
+
+/* SECTION HEAD */
 
 .section-head {
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:12px;
-  margin-bottom:23px;
+  margin-bottom:22px;
 }
 
 .section-head h2 {
-  font-size:23px;
-  font-weight:750;
-  letter-spacing:-.4px;
+  font-family:var(--heading);
+  font-size:30px;
+  font-weight:700;
 }
 
 .section-head h2::before {
   content:"";
   display:inline-block;
-  height:22px;
   width:3px;
+  height:23px;
   background:var(--gold);
   margin-right:12px;
   vertical-align:middle;
@@ -216,25 +427,29 @@ nav a:hover { color:var(--gold); }
 
 .section-head small {
   color:var(--muted);
-  font-size:12px;
+  font-size:11px;
 }
 
 /* SEARCH */
 
 .search {
   width:100%;
-  max-width:440px;
-  padding:14px 16px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
+  max-width:500px;
+  padding:15px 19px;
+  background:#151515;
+  border:1px solid #303030;
+  border-radius:30px;
   color:white;
   outline:none;
-  margin:5px 0 22px;
-  font-size:14px;
+  margin:0 0 22px;
+  font-size:12px;
+  transition:.25s;
 }
 
-.search:focus { border-color:var(--gold); }
+.search:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(214,181,109,.07);
+}
 
 /* FILTERS */
 
@@ -242,19 +457,19 @@ nav a:hover { color:var(--gold); }
   display:flex;
   gap:9px;
   flex-wrap:wrap;
-  margin-bottom:25px;
+  margin-bottom:28px;
 }
 
 .filter {
   border:1px solid #383838;
   background:#171717;
   color:#bbb;
-  padding:8px 17px;
-  border-radius:25px;
-  cursor:pointer;
+  padding:9px 18px;
+  border-radius:30px;
   white-space:nowrap;
   transition:.2s;
-  font-size:12px;
+  font-size:11px;
+  font-weight:700;
 }
 
 .filter.active,
@@ -264,18 +479,18 @@ nav a:hover { color:var(--gold); }
   border-color:var(--gold);
 }
 
-/* CARDS */
+/* VIDEO AND PLAYLIST CARDS */
 
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:22px;
+  gap:23px;
 }
 
 .card {
   background:var(--surface);
   border:1px solid #252525;
-  border-radius:10px;
+  border-radius:12px;
   overflow:hidden;
   transition:transform .25s,border-color .25s;
 }
@@ -293,86 +508,151 @@ nav a:hover { color:var(--gold); }
   background:#222;
 }
 
-.card-info { padding:15px; }
+.card-info {
+  padding:16px;
+}
 
 .card-info h3 {
-  font-size:15px;
-  margin-bottom:7px;
-  line-height:1.5;
+  font-family:var(--body);
+  font-size:13px;
+  font-weight:700;
+  line-height:1.6;
+  margin-bottom:6px;
 }
 
 .card-info p {
   color:var(--muted);
-  font-size:12px;
+  font-size:10px;
 }
 
 .play {
-  display:inline-block;
-  margin-top:13px;
-  padding:9px 15px;
-  border-radius:5px;
-  background:var(--gold);
-  color:#090909;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  margin-top:14px;
+  padding:10px 16px;
+  border-radius:25px;
+  background:linear-gradient(135deg,#F0D69E,#C39B4D);
+  color:#17120A;
   text-decoration:none;
-  font-size:11px;
-  font-weight:bold;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.5px;
   transition:.2s;
 }
 
-.play:hover { background:#efd49a; }
+.play:hover {
+  box-shadow:0 5px 15px rgba(214,181,109,.2);
+}
 
 .empty {
   color:var(--muted);
-  padding:25px 0;
+  padding:28px 0;
+  font-size:13px;
 }
 
-/* PLAYLISTS */
+/* HISTORY */
 
-#playlists {
-  background:linear-gradient(180deg,#090909,#101010);
-  border-top:1px solid #202020;
+.history-tools {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:25px;
 }
 
-/* CHURCH QUOTE */
-
-.church-quote {
-  margin:20px 6% 50px;
-  padding:32px 25px;
-  text-align:center;
-  background:radial-gradient(ellipse at center,rgba(214,181,109,.09),transparent 75%);
-  border-top:1px solid #29251c;
-  border-bottom:1px solid #29251c;
-}
-
-.church-quote p {
-  color:#ddd;
-  font-size:14px;
-  line-height:1.9;
-  max-width:850px;
-  margin:auto;
-}
-
-.church-quote span {
-  display:block;
-  margin-top:12px;
-  color:var(--gold);
+.history-count {
+  color:var(--muted);
   font-size:12px;
+}
+
+.clear-button {
+  background:transparent;
+  border:1px solid #59443a;
+  color:#dca18d;
+  border-radius:25px;
+  padding:10px 17px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.7px;
+  transition:.2s;
+}
+
+.clear-button:hover {
+  background:rgba(220,120,100,.1);
+  border-color:#dca18d;
+}
+
+.history-remove {
+  background:transparent;
+  border:0;
+  color:#dca18d;
+  font-size:10px;
+  margin-top:9px;
+  padding:5px 0;
+}
+
+.history-remove:hover {
+  color:white;
+}
+
+.history-card .play {
+  display:flex;
+  width:fit-content;
+}
+
+/* ABOUT */
+
+.about-panel {
+  background:
+    radial-gradient(ellipse at 90% 0%,rgba(214,181,109,.12),transparent 50%),
+    #151515;
+  border:1px solid #302a20;
+  border-radius:18px;
+  padding:clamp(25px,5vw,55px);
+  max-width:850px;
+}
+
+.about-panel h2 {
+  font-family:var(--heading);
+  color:var(--gold);
+  font-size:38px;
+  margin-bottom:12px;
+}
+
+.about-panel p {
+  color:#bbb;
+  font-size:13px;
+  line-height:2;
+}
+
+.about-details {
+  margin-top:25px;
+  padding-top:20px;
+  border-top:1px solid #333;
+  color:var(--gold-light);
+  font-size:12px;
+  font-weight:700;
 }
 
 /* FOOTER */
 
 footer {
   text-align:center;
-  padding:35px 6% 105px;
-  color:#888;
+  padding:35px 7% 45px;
+  color:#777;
   border-top:1px solid var(--border);
-  font-size:12px;
+  font-size:11px;
   line-height:2;
 }
 
-footer strong { color:white; }
+footer strong {
+  color:white;
+  letter-spacing:2px;
+}
 
-/* MOBILE BOTTOM NAV */
+/* MOBILE NAV */
 
 .bottom-nav {
   display:none;
@@ -380,56 +660,151 @@ footer strong { color:white; }
 
 /* RESPONSIVE */
 
+@media(max-width:800px) {
+  header {
+    padding:11px 5%;
+  }
+
+  .desktop-nav {
+    gap:3px;
+  }
+
+  .nav-link {
+    padding:9px 10px;
+    font-size:10px;
+  }
+
+  .home-links {
+    padding-left:5%;
+    padding-right:5%;
+  }
+
+  .page-content {
+    padding-left:5%;
+    padding-right:5%;
+  }
+}
+
 @media(max-width:650px) {
 
-  header {
-    min-height:67px;
-    padding:10px 5%;
+  body {
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
 
-  .brand { gap:9px; }
+  header {
+    min-height:65px;
+    padding:9px 5%;
+  }
+
+  .brand {
+    gap:9px;
+  }
 
   .brand img {
-    width:39px;
-    height:39px;
+    width:38px;
+    height:38px;
   }
 
-  .logo {
-    font-size:15px;
-    letter-spacing:.5px;
+  .brand-name {
+    font-size:13px;
+    letter-spacing:1.5px;
   }
 
-  header nav { display:none; }
+  .brand-name span {
+    font-size:9px;
+    letter-spacing:3px;
+  }
 
-  .header-search {
-    display:block;
-    padding:7px;
+  .desktop-nav {
+    display:none;
   }
 
   .hero {
-    min-height:420px;
+    min-height:450px;
     padding:65px 7%;
   }
 
   .hero h1 {
-    font-size:43px;
-    letter-spacing:-1.5px;
+    font-size:61px;
+    margin:22px 0;
   }
 
-  .hero .quote { font-size:12px; }
+  .hero .quote {
+    font-size:11px;
+    line-height:1.9;
+  }
 
-  .tag {
-    font-size:10px;
+  .eyebrow {
+    font-size:9px;
     letter-spacing:2.5px;
   }
 
-  .content {
-    padding:32px 5%;
+  .hero-actions {
+    gap:9px;
   }
 
-  .section-head h2 { font-size:19px; }
+  .gold-button,
+  .outline-button {
+    padding:12px 16px;
+    font-size:9px;
+  }
 
-  .section-head small { font-size:10px; }
+  .home-links {
+    grid-template-columns:1fr;
+    gap:11px;
+    padding:25px 5% 40px;
+  }
+
+  .quick-card {
+    padding:17px;
+    display:grid;
+    grid-template-columns:43px 1fr auto;
+    align-items:center;
+    column-gap:13px;
+  }
+
+  .quick-icon {
+    margin:0;
+    grid-row:span 2;
+  }
+
+  .quick-card h3 {
+    font-size:23px;
+  }
+
+  .quick-card p {
+    margin:0;
+  }
+
+  .quick-card .quick-arrow {
+    grid-column:3;
+    grid-row:1 / span 2;
+    margin:0;
+  }
+
+  .page-content {
+    padding:38px 5% 55px;
+  }
+
+  .page-heading {
+    margin-bottom:28px;
+  }
+
+  .page-heading h1 {
+    font-size:46px;
+  }
+
+  .page-heading p {
+    font-size:11px;
+  }
+
+  .section-head h2 {
+    font-size:25px;
+  }
+
+  .section-head small {
+    font-size:9px;
+  }
 
   .filters {
     flex-wrap:nowrap;
@@ -438,38 +813,67 @@ footer strong { color:white; }
     scrollbar-width:none;
   }
 
-  .filters::-webkit-scrollbar { display:none; }
+  .filters::-webkit-scrollbar {
+    display:none;
+  }
 
-  .filter { flex-shrink:0; }
+  .filter {
+    flex-shrink:0;
+  }
 
   .grid {
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:12px;
   }
 
-  .card { border-radius:8px; }
+  .card {
+    border-radius:9px;
+  }
 
-  .card-info { padding:10px; }
+  .card-info {
+    padding:10px;
+  }
 
-  .card-info h3 { font-size:12px; }
+  .card-info h3 {
+    font-size:11px;
+  }
 
-  .card-info p { font-size:10px; }
+  .card-info p {
+    font-size:9px;
+  }
 
   .play {
-    font-size:10px;
-    padding:8px 10px;
+    padding:9px 10px;
+    font-size:9px;
+    margin-top:11px;
   }
 
-  .church-quote {
-    margin:15px 5% 35px;
-    padding:25px 12px;
+  .history-tools {
+    align-items:center;
   }
 
-  .church-quote p { font-size:12px; }
+  .clear-button {
+    padding:9px 12px;
+    font-size:9px;
+  }
 
-  footer { padding-bottom:105px; }
+  .about-panel {
+    padding:25px 20px;
+  }
 
-  /* BOTTOM NAV */
+  .about-panel h2 {
+    font-size:33px;
+  }
+
+  .about-panel p {
+    font-size:12px;
+  }
+
+  footer {
+    padding:30px 5% 35px;
+  }
+
+  /* FIXED BOTTOM NAV */
 
   .bottom-nav {
     display:flex;
@@ -477,213 +881,662 @@ footer strong { color:white; }
     bottom:0;
     left:0;
     width:100%;
-    min-height:66px;
-    padding:8px 5% calc(8px + env(safe-area-inset-bottom));
+    min-height:68px;
+    padding:7px 2% calc(7px + env(safe-area-inset-bottom));
     justify-content:space-around;
     align-items:center;
     background:rgba(12,12,12,.97);
-    border-top:1px solid #303030;
+    border-top:1px solid #302b22;
     z-index:200;
-    backdrop-filter:blur(18px);
+    backdrop-filter:blur(20px);
   }
 
-  .bottom-nav a {
+  .bottom-nav button {
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:2px;
-    text-decoration:none;
+    gap:3px;
+    background:transparent;
+    border:0;
     color:#888;
-    font-size:10px;
-    min-width:55px;
+    font-size:9px;
+    font-weight:700;
+    min-width:53px;
+    padding:5px 2px;
     transition:.2s;
   }
 
-  .bottom-nav a span:first-child {
+  .bottom-nav .nav-icon {
     font-size:19px;
+    line-height:1.2;
   }
 
-  .bottom-nav a.active,
-  .bottom-nav a:hover {
+  .bottom-nav button.active {
     color:var(--gold);
+  }
+
+  .bottom-nav button.active .nav-icon {
+    text-shadow:0 0 15px rgba(214,181,109,.5);
   }
 }
 
 @media(max-width:360px) {
-  .grid { grid-template-columns:1fr; }
-  .hero h1 { font-size:37px; }
+  .grid {
+    grid-template-columns:1fr;
+  }
+
+  .hero h1 {
+    font-size:51px;
+  }
+
+  .bottom-nav button {
+    min-width:47px;
+    font-size:8px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    scroll-behavior:auto !important;
+    animation-duration:.01ms !important;
+    transition-duration:.01ms !important;
+  }
 }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+
 <header>
-  <div class="brand">
+  <a href="#home" class="brand" data-view="home">
     <img src="./logo.png" alt="Shalom Tabernacle Logo"
          onerror="this.style.display='none'">
-    <div class="logo">
-      SHALOM <span>TABERNACLE</span>
+    <div class="brand-name">
+      SHALOM
+      <span>TABERNACLE</span>
     </div>
-  </div>
+  </a>
 
-  <nav>
-    <a href="#videos">Videos</a>
-    <a href="#playlists">Playlists</a>
+  <nav class="desktop-nav" aria-label="Main navigation">
+    <button class="nav-link active" data-view="home">Home</button>
+    <button class="nav-link" data-view="videos">Videos</button>
+    <button class="nav-link" data-view="playlists">Playlists</button>
+    <button class="nav-link" data-view="history">History</button>
+    <button class="nav-link" data-view="about">About</button>
   </nav>
-
-  <a class="header-search" href="#videos" aria-label="Search messages">⌕</a>
 </header>
 
-<section class="hero">
-  <div class="tag">WELCOME TO SHALOM TABERNACLE</div>
-
-  <h1>
-    Faith. Truth.<br>
-    <span>The Word of God.</span>
-  </h1>
-
-  <p class="quote">
-    🕊️ And in here, we don’t have no creed but Christ, that’s the creed;
-    and no law but love; no book but the Bible. And Christ is the Head;
-    and the Bible is our textbook; the world is my parish. So I like to
-    just preach the way that I feel led to preach, and just the way that
-    I see it. 🦅
-  </p>
-
-  <div class="attribution">
-    Pas. Joel. P
-    <span>Visakhapatnam</span>
-  </div>
-
-  <a href="#videos" class="hero-button">EXPLORE MESSAGES →</a>
-</section>
 
 <main>
 
-<section class="content" id="videos">
+<!-- HOME VIEW -->
 
-  <div class="section-head">
-    <h2>Latest Messages</h2>
-    <small>Watch and be blessed</small>
+<section class="view active" id="home">
+
+  <div class="hero">
+    <div class="hero-content">
+
+      <div class="eyebrow">
+        WELCOME TO SHALOM TABERNACLE
+      </div>
+
+      <h1>
+        Faith. Truth.
+        <span>The Word of God.</span>
+      </h1>
+
+      <p class="quote">
+        🕊️ And in here, we don’t have no creed but Christ, that’s the creed;
+        and no law but love; no book but the Bible. And Christ is the Head;
+        and the Bible is our textbook; the world is my parish. So I like to
+        just preach the way that I feel led to preach, and just the way that
+        I see it. 🦅
+      </p>
+
+      <div class="attribution">
+        PAS. JOEL. P
+        <span>Visakhapatnam</span>
+      </div>
+
+      <div class="hero-actions">
+        <button class="gold-button" data-view="videos">
+          ▶ WATCH VIDEOS
+        </button>
+
+        <button class="outline-button" data-view="playlists">
+          EXPLORE PLAYLISTS ↗
+        </button>
+      </div>
+
+    </div>
   </div>
 
-  <input
-    class="search"
-    id="search"
-    type="search"
-    placeholder="Search messages..."
-    oninput="filterVideos()"
-  >
+  <div class="home-links">
 
-  <div class="filters" id="filters">
-    <button class="filter active" onclick="setCategory('All', this)">
-      All
+    <button class="quick-card" data-view="videos">
+      <span class="quick-icon">▶</span>
+      <span>
+        <h3>Watch Videos</h3>
+        <p>Explore messages and teachings</p>
+      </span>
+      <span class="quick-arrow">EXPLORE →</span>
     </button>
+
+    <button class="quick-card" data-view="playlists">
+      <span class="quick-icon">▤</span>
+      <span>
+        <h3>Playlists</h3>
+        <p>Find videos in our collections</p>
+      </span>
+      <span class="quick-arrow">EXPLORE →</span>
+    </button>
+
+    <button class="quick-card" data-view="history">
+      <span class="quick-icon">◷</span>
+      <span>
+        <h3>Watch Again</h3>
+        <p>Find videos you opened before</p>
+      </span>
+      <span class="quick-arrow">VIEW →</span>
+    </button>
+
   </div>
-
-  <div class="grid" id="videoGrid"></div>
-
-  <p class="empty" id="noVideos" hidden>
-    No videos found.
-  </p>
 
 </section>
 
-<section class="content" id="playlists">
 
-  <div class="section-head">
-    <h2>Featured Playlists</h2>
-    <small>Explore our collections</small>
+<!-- VIDEOS VIEW -->
+
+<section class="view" id="videos">
+
+  <div class="page-content">
+
+    <div class="page-heading">
+      <div class="eyebrow">SHALOM TABERNACLE</div>
+      <h1>Latest <span>Messages.</span></h1>
+      <p>Watch our messages, teachings and services.</p>
+    </div>
+
+    <input
+      class="search"
+      id="search"
+      type="search"
+      placeholder="Search for a video..."
+      aria-label="Search videos"
+      oninput="filterVideos()"
+    >
+
+    <div class="filters" id="filters">
+      <button class="filter active">All</button>
+    </div>
+
+    <div class="grid" id="videoGrid"></div>
+
+    <p class="empty" id="noVideos" hidden>
+      No videos found. Try another search.
+    </p>
+
   </div>
 
-  <div class="grid" id="playlistGrid"></div>
+</section>
 
-  <p class="empty" id="noPlaylists">
-    Playlists will appear here once added.
-  </p>
+
+<!-- PLAYLISTS VIEW -->
+
+<section class="view" id="playlists">
+
+  <div class="page-content">
+
+    <div class="page-heading">
+      <div class="eyebrow">EXPLORE OUR COLLECTIONS</div>
+      <h1>Featured <span>Playlists.</span></h1>
+      <p>Find collections of messages and worship videos.</p>
+    </div>
+
+    <div class="grid" id="playlistGrid"></div>
+
+    <p class="empty" id="noPlaylists">
+      Playlists will appear here once added.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- HISTORY VIEW -->
+
+<section class="view" id="history">
+
+  <div class="page-content">
+
+    <div class="page-heading">
+      <div class="eyebrow">YOUR WATCHING ACTIVITY</div>
+      <h1>Watch <span>Again.</span></h1>
+      <p>Find videos you opened recently.</p>
+    </div>
+
+    <div class="history-tools">
+
+      <span class="history-count" id="historyCount">
+        No videos in your history
+      </span>
+
+      <button class="clear-button" id="clearHistory" type="button">
+        CLEAR HISTORY
+      </button>
+
+    </div>
+
+    <div class="grid" id="historyGrid"></div>
+
+    <p class="empty" id="emptyHistory">
+      You haven't opened any videos yet.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- ABOUT VIEW -->
+
+<section class="view" id="about">
+
+  <div class="page-content">
+
+    <div class="page-heading">
+      <div class="eyebrow">GET TO KNOW US</div>
+      <h1>About <span>Us.</span></h1>
+      <p>Welcome to Shalom Tabernacle.</p>
+    </div>
+
+    <div class="about-panel">
+
+      <h2>Shalom Tabernacle</h2>
+
+      <p>
+        Welcome to Shalom Tabernacle, Visakhapatnam.
+        This website is a place to explore our messages,
+        teachings and worship collections.
+      </p>
+
+      <p style="margin-top:15px">
+        Watch, revisit and share the messages that inspire
+        your faith and help you grow in the Word of God.
+      </p>
+
+      <div class="about-details">
+        VISAKHAPATNAM
+      </div>
+
+    </div>
+
+  </div>
 
 </section>
 
 </main>
 
-<section class="church-quote">
-  <p>
-    “And in here, we don’t have no creed but Christ, that’s the creed;
-    and no law but love; no book but the Bible.”
-  </p>
-  <span>SHALOM TABERNACLE · VISAKHAPATNAM</span>
-</section>
+
+<!-- FOOTER -->
 
 <footer>
-  <strong>SHALOM TABERNACLE</strong><br>
-  Visakhapatnam<br>
+  <strong>SHALOM TABERNACLE</strong>
+  <br>
+  Visakhapatnam
+  <br>
   © 2026 Shalom Tabernacle. All rights reserved.
 </footer>
 
+
+<!-- MOBILE BOTTOM NAV -->
+
 <nav class="bottom-nav" aria-label="Mobile navigation">
-  <a href="#" class="active">
-    <span>⌂</span>
+
+  <button class="active" data-view="home">
+    <span class="nav-icon">⌂</span>
     <span>Home</span>
-  </a>
+  </button>
 
-  <a href="#videos">
-    <span>▶</span>
+  <button data-view="videos">
+    <span class="nav-icon">▶</span>
     <span>Videos</span>
-  </a>
+  </button>
 
-  <a href="#playlists">
-    <span>▤</span>
+  <button data-view="playlists">
+    <span class="nav-icon">▤</span>
     <span>Playlists</span>
-  </a>
+  </button>
 
-  <a href="#about" onclick="return false">
-    <span>ⓘ</span>
+  <button data-view="history">
+    <span class="nav-icon">◷</span>
+    <span>History</span>
+  </button>
+
+  <button data-view="about">
+    <span class="nav-icon">ⓘ</span>
     <span>About</span>
-  </a>
+  </button>
+
 </nav>
 
-<script>
-let selectedCategory = "All";
 
-function setCategory(category, button) {
-  selectedCategory = category;
-
-  document.querySelectorAll(".filter").forEach(item => {
-    item.classList.remove("active");
-  });
-
-  button.classList.add("active");
-  filterVideos();
-}
-
-function filterVideos() {
-  const search = document.getElementById("search");
-  if (!search) return;
-
-  const query = search.value.toLowerCase();
-  let visible = 0;
-
-  document.querySelectorAll("#videoGrid .card").forEach(card => {
-    const title = (card.dataset.title || "").toLowerCase();
-    const category = card.dataset.category || "";
-
-    const match =
-      title.includes(query) &&
-      (selectedCategory === "All" || category === selectedCategory);
-
-    card.style.display = match ? "" : "none";
-
-    if (match) visible++;
-  });
-
-  const empty = document.getElementById("noVideos");
-  if (empty) empty.hidden = visible !== 0;
-}
-</script>
+<!-- EXISTING GOOGLE SHEETS CONNECTION -->
 
 <script src="app.js?v=2"></script>
+
+
+<!-- NAVIGATION AND RECENT HISTORY -->
+
+<script>
+
+/* --------------------------------
+   PAGE NAVIGATION
+-------------------------------- */
+
+function showView(viewName) {
+
+  const validViews = [
+    "home",
+    "videos",
+    "playlists",
+    "history",
+    "about"
+  ];
+
+  if (!validViews.includes(viewName)) {
+    viewName = "home";
+  }
+
+  document.querySelectorAll(".view").forEach(view => {
+    view.classList.toggle("active", view.id === viewName);
+  });
+
+  document.querySelectorAll("[data-view]").forEach(button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.view === viewName &&
+      (
+        button.classList.contains("nav-link") ||
+        button.closest(".bottom-nav")
+      )
+    );
+  });
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+  if (viewName === "videos") {
+    setTimeout(() => {
+      document.getElementById("search")?.focus({
+        preventScroll:true
+      });
+    },350);
+  }
+}
+
+document.querySelectorAll("[data-view]").forEach(button => {
+
+  button.addEventListener("click", event => {
+
+    event.preventDefault();
+
+    showView(button.dataset.view);
+
+  });
+
+});
+
+
+/* --------------------------------
+   RECENTLY WATCHED
+-------------------------------- */
+
+const HISTORY_KEY = "shalomRecentlyWatched";
+const MAX_HISTORY = 20;
+
+
+function historyEscape(value) {
+
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+
+}
+
+
+function getHistory() {
+
+  try {
+
+    const saved = JSON.parse(
+      localStorage.getItem(HISTORY_KEY) || "[]"
+    );
+
+    return Array.isArray(saved) ? saved : [];
+
+  } catch {
+
+    return [];
+
+  }
+
+}
+
+
+function saveHistory(history) {
+
+  try {
+
+    localStorage.setItem(
+      HISTORY_KEY,
+      JSON.stringify(history.slice(0,MAX_HISTORY))
+    );
+
+  } catch {
+
+    console.warn("Browser history storage is unavailable.");
+
+  }
+
+  renderHistory();
+
+}
+
+
+function addToHistory(video) {
+
+  let history = getHistory();
+
+  // Remove an older entry for the same video.
+  history = history.filter(item => item.url !== video.url);
+
+  // Put the newest entry at the top.
+  history.unshift({
+    title:video.title,
+    url:video.url,
+    thumbnail:video.thumbnail,
+    watchedAt:Date.now()
+  });
+
+  saveHistory(history);
+
+}
+
+
+function renderHistory() {
+
+  const grid = document.getElementById("historyGrid");
+  const empty = document.getElementById("emptyHistory");
+  const count = document.getElementById("historyCount");
+  const clearButton = document.getElementById("clearHistory");
+
+  if (!grid) return;
+
+  const history = getHistory();
+
+  grid.innerHTML = history.map((item,index) => {
+
+    const title = historyEscape(item.title);
+    const url = historyEscape(item.url);
+    const thumbnail = historyEscape(item.thumbnail);
+
+    return `
+      <article class="card history-card">
+
+        <img
+          class="thumb"
+          src="${thumbnail}"
+          alt="${title}"
+          loading="lazy"
+          onerror="this.src='./logo.png'"
+        >
+
+        <div class="card-info">
+
+          <h3>${title}</h3>
+
+          <p>Shalom Tabernacle</p>
+
+          <a
+            class="play"
+            href="${url}"
+            target="_blank"
+            rel="noopener"
+          >
+            ▶ WATCH AGAIN
+          </a>
+
+          <button
+            class="history-remove"
+            type="button"
+            data-remove-history="${index}"
+          >
+            Remove from history ×
+          </button>
+
+        </div>
+
+      </article>
+    `;
+
+  }).join("");
+
+  if (empty) {
+    empty.hidden = history.length !== 0;
+  }
+
+  if (count) {
+    count.textContent = history.length
+      ? history.length + " recently opened video" +
+        (history.length === 1 ? "" : "s")
+      : "No videos in your history";
+  }
+
+  if (clearButton) {
+    clearButton.hidden = history.length === 0;
+  }
+
+}
+
+
+/* RECORD VIDEO CLICKS */
+
+document.getElementById("videoGrid").addEventListener(
+  "click",
+  function(event) {
+
+    const link = event.target.closest("a.play");
+
+    if (!link) return;
+
+    const card = link.closest(".card");
+
+    if (!card) return;
+
+    const title =
+      card.querySelector("h3")?.textContent?.trim() ||
+      "Shalom Tabernacle Video";
+
+    const image = card.querySelector("img.thumb");
+
+    const thumbnail = image?.src || "./logo.png";
+
+    const url = link.href;
+
+    addToHistory({
+      title,
+      thumbnail,
+      url
+    });
+
+  }
+);
+
+
+/* REMOVE ONE VIDEO */
+
+document.getElementById("historyGrid").addEventListener(
+  "click",
+  function(event) {
+
+    const button = event.target.closest("[data-remove-history]");
+
+    if (!button) return;
+
+    const index = Number(button.dataset.removeHistory);
+
+    const history = getHistory();
+
+    if (!Number.isInteger(index) || index < 0 || index >= history.length) {
+      return;
+    }
+
+    history.splice(index,1);
+
+    saveHistory(history);
+
+  }
+);
+
+
+/* CLEAR ALL HISTORY */
+
+document.getElementById("clearHistory").addEventListener(
+  "click",
+  function() {
+
+    const history = getHistory();
+
+    if (!history.length) return;
+
+    const confirmed = window.confirm(
+      "Clear all your recently watched videos?"
+    );
+
+    if (!confirmed) return;
+
+    saveHistory([]);
+
+  }
+);
+
+
+/* INITIALISE */
+
+renderHistory();
+
+</script>
 
 </body>
 </html>
