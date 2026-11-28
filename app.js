@@ -182,7 +182,13 @@ const I18N = {
     playerMarkWatchedBtn: "Mark as Watched",
     playerWatchedActiveBtn: "✓ Watched",
     markedWatchedToast: "Marked as watched",
-    unmarkedWatchedToast: "Removed watched mark"
+    unmarkedWatchedToast: "Removed watched mark",
+    navWatch: "Watch",
+    relatedEyebrow: "MORE MESSAGES & SERIES",
+    relatedTitle: "Related Videos",
+    bgPlayToggle: "🎧 Background Play",
+    bgPlayActiveToast: "Background play active! You can browse other tabs while listening.",
+    miniPlayerActiveSub: "Background Play Active"
   },
   te: {
     pageTitle: "షాలోమ్ టబర్నికల్ | విశాఖపట్నం",
@@ -319,7 +325,13 @@ const I18N = {
     playerMarkWatchedBtn: "చూసినట్లు గుర్తించండి",
     playerWatchedActiveBtn: "✓ చూశారు",
     markedWatchedToast: "చూసినట్లు గుర్తించబడింది",
-    unmarkedWatchedToast: "చూసిన గుర్తు తీసివేయబడింది"
+    unmarkedWatchedToast: "చూసిన గుర్తు తీసివేయబడింది",
+    navWatch: "వీక్షించు",
+    relatedEyebrow: "మరిన్ని సందేశాలు & సిరీస్",
+    relatedTitle: "సంబంధిత వీడియోలు",
+    bgPlayToggle: "🎧 బ్యాక్‌గ్రౌండ్ ప్లే",
+    bgPlayActiveToast: "బ్యాక్‌గ్రౌండ్ ప్లే ఆన్‌లో ఉంది! మీరు వింటూ ఇతర ట్యాబ్‌లను బ్రౌజ్ చేయవచ్చు.",
+    miniPlayerActiveSub: "బ్యాక్‌గ్రౌండ్ ప్లే ఆన్‌లో ఉంది"
   }
 };
 
@@ -2096,57 +2108,108 @@ function syncWatchedBadges() {
 }
 
 function syncPlayerWatchedButton() {
-  const btn = document.getElementById("videoPlayerWatchedBtn");
-  if (!btn) return;
-  if (!activePlayerKey) {
-    btn.hidden = true;
+  const watchBtn = document.getElementById("watchPageWatchedBtn");
+  if (watchBtn) {
+    if (!activePlayerKey) {
+      watchBtn.hidden = true;
+    } else {
+      watchBtn.hidden = false;
+      const active = isWatched(activePlayerKey);
+      watchBtn.classList.toggle("active", active);
+      watchBtn.setAttribute("aria-pressed", active ? "true" : "false");
+      watchBtn.textContent = active ? t("playerWatchedActiveBtn") : t("playerMarkWatchedBtn");
+    }
+  }
+
+  const legacyBtn = document.getElementById("videoPlayerWatchedBtn");
+  if (legacyBtn) {
+    if (!activePlayerKey) {
+      legacyBtn.hidden = true;
+    } else {
+      legacyBtn.hidden = false;
+      const active = isWatched(activePlayerKey);
+      legacyBtn.classList.toggle("active", active);
+      legacyBtn.setAttribute("aria-pressed", active ? "true" : "false");
+      legacyBtn.textContent = active ? t("playerWatchedActiveBtn") : t("playerMarkWatchedBtn");
+    }
+  }
+}
+
+function renderRelatedVideos(currentKey, category = "", preacher = "") {
+  const grid = document.getElementById("relatedVideosGrid");
+  if (!grid || !libraryData || !Array.isArray(libraryData.videos)) return;
+
+  const allVideos = libraryData.videos.filter(v => isVisible(v) && validVideo(v));
+  const scored = allVideos.map((v, idx) => {
+    const record = buildVideoRecord(v, idx);
+    if (!record || record.key === currentKey) return { record: null, score: -1 };
+    let score = 0;
+    if (category && record.category.toLowerCase() === category.toLowerCase()) score += 3;
+    if (preacher && record.preacher && record.preacher.toLowerCase() === preacher.toLowerCase()) score += 5;
+    return { record, score, timestamp: record.dateTimestamp ?? idx };
+  }).filter(item => item.record);
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return b.timestamp - a.timestamp;
+  });
+
+  const related = scored.slice(0, 8).map(item => item.record);
+  if (!related.length) {
+    grid.innerHTML = `<p class="empty">${escapeHTML(t("noVideosAvailable"))}</p>`;
     return;
   }
-  btn.hidden = false;
-  const active = isWatched(activePlayerKey);
-  btn.classList.toggle("active", active);
-  btn.setAttribute("aria-pressed", active ? "true" : "false");
-  btn.textContent = active ? t("playerWatchedActiveBtn") : t("playerMarkWatchedBtn");
+
+  grid.innerHTML = related
+    .map(record => createVideoCard(record, record.sourceIndex))
+    .join("");
+
+  markAlreadyLoadedThumbs();
 }
 
-function buildYouTubeEmbedURL(rawUrl, itemType = "video", fallbackId = "") {
-  const safeUrl = safeYouTubeURL(rawUrl);
-  if (!safeUrl && !/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "")) return "";
+function updateMiniPlayerUI(title, subtitle, thumbSrc) {
+  const mini = document.getElementById("floatingMiniPlayer");
+  const titleEl = document.getElementById("miniPlayerTitle");
+  const subEl = document.getElementById("miniPlayerSub");
+  const imgEl = document.getElementById("miniPlayerThumb");
 
-  const listId = extractYouTubeListIdFromUrl(safeUrl);
-  const videoId =
-    extractAnyYouTubeVideoId(safeUrl) ||
-    (/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "") ? fallbackId : "");
-
-  if (itemType === "playlist" && listId) {
-    if (videoId) {
-      return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
-    }
-    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+  if (!mini) return;
+  if (!activePlayerKey) {
+    mini.hidden = true;
+    return;
   }
 
-  if (videoId) {
-    const listQuery = listId ? `&list=${encodeURIComponent(listId)}` : "";
-    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0${listQuery}`;
+  // Hide mini player when user is actively viewing the watch tab
+  const activeView = document.querySelector(".view.active")?.id;
+  if (activeView === "watch") {
+    mini.hidden = true;
+    return;
   }
 
-  if (listId) {
-    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
-  }
-
-  return "";
+  mini.hidden = false;
+  if (titleEl) titleEl.textContent = title || t("orgName");
+  if (subEl) subEl.textContent = subtitle || t("miniPlayerActiveSub");
+  if (imgEl && thumbSrc) imgEl.src = thumbSrc;
 }
 
-function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type = "video", videoId = "" } = {}) {
-  const modal = document.getElementById("videoPlayerModal");
-  const frame = document.getElementById("videoPlayerFrame");
-  const titleEl = document.getElementById("videoPlayerTitle");
-  const subEl = document.getElementById("videoPlayerSub");
-  const externalLink = document.getElementById("videoPlayerExternalLink");
-  const closeBtn = document.getElementById("closeVideoPlayerBtn");
+window.onViewChanged = function(viewName) {
+  const mini = document.getElementById("floatingMiniPlayer");
+  if (!mini) return;
+  if (viewName === "watch" || !activePlayerKey) {
+    mini.hidden = true;
+  } else {
+    mini.hidden = false;
+  }
+};
+
+function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type = "video", videoId = "", thumbnail = "" } = {}) {
+  const frame = document.getElementById("watchPageFrame");
+  const titleEl = document.getElementById("watchPageTitle");
+  const subEl = document.getElementById("watchPageSub");
+  const externalLink = document.getElementById("watchPageExternalLink");
 
   const embedUrl = buildYouTubeEmbedURL(url, type, videoId);
-  if (!modal || !frame || !embedUrl) return false;
+  if (!frame || !embedUrl) return false;
 
   const safeExternal = safeYouTubeURL(url) || (videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : "");
   activePlayerKey = deriveWatchedKey({ key, url: safeExternal, type, videoId });
@@ -2166,28 +2229,30 @@ function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type =
   }
 
   frame.src = embedUrl;
-  modal.hidden = false;
-  document.body.style.overflow = "hidden";
+
+  const record = libraryItemMap.get(activePlayerKey);
+  renderRelatedVideos(activePlayerKey, record?.category || "", record?.preacher || "");
 
   if (activePlayerKey) {
     markWatched(activePlayerKey);
   }
   syncPlayerWatchedButton();
-  if (closeBtn) closeBtn.focus();
+  updateMiniPlayerUI(title, subtitle, thumbnail || record?.thumbnail);
+
+  if (typeof showView === "function") {
+    showView("watch");
+  }
   return true;
 }
 
 function closeVideoPlayer() {
-  const modal = document.getElementById("videoPlayerModal");
-  const frame = document.getElementById("videoPlayerFrame");
-  if (!modal || modal.hidden) return;
+  const frame = document.getElementById("watchPageFrame");
+  const mini = document.getElementById("floatingMiniPlayer");
 
-  if (frame) {
-    frame.src = "about:blank";
-  }
+  if (frame) frame.src = "about:blank";
+  if (mini) mini.hidden = true;
   activePlayerKey = "";
-  modal.hidden = true;
-  document.body.style.overflow = "";
+  syncPlayerWatchedButton();
 }
 
 
@@ -2196,35 +2261,51 @@ function closeVideoPlayer() {
 ========================================== */
 
 function initCardAndHistoryInteractions() {
-  const modal = document.getElementById("videoPlayerModal");
-  const closeBtn = document.getElementById("closeVideoPlayerBtn");
-  const watchedBtn = document.getElementById("videoPlayerWatchedBtn");
+  const watchBtn = document.getElementById("watchPageWatchedBtn");
+  const bgPlayBtn = document.getElementById("watchPageBgPlayBtn");
+  const miniExpand = document.getElementById("miniPlayerExpandBtn");
+  const miniTrigger = document.getElementById("miniPlayerExpandTrigger");
+  const miniClose = document.getElementById("miniPlayerCloseBtn");
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", closeVideoPlayer);
-  }
-
-  if (modal) {
-    modal.addEventListener("click", (event) => {
-      if (event.target.id === "videoPlayerModal") {
-        closeVideoPlayer();
-      }
-    });
-  }
-
-  if (watchedBtn) {
-    watchedBtn.addEventListener("click", () => {
+  if (watchBtn) {
+    watchBtn.addEventListener("click", () => {
       if (!activePlayerKey) return;
       const nowWatched = toggleWatched(activePlayerKey);
       showToast(nowWatched ? t("markedWatchedToast") : t("unmarkedWatchedToast"));
     });
   }
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && modal && !modal.hidden) {
+  if (bgPlayBtn) {
+    bgPlayBtn.addEventListener("click", () => {
+      showToast(t("bgPlayActiveToast"));
+      if (typeof showView === "function") {
+        showView("videos");
+      }
+    });
+  }
+
+  if (miniExpand) {
+    miniExpand.addEventListener("click", () => {
+      if (typeof showView === "function") {
+        showView("watch");
+      }
+    });
+  }
+
+  if (miniTrigger) {
+    miniTrigger.addEventListener("click", () => {
+      if (typeof showView === "function") {
+        showView("watch");
+      }
+    });
+  }
+
+  if (miniClose) {
+    miniClose.addEventListener("click", () => {
       closeVideoPlayer();
-    }
-  });
+      showToast(t("clearedHistoryToast"));
+    });
+  }
 
   document.addEventListener("click", function(event) {
     const favBtn = event.target.closest(".fav-btn[data-fav-key]");
@@ -2284,7 +2365,8 @@ function initCardAndHistoryInteractions() {
       subtitle,
       url,
       type: itemType,
-      videoId
+      videoId,
+      thumbnail: image?.src || ""
     });
 
     if (openedInApp) {

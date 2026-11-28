@@ -664,6 +664,190 @@ header {
   pointer-events:none;
 }
 
+/* WATCH TAB & PLAYER PAGE */
+
+.watch-page-content {
+  padding:45px 7% 70px;
+  max-width:1400px;
+  margin:auto;
+}
+
+.watch-player-layout {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);
+  margin-bottom:45px;
+}
+
+.watch-frame-wrap {
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  background:#000;
+}
+
+.watch-frame-wrap iframe {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+}
+
+.watch-info-bar {
+  padding:22px 26px;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.watch-title {
+  font-family:var(--heading);
+  font-size:clamp(24px,3vw,32px);
+  color:var(--gold-light);
+  line-height:1.2;
+}
+
+.watch-sub {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:6px;
+}
+
+.watch-actions-bar {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+}
+
+.watch-watched-btn.active {
+  background:rgba(214,181,109,.18);
+  border-color:var(--gold);
+  color:var(--gold-light);
+}
+
+.watch-related-section {
+  margin-top:40px;
+  border-top:1px solid var(--border);
+  padding-top:35px;
+}
+
+/* FLOATING MINI-PLAYER (BACKGROUND PLAY BAR) */
+
+.floating-mini-player {
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:400;
+  width:min(92vw,380px);
+  background:var(--surface);
+  border:1px solid rgba(214,181,109,.55);
+  border-radius:16px;
+  padding:12px 14px;
+  box-shadow:0 16px 45px rgba(0,0,0,.45);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  animation:viewFade .25s ease;
+}
+
+.floating-mini-player[hidden] {
+  display:none;
+}
+
+.mini-player-content {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  cursor:pointer;
+}
+
+.mini-player-thumb {
+  width:56px;
+  height:32px;
+  border-radius:6px;
+  object-fit:cover;
+  background:#050505;
+  border:1px solid var(--border);
+  flex-shrink:0;
+  overflow:hidden;
+}
+
+.mini-player-thumb img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.mini-player-info {
+  min-width:0;
+}
+
+.mini-player-title {
+  font-size:12px;
+  font-weight:700;
+  color:var(--gold-light);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mini-player-sub {
+  font-size:10px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-top:2px;
+}
+
+.mini-player-actions {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.mini-player-btn {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--surface-alt);
+  color:var(--white);
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+
+.mini-player-btn:hover {
+  border-color:var(--gold);
+  color:var(--gold);
+}
+
+@media(max-width:680px) {
+  .floating-mini-player {
+    left:12px;
+    right:12px;
+    bottom:calc(76px + env(safe-area-inset-bottom));
+    width:auto;
+  }
+}
+
 .thumb-wrap.is-loaded::before {
   display:none;
   animation:none;
@@ -1544,6 +1728,7 @@ footer strong {
       <button class="nav-link active" data-view="home" data-i18n="navHome">Home</button>
       <button class="nav-link" data-view="videos" data-i18n="navVideos">Videos</button>
       <button class="nav-link" data-view="playlists" data-i18n="navPlaylists">Playlists</button>
+      <button class="nav-link" data-view="watch" data-i18n="navWatch">Watch</button>
       <button class="nav-link" data-view="favorites" data-i18n="navFavorites">Favorites</button>
       <button class="nav-link" data-view="history" data-i18n="navHistory">History</button>
       <button class="nav-link" data-view="about" data-i18n="navAbout">About</button>
@@ -1853,6 +2038,50 @@ footer strong {
 
 </section>
 
+<!-- WATCH TAB -->
+
+<section class="view" id="watch">
+  <div class="watch-page-content">
+    <div class="watch-player-layout">
+      <div class="watch-frame-wrap">
+        <iframe
+          id="watchPageFrame"
+          title="Shalom Tabernacle Video Player"
+          src="about:blank"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div class="watch-info-bar">
+        <div>
+          <h1 class="watch-title" id="watchPageTitle"></h1>
+          <p class="watch-sub" id="watchPageSub" hidden></p>
+        </div>
+        <div class="watch-actions-bar">
+          <button type="button" class="outline-button watch-watched-btn" id="watchPageWatchedBtn" data-i18n="playerMarkWatchedBtn">
+            Mark as Watched
+          </button>
+          <button type="button" class="outline-button watch-bg-play-btn" id="watchPageBgPlayBtn" data-i18n="bgPlayToggle">
+            🎧 Background Play
+          </button>
+          <a class="outline-button" id="watchPageExternalLink" href="https://www.youtube.com" target="_blank" rel="noopener" data-i18n="playerOpenYoutubeBtn">
+            Open on YouTube ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="watch-related-section">
+      <div class="page-heading" style="margin-bottom:20px;">
+        <div class="eyebrow" data-i18n="relatedEyebrow">MORE MESSAGES &amp; SERIES</div>
+        <h2 data-i18n="relatedTitle" style="font-family:var(--heading); font-size:28px; color:var(--gold-light);">Related Videos</h2>
+      </div>
+      <div class="grid" id="relatedVideosGrid"></div>
+    </div>
+  </div>
+</section>
+
 <!-- ABOUT -->
 
 <section class="view" id="about">
@@ -1941,6 +2170,11 @@ footer strong {
   <button data-view="playlists">
     <span class="nav-icon">▤</span>
     <span data-i18n="navPlaylists">Playlists</span>
+  </button>
+
+  <button data-view="watch">
+    <span class="nav-icon">📺</span>
+    <span data-i18n="navWatch">Watch</span>
   </button>
 
   <button data-view="favorites">
@@ -2040,12 +2274,30 @@ footer strong {
   </div>
 </div>
 
+<!-- FLOATING MINI-PLAYER (BACKGROUND PLAY BAR) -->
+
+<aside class="floating-mini-player" id="floatingMiniPlayer" hidden aria-label="Mini Player">
+  <div class="mini-player-content" id="miniPlayerExpandTrigger">
+    <div class="mini-player-thumb">
+      <img id="miniPlayerThumb" src="./logo.png" alt="" width="56" height="32">
+    </div>
+    <div class="mini-player-info">
+      <div class="mini-player-title" id="miniPlayerTitle">Shalom Tabernacle</div>
+      <div class="mini-player-sub" id="miniPlayerSub" data-i18n="miniPlayerActiveSub">Background Play Active</div>
+    </div>
+  </div>
+  <div class="mini-player-actions">
+    <button type="button" class="mini-player-btn" id="miniPlayerExpandBtn" aria-label="Expand player" title="Expand">⤢</button>
+    <button type="button" class="mini-player-btn mini-player-close" id="miniPlayerCloseBtn" aria-label="Close player" title="Close">×</button>
+  </div>
+</aside>
+
 <!-- TOAST CONFIRMATION -->
 
 <div class="toast" id="appToast" role="status" aria-live="polite" hidden></div>
 
 <!-- PUBLIC LIBRARY CONNECTION -->
-<script src="./app.js?v=14"></script>
+<script src="./app.js?v=15"></script>
 
 <!-- NAVIGATION AND HISTORY -->
 
@@ -2058,6 +2310,7 @@ function showView(viewName) {
     "home",
     "videos",
     "playlists",
+    "watch",
     "favorites",
     "history",
     "about"
@@ -2070,6 +2323,10 @@ function showView(viewName) {
   document.querySelectorAll(".view").forEach(view => {
     view.classList.toggle("active", view.id === viewName);
   });
+
+  if (typeof window.onViewChanged === "function") {
+    window.onViewChanged(viewName);
+  }
 
   document.querySelectorAll("[data-view]").forEach(button => {
 
