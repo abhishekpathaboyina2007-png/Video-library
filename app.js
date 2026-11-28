@@ -2202,6 +2202,34 @@ window.onViewChanged = function(viewName) {
   }
 };
 
+function buildYouTubeEmbedURL(rawUrl, itemType = "video", fallbackId = "") {
+  const safeUrl = safeYouTubeURL(rawUrl);
+  if (!safeUrl && !/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "")) return "";
+
+  const listId = extractYouTubeListIdFromUrl(safeUrl);
+  const videoId =
+    extractAnyYouTubeVideoId(safeUrl) ||
+    (/^[A-Za-z0-9_-]{11}$/.test(fallbackId || "") ? fallbackId : "");
+
+  if (itemType === "playlist" && listId) {
+    if (videoId) {
+      return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+    }
+    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+  }
+
+  if (videoId) {
+    const listQuery = listId ? `&list=${encodeURIComponent(listId)}` : "";
+    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0${listQuery}`;
+  }
+
+  if (listId) {
+    return `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(listId)}&autoplay=1&rel=0`;
+  }
+
+  return "";
+}
+
 function openVideoPlayer({ key = "", title = "", subtitle = "", url = "", type = "video", videoId = "", thumbnail = "" } = {}) {
   const frame = document.getElementById("watchPageFrame");
   const titleEl = document.getElementById("watchPageTitle");
