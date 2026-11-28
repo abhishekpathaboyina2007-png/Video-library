@@ -1,17 +1,13 @@
 
 /* ==========================================
    SHALOM TABERNACLE - PUBLIC WEBSITE
-   Google Sheets + Responsive Video Library
+   Google Sheets + Horizontal Home Rows
 ========================================== */
 
 const API_URL = "https://script.google.com/macros/s/AKfycby_Lxcf0X0bDVZF6hqKcl42YB8AelRc8EoFENbz1D61LaJ9UxZHeqiu7jNtJosgtx05/exec";
 
-const ITEMS_PER_PAGE = 12;
-
 let libraryData = null;
 let currentCategory = "All";
-let videoLimit = ITEMS_PER_PAGE;
-let playlistLimit = ITEMS_PER_PAGE;
 
 
 /* ==========================================
@@ -44,9 +40,18 @@ window.videoLibraryCallback = function(data) {
 
   libraryData = data;
 
+  const videos = data.videos || [];
+  const playlists = data.playlists || [];
+
   renderCategories();
-  renderVideos(data.videos || []);
-  renderPlaylists(data.playlists || []);
+
+  // Complete libraries
+  renderVideos(videos);
+  renderPlaylists(playlists);
+
+  // Homepage horizontal rows
+  renderHomeVideos(videos);
+  renderHomePlaylists(playlists);
 
 };
 
@@ -126,34 +131,182 @@ function isVisible(item) {
 }
 
 
+function validVideo(item) {
+
+  const id = String(item.YouTube_ID || "");
+
+  return (
+    /^[A-Za-z0-9_-]{11}$/.test(id) &&
+    Boolean(safeYouTubeURL(item.YouTube_URL))
+  );
+
+}
+
+
+function validPlaylist(item) {
+
+  return Boolean(safeYouTubeURL(item.YouTube_URL));
+
+}
+
+
 /* ==========================================
-   SHOW MORE BUTTON CREATOR
+   VIDEO CARD CREATOR
 ========================================== */
 
-function createMoreButton(gridId, buttonId, label) {
+function createVideoCard(video) {
 
-  let button = document.getElementById(buttonId);
+  const id = String(video.YouTube_ID || "");
 
-  if (button) return button;
+  const title = escapeHTML(video.Title);
 
-  const grid = document.getElementById(gridId);
+  const url = safeYouTubeURL(video.YouTube_URL);
 
-  if (!grid) return null;
+  const category = escapeHTML(
+    video.Category || "Message"
+  );
 
-  button = document.createElement("button");
+  const thumbnail =
+    "https://img.youtube.com/vi/" + id + "/hqdefault.jpg";
 
-  button.id = buttonId;
-  button.className = "outline-button";
-  button.type = "button";
-  button.textContent = label;
+  return `
+    <article class="card" data-title="${title}">
 
-  button.style.display = "none";
-  button.style.margin = "30px auto 0";
-  button.style.width = "fit-content";
+      <img
+        class="thumb"
+        src="${thumbnail}"
+        alt="${title}"
+        loading="lazy"
+      >
 
-  grid.insertAdjacentElement("afterend", button);
+      <div class="card-info">
 
-  return button;
+        <h3>${title}</h3>
+
+        <p>Shalom Tabernacle · ${category}</p>
+
+        <a
+          class="play"
+          href="${escapeHTML(url)}"
+          target="_blank"
+          rel="noopener"
+        >
+          ▶ WATCH VIDEO
+        </a>
+
+      </div>
+
+    </article>
+  `;
+
+}
+
+
+/* ==========================================
+   PLAYLIST CARD CREATOR
+========================================== */
+
+function createPlaylistCard(item) {
+
+  const title = escapeHTML(item.Title);
+
+  const url = safeYouTubeURL(item.YouTube_URL);
+
+  const thumbnail =
+    safeImageURL(item.Thumbnail_URL || "") || "./logo.png";
+
+  return `
+    <article class="card">
+
+      <img
+        class="thumb"
+        src="${escapeHTML(thumbnail)}"
+        alt="${title}"
+        loading="lazy"
+        onerror="this.onerror=null;this.src='./logo.png';"
+      >
+
+      <div class="card-info">
+
+        <h3>${title}</h3>
+
+        <p>Shalom Tabernacle Collection</p>
+
+        <a
+          class="play"
+          href="${escapeHTML(url)}"
+          target="_blank"
+          rel="noopener"
+        >
+          ▶ OPEN PLAYLIST
+        </a>
+
+      </div>
+
+    </article>
+  `;
+
+}
+
+
+/* ==========================================
+   HOMEPAGE - HORIZONTAL VIDEOS
+========================================== */
+
+function renderHomeVideos(videos) {
+
+  const row = document.getElementById("homeVideoRow");
+
+  if (!row) return;
+
+  const visibleVideos = videos.filter(video =>
+    isVisible(video) && validVideo(video)
+  );
+
+  if (visibleVideos.length === 0) {
+
+    row.innerHTML = `
+      <p class="empty">No videos available yet.</p>
+    `;
+
+    return;
+
+  }
+
+  row.innerHTML = visibleVideos
+    .map(createVideoCard)
+    .join("");
+
+}
+
+
+/* ==========================================
+   HOMEPAGE - HORIZONTAL PLAYLISTS
+========================================== */
+
+function renderHomePlaylists(playlists) {
+
+  const row = document.getElementById("homePlaylistRow");
+
+  if (!row) return;
+
+  const visiblePlaylists = playlists.filter(item =>
+    isVisible(item) && validPlaylist(item)
+  );
+
+  if (visiblePlaylists.length === 0) {
+
+    row.innerHTML = `
+      <p class="empty">No playlists available yet.</p>
+    `;
+
+    return;
+
+  }
+
+  row.innerHTML = visiblePlaylists
+    .map(createPlaylistCard)
+    .join("");
 
 }
 
@@ -168,7 +321,9 @@ function renderCategories() {
 
   if (!filters) return;
 
-  const videos = (libraryData?.videos || []).filter(isVisible);
+  const videos = (libraryData?.videos || []).filter(item =>
+    isVisible(item) && validVideo(item)
+  );
 
   const categories = [
     ...new Set(
@@ -210,7 +365,6 @@ function renderCategories() {
 function setLibraryCategory(category, button) {
 
   currentCategory = category;
-  videoLimit = ITEMS_PER_PAGE;
 
   document.querySelectorAll("#filters .filter").forEach(item => {
     item.classList.remove("active");
@@ -223,7 +377,7 @@ function setLibraryCategory(category, button) {
 }
 
 
-/* Category button clicks */
+/* CATEGORY BUTTON EVENTS */
 
 document.getElementById("filters").addEventListener(
   "click",
@@ -233,14 +387,17 @@ document.getElementById("filters").addEventListener(
 
     if (!button) return;
 
-    setLibraryCategory(button.dataset.category || "All", button);
+    setLibraryCategory(
+      button.dataset.category || "All",
+      button
+    );
 
   }
 );
 
 
 /* ==========================================
-   VIDEO DISPLAY
+   VIDEOS TAB - COMPLETE LIBRARY
 ========================================== */
 
 function renderVideos(videos) {
@@ -257,8 +414,6 @@ function renderVideos(videos) {
 
   const filtered = videos.filter(video => {
 
-    const visible = isVisible(video);
-
     const title = String(video.Title || "").toLowerCase();
 
     const category = String(video.Category || "").trim();
@@ -269,106 +424,30 @@ function renderVideos(videos) {
       currentCategory === "All" ||
       category === currentCategory;
 
-    return visible && matchesSearch && matchesCategory;
+    return (
+      isVisible(video) &&
+      validVideo(video) &&
+      matchesSearch &&
+      matchesCategory
+    );
 
   });
 
 
-  const validVideos = filtered.filter(video => {
-
-    const id = String(video.YouTube_ID || "");
-
-    const url = safeYouTubeURL(video.YouTube_URL);
-
-    return /^[A-Za-z0-9_-]{11}$/.test(id) && Boolean(url);
-
-  });
-
-
-  const displayed = validVideos.slice(0, videoLimit);
-
-
-  grid.innerHTML = displayed.map(video => {
-
-    const id = String(video.YouTube_ID || "");
-
-    const title = escapeHTML(video.Title);
-
-    const url = safeYouTubeURL(video.YouTube_URL);
-
-    const thumbnail =
-      "https://img.youtube.com/vi/" + id + "/hqdefault.jpg";
-
-    const category = escapeHTML(video.Category || "Message");
-
-    return `
-      <article class="card"
-        data-title="${title}"
-        data-category="${category}">
-
-        <img
-          class="thumb"
-          src="${thumbnail}"
-          alt="${title}"
-          loading="lazy"
-        >
-
-        <div class="card-info">
-
-          <h3>${title}</h3>
-
-          <p>Shalom Tabernacle · ${category}</p>
-
-          <a
-            class="play"
-            href="${escapeHTML(url)}"
-            target="_blank"
-            rel="noopener"
-          >
-            ▶ WATCH VIDEO
-          </a>
-
-        </div>
-
-      </article>
-    `;
-
-  }).join("");
+  grid.innerHTML = filtered
+    .map(createVideoCard)
+    .join("");
 
 
   if (empty) {
-    empty.hidden = validVideos.length !== 0;
-  }
-
-
-  /* SHOW MORE BUTTON */
-
-  const moreButton = createMoreButton(
-    "videoGrid",
-    "showMoreVideos",
-    "SHOW MORE VIDEOS ↓"
-  );
-
-  if (moreButton) {
-
-    moreButton.style.display =
-      validVideos.length > videoLimit ? "flex" : "none";
-
-    moreButton.onclick = function() {
-
-      videoLimit += ITEMS_PER_PAGE;
-
-      renderVideos(videos);
-
-    };
-
+    empty.hidden = filtered.length !== 0;
   }
 
 }
 
 
 /* ==========================================
-   PLAYLIST DISPLAY
+   PLAYLISTS TAB - COMPLETE LIBRARY
 ========================================== */
 
 function renderPlaylists(playlists) {
@@ -378,87 +457,16 @@ function renderPlaylists(playlists) {
 
   if (!grid) return;
 
+  const visible = playlists.filter(item =>
+    isVisible(item) && validPlaylist(item)
+  );
 
-  const visible = playlists.filter(item => {
-
-    return isVisible(item) &&
-      Boolean(safeYouTubeURL(item.YouTube_URL));
-
-  });
-
-
-  const displayed = visible.slice(0, playlistLimit);
-
-
-  grid.innerHTML = displayed.map(item => {
-
-    const url = safeYouTubeURL(item.YouTube_URL);
-
-    const title = escapeHTML(item.Title);
-
-    const thumbnail =
-      safeImageURL(item.Thumbnail_URL || "") || "./logo.png";
-
-    return `
-      <article class="card">
-
-        <img
-          class="thumb"
-          src="${escapeHTML(thumbnail)}"
-          alt="${title}"
-          loading="lazy"
-          onerror="this.onerror=null;this.src='./logo.png';"
-        >
-
-        <div class="card-info">
-
-          <h3>${title}</h3>
-
-          <p>Shalom Tabernacle Collection</p>
-
-          <a
-            class="play"
-            href="${escapeHTML(url)}"
-            target="_blank"
-            rel="noopener"
-          >
-            ▶ OPEN PLAYLIST
-          </a>
-
-        </div>
-
-      </article>
-    `;
-
-  }).join("");
-
+  grid.innerHTML = visible
+    .map(createPlaylistCard)
+    .join("");
 
   if (empty) {
     empty.hidden = visible.length !== 0;
-  }
-
-
-  /* SHOW MORE PLAYLISTS */
-
-  const moreButton = createMoreButton(
-    "playlistGrid",
-    "showMorePlaylists",
-    "SHOW MORE PLAYLISTS ↓"
-  );
-
-  if (moreButton) {
-
-    moreButton.style.display =
-      visible.length > playlistLimit ? "flex" : "none";
-
-    moreButton.onclick = function() {
-
-      playlistLimit += ITEMS_PER_PAGE;
-
-      renderPlaylists(playlists);
-
-    };
-
   }
 
 }
@@ -470,8 +478,6 @@ function renderPlaylists(playlists) {
 
 function filterVideos() {
 
-  videoLimit = ITEMS_PER_PAGE;
-
   if (libraryData) {
     renderVideos(libraryData.videos || []);
   }
@@ -480,19 +486,59 @@ function filterVideos() {
 
 
 /* ==========================================
+   HISTORY - HOMEPAGE VIDEO CLICKS
+========================================== */
+
+document.getElementById("homeVideoRow").addEventListener(
+  "click",
+  function(event) {
+
+    const link = event.target.closest("a.play");
+
+    if (!link) return;
+
+    const card = link.closest(".card");
+
+    if (!card) return;
+
+    const title =
+      card.querySelector("h3")?.textContent?.trim() ||
+      "Shalom Tabernacle Video";
+
+    const thumbnail =
+      card.querySelector("img.thumb")?.src || "./logo.png";
+
+    if (typeof addToHistory === "function") {
+
+      addToHistory({
+        title,
+        url: link.href,
+        thumbnail
+      });
+
+    }
+
+  }
+);
+
+
+/* ==========================================
    ERROR HANDLING
 ========================================== */
 
 function showError(message) {
 
+  const homeVideos = document.getElementById("homeVideoRow");
+  const homePlaylists = document.getElementById("homePlaylistRow");
   const grid = document.getElementById("videoGrid");
 
-  if (grid) {
+  const error = `<p class="empty">${escapeHTML(message)}</p>`;
 
-    grid.innerHTML =
-      `<p class="empty">${escapeHTML(message)}</p>`;
+  if (homeVideos) homeVideos.innerHTML = error;
 
-  }
+  if (homePlaylists) homePlaylists.innerHTML = error;
+
+  if (grid) grid.innerHTML = error;
 
 }
 
